@@ -402,7 +402,7 @@ class Analysis extends DashboardController {
 
         $heading = [
             "No.",
-            "Participant ID",
+            "Facility",
             "Batch No"
         ];
         $tabledata = $tablebody = $table = [];
@@ -421,7 +421,7 @@ class Analysis extends DashboardController {
 
         
 
-       	$batch = $this->db->get_where('pt_ready_participants', ['p_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid])->row()->batch;
+       	$parti = $this->db->get_where('pt_ready_participants', ['p_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid, 'lab_result' => 1])->row();
 
 			
         	foreach ($samples as $sample) {
@@ -429,21 +429,17 @@ class Analysis extends DashboardController {
 				
         		array_push($heading, $sample->sample_name,"Comment");
 
-        		$nhrl_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'pt_sample_id'  =>  $sample->id])->row();
-
-                if($nhrl_values){
-                    $upper_limit = $nhrl_values->upper_limit;
-                    $lower_limit = $nhrl_values->lower_limit;
+                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+                if($cd4_values){
+                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
                 }else{
                     $upper_limit = 0;
                     $lower_limit = 0;
                 } 
 
-        		// $upper_limit = $nhrl_values->upper_limit;
-        		// $lower_limit = $nhrl_values->lower_limit;
-
         		$part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
-		 		// echo "<pre>";print_r($part_cd4);echo "</pre>";die();
+		 		// echo "<pre>";print_r($upper_limit);echo "</pre>";die();
         		if($part_cd4){
         			if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
 					 	$acceptable++;
@@ -478,7 +474,7 @@ class Analysis extends DashboardController {
         		$review = "Incomplete Submission";
         	}
 
-        	array_push($tabledata, $part_counter,$participant->username,$batch);
+        	array_push($tabledata, $part_counter,$parti->facility_name,$parti->batch);
 
         	foreach ($tablebody as $key => $value) {
         		
