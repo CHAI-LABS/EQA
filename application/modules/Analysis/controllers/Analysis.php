@@ -93,19 +93,19 @@ class Analysis extends DashboardController {
 	}
 
 
-	public function createParticipantResultsTable($equipment_id)
+	public function createParticipantResultsTable($round_id,$equipment_id,$sample_id)
 	{
 		$template = $this->config->item('default');
 
         $heading = [
             "No.",
             "Participant ID",
-            "CD4 Absolute Mean Results"
+            "CD4 Absolute Result"
         ];
 		$tabledata = [];
 
         
-        $part_results = $this->db->get_where('pt_participant_result_v',['equipment_id' => $equipment_id])->result();
+        $part_results = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample_id])->result();
          //echo "<pre>";print_r($part_results);echo "</pre>";die();
 
         if($part_results){
@@ -124,7 +124,7 @@ class Analysis extends DashboardController {
                 $tabledata[] = [
                     $counter,
                     $participant_id,
-                    $part_result->cd4_absolute_mean
+                    $part_result->cd4_absolute
                 ];
             }
         }
@@ -320,7 +320,7 @@ class Analysis extends DashboardController {
             $data = [
             	'round_uuid' => $round_uuid,
             	'participants_info' => $this->ParticipantInfo($round_id,$equipment_id,$sample_id),
-                'results_table'    =>  $this->createParticipantResultsTable($equipment_id)
+                'results_table'    =>  $this->createParticipantResultsTable($round_id,$equipment_id,$sample_id)
             ];
 
         $this->assets
