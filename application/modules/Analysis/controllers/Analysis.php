@@ -113,7 +113,7 @@ class Analysis extends DashboardController {
             foreach($part_results as $part_result){
                 $counter ++;
 
-                $participant_id = $this->db->get_where('participant_readiness_v', ['p_id' => $part_result->participant_id])->row()->username;
+                // $participant_id = $this->db->get_where('participant_readiness_v', ['p_id' => $part_result->participant_id])->row()->username;
 
                 // if($round->type == "ongoing"){
                 //     $status = "<label class = 'tag tag-warning tag-sm'>Ongoing</label>"; 
@@ -123,7 +123,7 @@ class Analysis extends DashboardController {
                 
                 $tabledata[] = [
                     $counter,
-                    $participant_id,
+                    0,
                     $part_result->cd4_absolute
                 ];
             }
