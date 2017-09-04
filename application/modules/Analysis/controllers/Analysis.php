@@ -429,10 +429,18 @@ class Analysis extends DashboardController {
 				
         		array_push($heading, $sample->sample_name,"Comment");
 
-        		$nhrl_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'pt_sample_id'  =>  $sample->id])->row(); 
+        		$nhrl_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'pt_sample_id'  =>  $sample->id])->row();
 
-        		$upper_limit = $nhrl_values->upper_limit;
-        		$lower_limit = $nhrl_values->lower_limit;
+                if($nhrl_values){
+                    $upper_limit = $nhrl_values->upper_limit;
+                    $lower_limit = $nhrl_values->lower_limit;
+                }else{
+                    $upper_limit = 0;
+                    $lower_limit = 0;
+                } 
+
+        		// $upper_limit = $nhrl_values->upper_limit;
+        		// $lower_limit = $nhrl_values->lower_limit;
 
         		$part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
 		 		// echo "<pre>";print_r($part_cd4);echo "</pre>";die();
@@ -564,10 +572,18 @@ class Analysis extends DashboardController {
 	        foreach ($samples as $sample) {
 	    		$samp_counter++;
 
-	    		$nhrl_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' => $round_id, 'equipment_id' => $equipment_id, 'pt_sample_id' => $sample->id])->row(); 
 
-	    		$upper_limit = $nhrl_values->upper_limit;
-	    		$lower_limit = $nhrl_values->lower_limit;
+	    		$nhrl_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' => $round_id, 'equipment_id' => $equipment_id, 'pt_sample_id' => $sample->id])->row(); 
+                // echo "<pre>";print_r($nhrl_values);echo "</pre>";die();
+
+                if($nhrl_values){
+                    $upper_limit = $nhrl_values->upper_limit;
+                    $lower_limit = $nhrl_values->lower_limit;
+                }else{
+                    $upper_limit = 0;
+                    $lower_limit = 0;
+                }
+	    		
 
 	    		foreach ($participants as $participant) {
 	    			$part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
