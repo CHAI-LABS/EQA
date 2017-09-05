@@ -11,6 +11,7 @@ class Import extends DashboardController{
 
 	function importPTDataSubmissionData(){
 		$file_path = './uploads/data/R17_Results.xlsx';
+		$participant = 0;
 
 		$data = $this->excel->readExcel($file_path);
 		if (count($data) > 0) {
@@ -40,10 +41,11 @@ class Import extends DashboardController{
 							$facility_id = 0;
 						}
 						
-
+						$participant++;
+						
 						$insertdata = [
 								'round_id'    =>  1,
-				                'participant_id'    =>  $facility_id,
+				                'participant_id'    =>  $participant,
 				                'equipment_id'    =>  $equip_id,
 				                'status'    =>  1,
 				                'verdict'    =>  2
@@ -100,12 +102,11 @@ class Import extends DashboardController{
 
                    		}
 					}
+
+					
 				}
 
-				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_data_submission and pt_equipment_results");echo "</pre>";die();
-
-
-
+				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_data_submission and pt_equipment_results");echo "</pre>";die();	
 			}
 		}
 	}

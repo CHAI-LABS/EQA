@@ -99,7 +99,7 @@ class Analysis extends DashboardController {
 
         $heading = [
             "No.",
-            "Participant ID",
+            "Facility",
             "CD4 Absolute Result"
         ];
 		$tabledata = [];
@@ -397,108 +397,216 @@ class Analysis extends DashboardController {
         return $this->table->generate($tabledata);
 	}
 
-	public function createParticipantTable($round_id, $equipment_id){
-		$template = $this->config->item('default');
+    public function createParticipantTable($round_id, $equipment_id){
+        $template = $this->config->item('default');
+        $tablevalues = $tablebody = $table = [];
+        $count = $zerocount = $acceptable = $unacceptable = $sub_counter = $samp_counter = 0;
 
         $heading = [
             "No.",
-            "Participant ID",
+            "Facility",
             "Batch No"
         ];
-        $tabledata = $tablebody = $table = [];
-
+        
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
 
-        $participants = $this->db->get_where('participant_readiness_v', ['status' =>  1, 'approved' => 1, 'user_type' => 'participant'])->result();
+        foreach ($samples as $sample) {
+            array_push($heading, $sample->sample_name,"Comment");
+        }
 
-        $round_uuid = $this->db->get_where('pt_round', ['id' =>  $round_id])->row()->uuid;
+        array_push($heading, 'Overall Grade', "Review Comment");
 
 
-        $zerocount = $acceptable = $unacceptable = $part_counter = $samp_counter = 0;
-
-        foreach ($participants as $key => $participant) {
-		$part_counter++;
+        $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
 
         
 
-       	$batch = $this->db->get_where('pt_ready_participants', ['p_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid])->row()->batch;
+        foreach ($submissions as $submission) {
+            $sub_counter++;
 
-			
-        	foreach ($samples as $sample) {
-        		$samp_counter++;
-				
-        		array_push($heading, $sample->sample_name,"Comment");
+            $tabledata = [];
 
-        		$nhrl_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'pt_sample_id'  =>  $sample->id])->row();
+            array_push($tabledata, $sub_counter, 0, 0);
 
-                if($nhrl_values){
-                    $upper_limit = $nhrl_values->upper_limit;
-                    $lower_limit = $nhrl_values->lower_limit;
+            foreach ($samples as $sample) {
+                $samp_counter++;
+                
+                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                
+
+
+                if($cd4_values){
+                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
                 }else{
                     $upper_limit = 0;
                     $lower_limit = 0;
                 } 
 
-        		// $upper_limit = $nhrl_values->upper_limit;
-        		// $lower_limit = $nhrl_values->lower_limit;
+                // echo "<pre>";print_r($submission->participant_id);echo "</pre>";die();
+                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$submission->participant_id);
 
-        		$part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
-		 		// echo "<pre>";print_r($part_cd4);echo "</pre>";die();
-        		if($part_cd4){
-        			if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-					 	$acceptable++;
-					 	$comment = "Acceptable";
-	        		}else{
-	        			$unacceptable++;
-	        			$comment = "Unacceptable";
-	        		}   
+               // echo "<pre>";print_r($part_cd4);echo "</pre>";
+               
+                if($part_cd4){
 
-	        		if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
-	        			$zerocount++;
-	        		}
+                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                        $acceptable++;
+                        $comment = "Acceptable";
+                    }else{
+                        $unacceptable++;
+                        $comment = "Unacceptable";
+                    }   
 
-	        		array_push($tablebody, $part_cd4->cd4_absolute, $comment);
-					
-        		}else{
+                    if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
+                        $zerocount++;
+                    }
 
+                    array_push($tabledata, $part_cd4->cd4_absolute, $comment);
+                    
+                }else{
+                    array_push($tabledata, 0, "Unacceptable");
+                }    
+            }
 
-        			array_push($tablebody, 0, "Unacceptable");
-        		}				
-        	}
+            
 
-        	$grade = (($acceptable / $samp_counter) * 100);
+            $grade = (($acceptable / $samp_counter) * 100);
 
-        	$overall_grade = $grade . ' %';
+            $overall_grade = $grade . ' %';
 
-        	if($grade == 100){
-        		$review = "Satisfactory Performance";
-        	}else if($zerocount == $samp_counter){
-        		$review = "Non-responsive";
-        	}else{
-        		$review = "Incomplete Submission";
-        	}
+            if($grade == 100){
+                $review = "Satisfactory Performance";
+            }else if($zerocount == $samp_counter){
+                $review = "Non-responsive";
+            }else{
+                $review = "Incomplete Submission";
+            }
 
-        	array_push($tabledata, $part_counter,$participant->username,$batch);
+            
 
-        	foreach ($tablebody as $key => $value) {
-        		
-        		array_push($tabledata, $value);
-        	}
+            array_push($tabledata, $overall_grade,$review);
 
-        	array_push($tabledata, $overall_grade,$review);
-
-        	array_push($table, $tabledata);
+            $table[$count] = $tabledata;
+           
+            $count++;
+                      
         }
 
-        array_push($heading, 'Overall Grade', "Review Comment");
-
-        
+        // echo "<pre>";print_r("end");echo "</pre>";die();
+     
 
         $this->table->set_template($template);
         $this->table->set_heading($heading);
 
         return $this->table->generate($table);
-	}
+    }
+
+	// public function createParticipantTable($round_id, $equipment_id){
+	// 	$template = $this->config->item('default');
+
+ //        $heading = [
+ //            "No.",
+ //            "Facility",
+ //            "Batch No"
+ //        ];
+ //        $tabledata = $tablebody = $table = [];
+
+ //        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+            // foreach ($samples as $sample) {
+            //     array_push($heading, $sample->sample_name,"Comment");
+            // }
+
+ //        $participants = $this->db->get_where('participant_readiness_v', ['status' =>  1, 'approved' => 1, 'user_type' => 'participant'])->result();
+
+ //        $round_uuid = $this->db->get_where('pt_round', ['id' =>  $round_id])->row()->uuid;
+
+
+ //        $zerocount = $acceptable = $unacceptable = $part_counter = $samp_counter = 0;
+
+ //        // echo "<pre>";print_r($participants);echo "</pre>";die();
+
+ //        foreach ($participants as $key => $participant) {
+	// 	$part_counter++;
+
+        
+
+ //       	$parti = $this->db->get_where('pt_ready_participants', ['p_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid, 'lab_result' => 1])->row();
+
+		
+
+ //        	foreach ($samples as $sample) {
+ //        		$samp_counter++;
+			
+ //                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+ //                if($cd4_values){
+ //                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+ //                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+ //                }else{
+ //                    $upper_limit = 0;
+ //                    $lower_limit = 0;
+ //                } 
+
+ //        		$part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
+		 		
+ //        		if($part_cd4){
+ //        			if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+	// 				 	$acceptable++;
+	// 				 	$comment = "Acceptable";
+	//         		}else{
+	//         			$unacceptable++;
+	//         			$comment = "Unacceptable";
+	//         		}   
+
+	//         		if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
+	//         			$zerocount++;
+	//         		}
+
+	//         		array_push($tablebody, $part_cd4->cd4_absolute, $comment);
+					
+ //        		}else{
+
+
+ //        			array_push($tablebody, 0, "Unacceptable");
+ //        		}				
+ //        	}
+
+ //        	$grade = (($acceptable / $samp_counter) * 100);
+
+ //        	$overall_grade = $grade . ' %';
+
+ //        	if($grade == 100){
+ //        		$review = "Satisfactory Performance";
+ //        	}else if($zerocount == $samp_counter){
+ //        		$review = "Non-responsive";
+ //        	}else{
+ //        		$review = "Incomplete Submission";
+ //        	}
+
+ //        	array_push($tabledata, $part_counter,$parti->facility_name,$parti->batch);
+
+ //        	foreach ($tablebody as $key => $value) {
+        		
+ //        		array_push($tabledata, $value);
+ //        	}
+
+ //        	array_push($tabledata, $overall_grade,$review);
+
+ //        	array_push($table, $tabledata);
+ //        }
+
+ //        array_push($heading, 'Overall Grade', "Review Comment");
+
+        
+
+ //        $this->table->set_template($template);
+ //        $this->table->set_heading($heading);
+
+ //        return $this->table->generate($table);
+	// }
 
 
 
