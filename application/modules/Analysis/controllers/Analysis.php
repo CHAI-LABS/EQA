@@ -419,7 +419,7 @@ class Analysis extends DashboardController {
 
         $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
 
-
+        
 
         foreach ($submissions as $submission) {
             $sub_counter++;
@@ -433,7 +433,7 @@ class Analysis extends DashboardController {
                 
                 $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
 
-                // echo "<pre>";print_r($cd4_values);echo "</pre>";
+                
 
 
                 if($cd4_values){
@@ -444,9 +444,10 @@ class Analysis extends DashboardController {
                     $lower_limit = 0;
                 } 
 
-                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id);
+                // echo "<pre>";print_r($submission->participant_id);echo "</pre>";die();
+                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$submission->participant_id);
 
-               
+               // echo "<pre>";print_r($part_cd4);echo "</pre>";
                
                 if($part_cd4){
 
@@ -483,7 +484,7 @@ class Analysis extends DashboardController {
                 $review = "Incomplete Submission";
             }
 
-            // echo "<pre>";print_r($tabledata);echo "</pre>";die();
+            
 
             array_push($tabledata, $overall_grade,$review);
 
@@ -493,10 +494,7 @@ class Analysis extends DashboardController {
                       
         }
 
-        // echo "<pre>";print_r($part_cd4);echo "</pre>";die();
-
-
-        // echo "<pre>";print_r($table);echo "</pre>";die();
+        // echo "<pre>";print_r("end");echo "</pre>";die();
      
 
         $this->table->set_template($template);
