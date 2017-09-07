@@ -42,6 +42,27 @@ class Import extends DashboardController{
 						}
 						
 						$participant++;
+
+						$insertdata4 = [
+				                'participant_id'    =>  $participant,
+				                'participant_fname'    =>  $itemData[$i][23] ? $itemData[$i][23] : 'No name',
+				                'participant_phonenumber'    =>  $itemData[$i][24] ? $itemData[$i][24] : 0,
+				                'participant_facility'    =>  $itemData[$i][0] ? $itemData[$i][0] : 0,
+				                'participant_email'    =>  $itemData[$i][25] ? $itemData[$i][25] : 0,
+				                'participant_sex'    =>  '',
+				                'participant_age'    =>  0,
+				                'participant_education'    =>  '',
+				                'participant_experience'    =>  '',
+				                'user_type'    =>  'participant',
+				                'participant_password'    =>  '$2y$10$kHEgvCOIRVePKcwc00n0puvWsrCXN6ab2HIxwvKsNsCbvt8UK49au',
+				                'avatar'    =>  '',
+				                'approved'    =>  1,
+				                'status'    =>  1,
+				                'date_registered'    =>  '',
+				                'confirm_token'    =>  null
+			            	];
+
+			            	$this->db->insert('participants', $insertdata4);
 						
 						$insertdata = [
 								'round_id'    =>  1,
@@ -98,7 +119,6 @@ class Import extends DashboardController{
 			            	];
 
 			            	$this->db->insert('pt_equipment_results', $insertdata3);
-
 
                    		}
 					}

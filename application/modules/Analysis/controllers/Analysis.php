@@ -414,7 +414,7 @@ class Analysis extends DashboardController {
             array_push($heading, $sample->sample_name,"Comment");
         }
 
-        array_push($heading, 'Overall Grade', "Review Comment");
+        array_push($heading, 'Overall Grade', "Review Comment",'Participant','Cell','Email');
 
 
         $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
@@ -446,6 +446,8 @@ class Analysis extends DashboardController {
 
                 // echo "<pre>";print_r($submission->participant_id);echo "</pre>";die();
                 $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$submission->participant_id);
+
+
 
                // echo "<pre>";print_r($part_cd4);echo "</pre>";
                
@@ -484,9 +486,11 @@ class Analysis extends DashboardController {
                 $review = "Incomplete Submission";
             }
 
+            $part_details = $this->db->get_where('users_v', ['username' =>  $submission->participant_id])->row();
+            // echo "<pre>";print_r($part_details->firstname);echo "</pre>";die();
             
 
-            array_push($tabledata, $overall_grade,$review);
+            array_push($tabledata, $overall_grade,$review,$part_details->firstname,$part_details->phone,$part_details->email_address);
 
             $table[$count] = $tabledata;
            
