@@ -35,10 +35,8 @@ class Import extends DashboardController{
 						}
 
 
-						//echo "<pre>"; print_r($itemData[$i][0]);echo "</pre>";die();
+						// echo "<pre>"; print_r($itemData[$i]);echo "</pre>";die();
 						
-
-
 						$facility = $this->db->get_where('facility_v', ['facility_name'=>$itemData[$i][0]])->row();
 
 
@@ -127,13 +125,24 @@ class Import extends DashboardController{
 
 			            	$this->db->insert('pt_equipment_results', $insertdata3);
 
+
+			            	$equipment = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row(); 
+
+
+			            	$insertdata4 = [
+								'participant_id'    =>  $submission_id,
+				                'equipment_id'    =>  $equipment->id
+			            	];
+
+			            	$this->db->insert('participant_equipment', $insertdata4);
+
                    		}
 					}
 
 					
 				}
 
-				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_data_submission, participants and pt_equipment_results");echo "</pre>";die();	
+				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();	
 			}
 		}
 	}

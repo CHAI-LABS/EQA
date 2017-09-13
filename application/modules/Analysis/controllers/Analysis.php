@@ -416,7 +416,7 @@ class Analysis extends DashboardController {
     public function createParticipantTable($round_id, $equipment_id){
         $template = $this->config->item('default');
         $tablevalues = $tablebody = $table = [];
-        $count = $zerocount = $acceptable = $unacceptable = $sub_counter = $samp_counter = 0;
+        $count = $zerocount = $sub_counter = 0;
 
         $heading = [
             "No.",
@@ -455,6 +455,8 @@ class Analysis extends DashboardController {
             }
 
             array_push($tabledata, $sub_counter, $facility_name, 0);
+
+            $samp_counter = $acceptable = $unacceptable = 0;
 
             foreach ($samples as $sample) {
                 $samp_counter++;
@@ -501,6 +503,7 @@ class Analysis extends DashboardController {
 
             $grade = (($acceptable / $samp_counter) * 100);
 
+
             $overall_grade = $grade . ' %';
 
             if($grade == 100){
@@ -512,7 +515,7 @@ class Analysis extends DashboardController {
             }
 
             $part_details = $this->db->get_where('users_v', ['username' =>  $submission->participant_id])->row();
-            // echo "<pre>";print_r($part_details->firstname);echo "</pre>";die();
+            
             
 
             array_push($tabledata, $overall_grade,$review,$part_details->firstname,$part_details->phone,$part_details->email_address);
@@ -522,9 +525,6 @@ class Analysis extends DashboardController {
             $count++;
                       
         }
-
-        // echo "<pre>";print_r("end");echo "</pre>";die();
-     
 
         $this->table->set_template($template);
         $this->table->set_heading($heading);
@@ -538,7 +538,7 @@ class Analysis extends DashboardController {
         
         $datas=[];
 
-        $samp_counter = $acceptable = $counter = $tab = 0;
+        $counter = $tab = 0;
         
         $where = ['pt_round_id' =>  $round_id];
         $samples = $this->db->get_where('pt_samples', $where)->result();
@@ -577,11 +577,11 @@ class Analysis extends DashboardController {
                             <div class='tab-content'>";
 
         
-
-
         foreach ($equipments as $key => $equipment) {
+            
+
             $counter++;
-            $passed = $failed = 0;
+            
             $equipment_id = $equipment->id;
             $equipmentname = $equipment->equipment_name;
             $equipmentname = str_replace(' ', '_', $equipmentname);
@@ -597,46 +597,56 @@ class Analysis extends DashboardController {
             $round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
 
             $submissions = $this->Analysis_m->getSubmissionsNumber($round_id, $equipment_id);
-            $registrations = $this->Analysis_m->getRegistrationsNumber($round_uuid, $equipment_id);
+            $registrations = $this->Analysis_m->getRegistrationsNumber($equipment_id);
             $participants = $this->Analysis_m->getReadyParticipants($round_id, $equipment_id);
 
+            
+            $partcount = $passed = $failed = 0;
 
-	        foreach ($samples as $sample) {
-	    		$samp_counter++;
+            foreach ($participants as $participant) {
+                $partcount ++;
+                $sampcount = $acceptable = $unacceptable =0;
 
 
-	    		$nhrl_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' => $round_id, 'equipment_id' => $equipment_id, 'pt_sample_id' => $sample->id])->row(); 
-                // echo "<pre>";print_r($nhrl_values);echo "</pre>";die();
 
-                if($nhrl_values){
-                    $upper_limit = $nhrl_values->upper_limit;
-                    $lower_limit = $nhrl_values->lower_limit;
+                foreach ($samples as $sample) {
+                    $sampcount++;
+
+                    $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                    
+
+
+                    if($cd4_values){
+                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                    }else{
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    } 
+
+
+
+                    $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+                    if($part_cd4){
+                        // echo "<pre>";print_r("Upper ".$upper_limit);echo "</pre>";
+                        
+                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                            $acceptable++;
+                            
+                        } else{
+                            $unacceptable++;
+                            
+                        } 
+                    }  
+                } 
+
+                if($acceptable == $sampcount) {
+                    $passed++;
                 }else{
-                    $upper_limit = 0;
-                    $lower_limit = 0;
+                    $failed++;
                 }
-	    		
-
-	    		foreach ($participants as $participant) {
-	    			$part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
-
-		    		if($part_cd4){
-		    			if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-						 	$acceptable++;
-		        		}  
-		    		}	
-	    		}	
-	        }
-
-	    	$grade = (($acceptable / $samp_counter) * 100);
-
-	    	if($grade == 100){
-	    		$passed++;
-	    	}else{
-	    		$failed++;
-	    	}
-
-            // echo "<pre>";print_r($registrations);echo "</pre>";die();
+            }
 
             $equipment_tabs .= '<div class = "row">
 								    <div class="col-md-12">
@@ -722,13 +732,13 @@ class Analysis extends DashboardController {
 				<div class = "row">
 				    <div class="col-md-12">
 				        <div class = "card card-outline-danger">
-				            <div class="card-header col-4">
+				            <div class="card-header col-12">
 				                <i class = "icon-chart"></i>
 				                &nbsp;
 				                    Participant Results
 				            </div>
 
-				            <div class = "card-block col-12">';
+				            <div class = "card-block col-md-12">';
 
             $equipment_tabs .= $this->createParticipantTable($round_id, $equipment_id);
 
@@ -743,8 +753,9 @@ class Analysis extends DashboardController {
                
         }
 
+        
+
         $equipment_tabs .= "</div>";
-  // echo "<pre>";print_r($equipment_tabs);echo "</pre>";die();
         return $equipment_tabs;
 
     }
