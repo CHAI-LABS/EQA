@@ -10,8 +10,6 @@ class Analysis extends DashboardController {
         $this->load->config('table');
 		$this->load->model('Analysis_m');
 
-		
-
 	}
 	
 	public function index()
@@ -106,14 +104,32 @@ class Analysis extends DashboardController {
 
         
         $part_results = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample_id])->result();
-         //echo "<pre>";print_r($part_results);echo "</pre>";die();
+         
 
         if($part_results){
             $counter = 0;
             foreach($part_results as $part_result){
                 $counter ++;
 
-                // $participant_id = $this->db->get_where('participant_readiness_v', ['p_id' => $part_result->participant_id])->row()->username;
+                $participant_id = $this->db->get_where('participant_readiness_v', ['p_id' => $part_result->participant_id])->row();
+                // echo "<pre>";print_r($participant_id);echo "</pre>";die();
+
+
+                if($participant_id){
+                    $pid = $participant_id->username;
+
+                    $facilityid = $this->db->get_where('participant_readiness_v', ['username' => $pid])->row();
+
+                    if($facilityid){
+                        $facility_id = $facilityid->facility_id;
+
+                        $facility_name = $this->db->get_where('facility_v', ['facility_id' =>  $facility_id])->row()->facility_name;
+                    }else{
+                        $facility_name = "No Facility";
+                    }
+                }else{
+                    $facility_name = "No Facility";
+                }
 
                 // if($round->type == "ongoing"){
                 //     $status = "<label class = 'tag tag-warning tag-sm'>Ongoing</label>"; 
@@ -123,7 +139,7 @@ class Analysis extends DashboardController {
                 
                 $tabledata[] = [
                     $counter,
-                    0,
+                    $facility_name,
                     $part_result->cd4_absolute
                 ];
             }
@@ -426,7 +442,19 @@ class Analysis extends DashboardController {
 
             $tabledata = [];
 
-            array_push($tabledata, $sub_counter, 0, 0);
+            // echo "<pre>";print_r($submission);echo "</pre>";die();
+
+            $facilityid = $this->db->get_where('participant_readiness_v', ['username' => $submission->participant_id])->row();
+
+            if($facilityid){
+                $facility_id = $facilityid->facility_id;
+
+                $facility_name = $this->db->get_where('facility_v', ['facility_id' =>  $facility_id])->row()->facility_name;
+            }else{
+                $facility_name = "No Facility";
+            }
+
+            array_push($tabledata, $sub_counter, $facility_name, 0);
 
             foreach ($samples as $sample) {
                 $samp_counter++;
@@ -444,12 +472,9 @@ class Analysis extends DashboardController {
                     $lower_limit = 0;
                 } 
 
-                // echo "<pre>";print_r($submission->participant_id);echo "</pre>";die();
+                
                 $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$submission->participant_id);
 
-
-
-               // echo "<pre>";print_r($part_cd4);echo "</pre>";
                
                 if($part_cd4){
 
