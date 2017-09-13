@@ -77,14 +77,28 @@ class Analysis_m extends CI_Model {
     }
 
 
+    // public function getReadyParticipants($round_id, $equipment_id){
+
+    //     $this->db->select("prp.p_id");
+    //     $this->db->from("pt_participant_review_v ppr");
+    //     $this->db->join('pt_ready_participants prp', 'prp.p_id = ppr.participant_id');
+    //     $this->db->where("round_id",$round_id);
+    //     $this->db->where("equipment_id",$equipment_id);
+    //     $this->db->group_by("participant_id");
+
+    //     $query = $this->db->get();
+        
+    //     return $query->result();
+    // }
+
+
     public function getReadyParticipants($round_id, $equipment_id){
 
-        $this->db->select("prp.p_id");
-        $this->db->from("pt_participant_review_v ppr");
-        $this->db->join('pt_ready_participants prp', 'prp.p_id = ppr.participant_id');
+        $this->db->select("participant_id");
+        $this->db->from("pt_participant_review_v");
         $this->db->where("round_id",$round_id);
         $this->db->where("equipment_id",$equipment_id);
-        $this->db->group_by("equipment_id");
+        $this->db->group_by("participant_id");
 
         $query = $this->db->get();
         
