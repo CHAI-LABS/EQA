@@ -34,7 +34,14 @@ class Import extends DashboardController{
 							$equip_id = 0;
 						}
 
+
+						//echo "<pre>"; print_r($itemData[$i][0]);echo "</pre>";die();
+						
+
+
 						$facility = $this->db->get_where('facility_v', ['facility_name'=>$itemData[$i][0]])->row();
+
+
 						if($facility){
 							$facility_id = $facility->facility_id;
 						}else{
@@ -47,7 +54,7 @@ class Import extends DashboardController{
 				                'participant_id'    =>  $participant,
 				                'participant_fname'    =>  $itemData[$i][23] ? $itemData[$i][23] : 'No name',
 				                'participant_phonenumber'    =>  $itemData[$i][24] ? $itemData[$i][24] : 0,
-				                'participant_facility'    =>  $itemData[$i][0] ? $itemData[$i][0] : 0,
+				                'participant_facility'    =>  $facility_id ? $facility_id : 0,
 				                'participant_email'    =>  $itemData[$i][25] ? $itemData[$i][25] : 0,
 				                'participant_sex'    =>  '',
 				                'participant_age'    =>  0,
@@ -126,7 +133,7 @@ class Import extends DashboardController{
 					
 				}
 
-				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_data_submission and pt_equipment_results");echo "</pre>";die();	
+				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_data_submission, participants and pt_equipment_results");echo "</pre>";die();	
 			}
 		}
 	}
