@@ -62,35 +62,16 @@ class Analysis_m extends CI_Model {
         return $query->row();
     }
 
-    public function getRegistrationsNumber($round_uuid,$equipment_id){
+    public function getRegistrationsNumber($equipment_id){
         
-        $this->db->select("count(prp.participant_id) AS register_count");
-        $this->db->from("pt_ready_participants prp");
-        $this->db->join('participant_equipment pe', 'prp.p_id = pe.participant_id');
-        $this->db->where("pt_round_uuid",$round_uuid);
+        $this->db->select("count(participant_id) AS register_count");
+        $this->db->from("participant_equipment");
         $this->db->where("equipment_id",$equipment_id);
-        $this->db->group_by("equipment_id");
         $query = $this->db->get();
         
         return $query->row();
 
     }
-
-
-    // public function getReadyParticipants($round_id, $equipment_id){
-
-    //     $this->db->select("prp.p_id");
-    //     $this->db->from("pt_participant_review_v ppr");
-    //     $this->db->join('pt_ready_participants prp', 'prp.p_id = ppr.participant_id');
-    //     $this->db->where("round_id",$round_id);
-    //     $this->db->where("equipment_id",$equipment_id);
-    //     $this->db->group_by("participant_id");
-
-    //     $query = $this->db->get();
-        
-    //     return $query->result();
-    // }
-
 
     public function getReadyParticipants($round_id, $equipment_id){
 

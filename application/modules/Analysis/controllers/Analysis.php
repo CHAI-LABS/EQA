@@ -597,7 +597,7 @@ class Analysis extends DashboardController {
             $round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
 
             $submissions = $this->Analysis_m->getSubmissionsNumber($round_id, $equipment_id);
-            $registrations = $this->Analysis_m->getRegistrationsNumber($round_uuid, $equipment_id);
+            $registrations = $this->Analysis_m->getRegistrationsNumber($equipment_id);
             $participants = $this->Analysis_m->getReadyParticipants($round_id, $equipment_id);
 
             
