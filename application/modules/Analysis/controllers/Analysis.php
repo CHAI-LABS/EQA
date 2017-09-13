@@ -416,7 +416,7 @@ class Analysis extends DashboardController {
     public function createParticipantTable($round_id, $equipment_id){
         $template = $this->config->item('default');
         $tablevalues = $tablebody = $table = [];
-        $count = $zerocount = $acceptable = $unacceptable = $sub_counter = $samp_counter = 0;
+        $count = $zerocount = $sub_counter = 0;
 
         $heading = [
             "No.",
@@ -455,6 +455,8 @@ class Analysis extends DashboardController {
             }
 
             array_push($tabledata, $sub_counter, $facility_name, 0);
+
+            $samp_counter = $acceptable = $unacceptable = 0;
 
             foreach ($samples as $sample) {
                 $samp_counter++;
@@ -501,6 +503,7 @@ class Analysis extends DashboardController {
 
             $grade = (($acceptable / $samp_counter) * 100);
 
+
             $overall_grade = $grade . ' %';
 
             if($grade == 100){
@@ -512,7 +515,7 @@ class Analysis extends DashboardController {
             }
 
             $part_details = $this->db->get_where('users_v', ['username' =>  $submission->participant_id])->row();
-            // echo "<pre>";print_r($part_details->firstname);echo "</pre>";die();
+            
             
 
             array_push($tabledata, $overall_grade,$review,$part_details->firstname,$part_details->phone,$part_details->email_address);
@@ -522,9 +525,6 @@ class Analysis extends DashboardController {
             $count++;
                       
         }
-
-        // echo "<pre>";print_r("end");echo "</pre>";die();
-     
 
         $this->table->set_template($template);
         $this->table->set_heading($heading);
@@ -612,26 +612,24 @@ class Analysis extends DashboardController {
                 foreach ($samples as $sample) {
                     $sampcount++;
 
-                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+                    $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
 
-                
+                    
 
 
-                if($cd4_values){
-                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                }else{
-                    $upper_limit = 0;
-                    $lower_limit = 0;
-                } 
+                    if($cd4_values){
+                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                    }else{
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    } 
 
 
 
                     $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
                     if($part_cd4){
                         // echo "<pre>";print_r("Upper ".$upper_limit);echo "</pre>";
-                        // echo "<pre>";print_r("Value ".$part_cd4->cd4_absolute);echo "</pre>";
-                        // echo "<pre>";print_r("Lower ".$lower_limit);echo "</pre>";
                         
                         if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
                             $acceptable++;
@@ -640,9 +638,7 @@ class Analysis extends DashboardController {
                             $unacceptable++;
                             
                         } 
-                    }
-
-                    
+                    }  
                 } 
 
                 if($acceptable == $sampcount) {
@@ -650,13 +646,7 @@ class Analysis extends DashboardController {
                 }else{
                     $failed++;
                 }
-
-                // echo "<pre>";print_r("End Part");echo "</pre>";
-
             }
-
-            // echo "<pre>";print_r("End");echo "</pre>";die();
-
 
             $equipment_tabs .= '<div class = "row">
 								    <div class="col-md-12">
