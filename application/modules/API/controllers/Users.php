@@ -92,13 +92,15 @@ class Users extends MY_Controller{
          }
 
          $participants = $this->M_Participant->getParticipants($search_value, $limit, $offset);
+
+
          $data = [];
 
          if($participants){
              foreach($participants as $participant){
                  $activation = $status = $details = $approval = "";
                  $facility = $this->db->get_where('facility', ['id'=>$participant->participant_facility])->row();
-
+                 // echo "<pre>";print_r($participants);echo "</pre>";die();
                  $details = "<a class = 'btn btn-sm btn-warning' href = '".base_url('Users/Participants/details/' . $participant->uuid)."'>Details</a>";
 
                  if($participant->confirm_token != NULL && $participant->status == 0){
