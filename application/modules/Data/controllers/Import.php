@@ -193,13 +193,15 @@ class Import extends MY_Controller {
 			            ];
 
 			            // $this->db->insert('pt_data_submission', $insertdata);
-						$counter = 1;
+						$sample_counter = 1;
+						$batch_counter = 1;
+
 			            if($this->db->insert('pt_data_submission', $insertdata)){
                         $submission_id = $this->db->insert_id();
 
                         $insertdata1 = [
 								'equip_result_id'    =>  $submission_id,
-				                'sample_id'    =>  $counter,
+				                'sample_id'    =>  $sample_counter,
 				                'cd3_absolute'    =>  $itemData[$i][10] ? $itemData[$i][10] : 0,
 				                'cd3_percent'    =>  $itemData[$i][11] ? $itemData[$i][11] : 0,
 				                'cd4_absolute'    =>  $itemData[$i][12] ? $itemData[$i][12] : 0,
@@ -209,12 +211,12 @@ class Import extends MY_Controller {
 			            	];
 
 			            	$this->db->insert('pt_equipment_results', $insertdata1);
-			            	$counter ++;
+			            	$sample_counter ++;
 			            	
 
 			            	$insertdata2 = [
 			            		'equip_result_id'    =>  $submission_id,
-				                'sample_id'    =>  $counter,
+				                'sample_id'    =>  $sample_counter,
 				                'cd3_absolute'    =>  $itemData[$i][14] ? $itemData[$i][14] : 0,
 				                'cd3_percent'    =>  $itemData[$i][15] ? $itemData[$i][15] : 0,
 				                'cd4_absolute'    =>  $itemData[$i][16] ? $itemData[$i][16] : 0,
@@ -224,12 +226,12 @@ class Import extends MY_Controller {
 			            	];
 
 			            	$this->db->insert('pt_equipment_results', $insertdata2);
-			            	$counter ++;
+			            	$sample_counter ++;
 			            	
 
 			            	$insertdata3 = [
 			            		'equip_result_id'    =>  $submission_id,
-				                'sample_id'    =>  $counter,
+				                'sample_id'    =>  $sample_counter,
 				                'cd3_absolute'    =>  $itemData[$i][18] ? $itemData[$i][18] : 0,
 				                'cd3_percent'    =>  $itemData[$i][19] ? $itemData[$i][19] : 0,
 				                'cd4_absolute'    =>  $itemData[$i][20] ? $itemData[$i][20] : 0,
@@ -299,13 +301,42 @@ class Import extends MY_Controller {
 
 			            	$this->db->insert('pt_panel_tracking', $insertdata7);
 
+
+			            	$insertdata7 = [
+			            		'batch_id'    =>  $submission_id,
+				                'tube_id'    => $batch_counter,
+				                'sample_id'    =>  $batch_counter
+			            	];
+
+			            	$this->db->insert('pt_batch_tube', $insertdata7);
+			            	$batch_counter++;
+
+
+			            	$insertdata7 = [
+			            		'batch_id'    =>  $submission_id,
+				                'tube_id'    => $batch_counter,
+				                'sample_id'    =>  $batch_counter
+			            	];
+
+			            	$this->db->insert('pt_batch_tube', $insertdata7);
+			            	$batch_counter++;
+			            	
+
+			            	$insertdata7 = [
+			            		'batch_id'    =>  $submission_id,
+				                'tube_id'    => $batch_counter,
+				                'sample_id'    =>  $batch_counter
+			            	];
+
+			            	$this->db->insert('pt_batch_tube', $insertdata7);
+
                    		}
 					}
 
 					
 				}
 
-				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();	
+				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_batch_tube, pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();	
 			}
 		}
 	}

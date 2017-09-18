@@ -12,7 +12,7 @@ class PTRound extends MY_Controller {
         $this->load->model('M_Readiness');
         $this->load->library('Mailer');
 
-        $this->row_blueprint = "<tr class = 'reagent_row'><td colspan = '2'><label style='text-align: center;'>Reagent Name: </label> <input type = 'text' class = 'page-signup-form-control form-control' name = 'reagent_name[]' value = '|reagent_name|' required |disabled|/> </td><td colspan = '3'><label style='text-align: center;'>Lot Number: </label><input type = 'text' class = 'page-signup-form-control form-control' name = 'lot_number[]' value = '|lot_number|' required |disabled|/></td><td colspan = '3'><label style='text-align: center;'>Expiry Date: </label><input type = 'text' class = 'page-signup-form-control form-control' name = 'expiry_date[]' value = '|expiry_date|' required |disabled|/> </td></tr>";
+        $this->row_blueprint = "<tr class = 'reagent_row'><td colspan = '2'><label style='text-align: center;'>Reagent Name: </label> <input type = 'text' class = 'page-signup-form-control form-control' name = 'reagent_name[]' value = '|reagent_name|' required |disabled|/> </td><td colspan = '3'><label style='text-align: center;'>Lot Number: </label><input type = 'text' class = 'page-signup-form-control form-control' name = 'lot_number[]' value = '|lot_number|' required |disabled|/></td><td colspan = '3'><label style='text-align: center;'>Expiry Date: (YYYY-MM-DD)</label><input type = 'text' class = 'page-signup-form-control form-control' name = 'expiry_date[]' value = '|expiry_date|' required |disabled|/> </td></tr>";
     }
 
     public function index(){
@@ -504,80 +504,7 @@ class PTRound extends MY_Controller {
 
 
                 $equipment_tabs .= $this->generateReagentRow($submission_id, $equipment->id, $disabled);
-                        // $equipment_tabs .= "<tr>
-
-                        // <td style='style='text-align: center;' colspan='2'>
-
-                        // <label style='text-align: center;' for='reagent_name'>Reagent Name: </label>";
-
-                // if($datas){
-                //     // echo "<pre>";print_r("<br/><br/><br/><br/><br/>".$counter.": Reagent Name is".$datas[$counter]->lot_number);echo "</pre>";
-                //     if($datas[0]->lot_number != ''){
-                //         $lot = "<input style='text-align: center;' type='text' name='reagent_name' id='reagent_".$equipment->id."'class='page-signup-form-control form-control' $disabled placeholder='Enter the Reagent Name' value='".$datas[0]->lot_number."' required>" ;
-                //     }else{
-                //         $lot = "<input style='text-align: center;' type='text' name='reagent_name' id='reagent_".$equipment->id."'class='page-signup-form-control  form-control' $disabled placeholder='Enter the Reagent Name' required>";
-                //     }
-                // }else{
-                //     $lot = "<input style='text-align: center;' type='text' name='reagent_name' class='page-signup-form-control form-control' $disabled id='reagent_".$equipment->id."' placeholder='Enter the Reagent Name' required>";
-                // }
-                // $equipment_tabs .= $lot;
-
-                            
-                //       $equipment_tabs .= " </td>
-
-                //       <td style='style='text-align: center;' colspan='3'>
-
-                //         <label style='text-align: center;' for='lot_number'>Lot Number: </label>";
-
-                // if($datas){
-                //     // echo "<pre>";print_r("<br/><br/><br/><br/><br/>".$counter.": Lot number is".$datas[$counter]->lot_number);echo "</pre>";
-                //     if($datas[0]->lot_number != ''){
-                //         $lot = "<input style='text-align: center;' type='text' name='lot_number' id='lot_".$equipment->id."'class='page-signup-form-control form-control' $disabled placeholder='Enter the Lot Number' value='".$datas[0]->lot_number."' required>" ;
-                //     }else{
-                //         $lot = "<input style='text-align: center;' type='text' name='lot_number' id='lot_".$equipment->id."'class='page-signup-form-control  form-control' $disabled placeholder='Enter the Lot Number' required>";
-                //     }
-                // }else{
-                //     $lot = "<input style='text-align: center;' type='text' name='lot_number' class='page-signup-form-control form-control' $disabled id='lot_".$equipment->id."' placeholder='Enter the Lot Number' required>";
-                // }
-                // $equipment_tabs .= $lot;
-
-                            
-                //       $equipment_tabs .= " </td>
-
-
-
-
-
-                //       <td style='style='text-align: center;' colspan='3'>
-
-                //         <label style='text-align: center;' for='lot_number'>Expiry date: </label>";
-
-                // if($datas){
-                //     // echo "<pre>";print_r("<br/><br/><br/><br/><br/>".$counter.": Expiry date is".$datas[$counter]->lot_number);echo "</pre>";
-                //     if($datas[0]->lot_number != ''){
-                //         $lot = "<input style='text-align: center;' type='text' name='expiry_date' id='expiry_".$equipment->id."'class='page-signup-form-control form-control' $disabled placeholder='Enter the Expiry date' value='".$datas[0]->lot_number."' required>" ;
-                //     }else{
-                //         $lot = "<input style='text-align: center;' type='text' name='expiry_date' id='expiry_".$equipment->id."'class='page-signup-form-control  form-control' value=". date('m/d/Y') ." $disabled placeholder='Enter the Expiry date' required>";
-                //     }
-                // }else{
-                //     $lot = "<input style='text-align: center;' type='text' name='expiry_date' class='page-signup-form-control form-control' value=". date('m/d/Y') ." $disabled id='expiry_".$equipment->id."' placeholder='Enter the Expiry date' required>";
-                // }
-                // $equipment_tabs .= $lot;
-
-                            
-                //       $equipment_tabs .= " </td>
-
-
-
-
-
-                //       </tr>
-
-
-
-
-
-
+    
 
                        $equipment_tabs .= "<tr>
                             <th style='text-align: center; width:20%;' rowspan='3'>
@@ -619,10 +546,12 @@ class PTRound extends MY_Controller {
                             </th>
                         </tr>";                    
                     $counter2 = 0;
+
+                    // echo "<pre>";print_r($samples);echo "</pre>";die();
                     foreach ($samples as $key => $sample) {
                         
                         
- // echo "<pre>";print_r($sample);echo "</pre>";die();
+
                         $value = 0;
                         $equipment_tabs .= "
                                         <tr>
