@@ -188,7 +188,7 @@ class Import extends MY_Controller {
 								'round_id'    =>  1,
 				                'participant_id'    =>  $participant,
 				                'equipment_id'    =>  $equip_id,
-				                'status'    =>  1,
+				                'status'    =>  0,
 				                'verdict'    =>  2
 			            ];
 
