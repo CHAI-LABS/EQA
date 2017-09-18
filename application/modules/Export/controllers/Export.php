@@ -1,10 +1,15 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Export extends MY_Controller{
-	function __construct(){
+class Export extends MY_Controller {
+
+	public function __construct(){
 		parent::__construct();
+
+		
 		$this->load->library('pdf');
 		$this->load->library('excel');
+		// $this->load->library('PHPExcel');
 		$this->load->helper(array('url','file','download'));
 	}
 
@@ -16,7 +21,7 @@ class Export extends MY_Controller{
 	     if(count($excel_data)>0):
 	        
 	        $objPHPExcel = new PHPExcel();
-	        $objPHPExcel -> getProperties() -> setCreator("SokoHewani Limited");
+	        $objPHPExcel -> getProperties() -> setCreator("External Quality Assurance");
 	        $objPHPExcel -> getProperties() -> setLastModifiedBy($excel_data['doc_creator']);
 	        $objPHPExcel -> getProperties() -> setTitle($excel_data['doc_title']);
 	        $objPHPExcel -> getProperties() -> setSubject($excel_data['doc_title']);
@@ -47,7 +52,7 @@ class Export extends MY_Controller{
 	        $objPHPExcel -> getActiveSheet() -> setTitle($excel_data['excel_topic']);
 	        // Save Excel 2007 file
 	        //echo date('H:i:s') . " Write to Excel2007 format\n";
-	        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+	        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 	            // We'll be outputting an excel file
 	    if(isset($excel_data['report_type'])){
 	       $objWriter->save("./print_docs/excel/excel_files/".$excel_data['file_name'].'.xls');
@@ -56,6 +61,7 @@ class Export extends MY_Controller{
 	        // We'll be outputting an excel file
 	        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 	        header("Cache-Control: no-store, no-cache, must-revalidate");
+	        
 	        header('Content-Type: application/vnd.ms-excel');
 	        header("Cache-Control: post-check=0, pre-check=0", false);
 	        header("Pragma: no-cache");
@@ -71,7 +77,7 @@ class Export extends MY_Controller{
 }
 
 
-    public function create_pdf($pdf_data=NULL){
+public function create_pdf($pdf_data=NULL){
 		if(count($pdf_data)>0): 
 		    
 		$image=base_url().'assets/images/mareka.jpg';
@@ -204,8 +210,6 @@ class Export extends MY_Controller{
 	}
 
 
-
-
 	function pdf($html, $data){
 		$pdf = $this->pdf->load();
 
@@ -216,7 +220,7 @@ class Export extends MY_Controller{
 		$pdf->WriteHTML($stylesheet, 1);
 		$pdf->WriteHTML($html, 2);
 
-		$pdf->SetHTMLHeader('<div style="text-align: right; font-weight: bold;">'.$data["document_title"].'</div>');
+		$pdf->SetHTMLHeader('<div style="text-align: right; font-weight: bold;">'.$data["pdf_title"].'</div>');
 
 		$pdf->SetHTMLFooter('
 
@@ -226,7 +230,7 @@ class Export extends MY_Controller{
 
 		<td width="33%" align="center" style="font-weight: bold; font-style: italic;">Page {PAGENO} of {nbpg}</td>
 
-		<td width="33%" style="text-align: right; ">'.$data["document_title"].'</td>
+		<td width="33%" style="text-align: right; ">'.$data["pdf_title"].'</td>
 
 		</tr></table>
 
@@ -234,4 +238,11 @@ class Export extends MY_Controller{
 
 		$pdf->output();
 	}
+	
+	
+
+	
 }
+
+/* End of file Export.php */
+/* Location: ./application/modules/Export/controllers/Export.php */

@@ -23,7 +23,11 @@
                     Participants Analysis
 
                 <div class = "pull-right">
-                    <a href = "<?= @base_url('Analysis/Results/'); ?><?= @$round_uuid?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to Analysis Results</button></a><br /><br />
+                    <a href = "<?= @$excel_link?>"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i>  Download Excel</button></a>
+
+                    <a href = "<?= @$pdf_link?>"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i>  Download PDF</button></a>
+
+                    <a href = "<?= @base_url('Analysis/Results/'); ?><?= @$round_uuid?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to Analysis Results</button></a>     
                 </div>
             </div>
 

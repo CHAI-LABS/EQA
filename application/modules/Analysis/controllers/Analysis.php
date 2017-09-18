@@ -8,6 +8,7 @@ class Analysis extends DashboardController {
 
 		$this->load->library('table');
         $this->load->config('table');
+        $this->load->module('Export');
 		$this->load->model('Analysis_m');
 
 	}
@@ -37,10 +38,9 @@ class Analysis extends DashboardController {
 	}
 
 
-	
-
 	public function createPTTable()
 	{
+
 		$template = $this->config->item('default');
 
         $heading = [
@@ -91,9 +91,26 @@ class Analysis extends DashboardController {
 	}
 
 
-	public function createParticipantResultsTable($round_id,$equipment_id,$sample_id)
+
+	public function createParticipantResultsTable($type,$round_id,$equipment_id,$sample_id)
 	{
+
+        // $this->auth->check();
+
 		$template = $this->config->item('default');
+        $column_data = $row_data = array();
+
+        $html_body = '
+        <table class="data-table">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Facility Name</th>
+            <th>CD4 Absolute Result</th>
+        </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
 
         $heading = [
             "No.",
@@ -112,7 +129,6 @@ class Analysis extends DashboardController {
                 $counter ++;
 
                 $participant_id = $this->db->get_where('participant_readiness_v', ['p_id' => $part_result->participant_id])->row();
-                // echo "<pre>";print_r($participant_id);echo "</pre>";die();
 
 
                 if($participant_id){
@@ -131,23 +147,67 @@ class Analysis extends DashboardController {
                     $facility_name = "No Facility";
                 }
 
-                // if($round->type == "ongoing"){
-                //     $status = "<label class = 'tag tag-warning tag-sm'>Ongoing</label>"; 
-                // }else{
-                //     $status = "<label class = 'tag tag-success tag-sm'>Done</label>";
-                // }
-                
-                $tabledata[] = [
+                switch ($type) {
+                    case 'table':
+                        $tabledata[] = [
                     $counter,
                     $facility_name,
                     $part_result->cd4_absolute
                 ];
+                        break;
+
+                    case 'excel':
+                        array_push($row_data, array($counter, $facility_name, $part_result->cd4_absolute));
+
+                        // echo'<pre>';print_r($row_data);echo'</pre>';die();
+                        break;
+
+                    case 'pdf':
+                        $html_body .= '<tr>';
+                        $html_body .= '<td>'.$counter.'</td>';
+                        $html_body .= '<td>'.$facility_name.'</td>';
+                        $html_body .= '<td>'.$part_result->cd4_absolute.'</td>';
+                        $html_body .= "</tr></ol>";
+                        break;
+                    
+                    default:
+                        echo "<pre>";print_r("Something went wrong... Please contact your administrator");echo "</pre>";die();
+                        break;
+                }
+                
+                
             }
         }
-        $this->table->set_heading($heading);
-        $this->table->set_template($template);
 
-        return $this->table->generate($tabledata);
+        if($type == 'table'){
+
+            $this->table->set_heading($heading);
+            $this->table->set_template($template);
+
+            return $this->table->generate($tabledata);
+
+        }else if($type == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External Quality Assurance', 'doc_title' => 'Participant Sample Report', 'file_name' => 'Sample Report', 'excel_topic' => 'Sample Report');
+
+            $column_data = array('No.','Facility Name','CD4 Absolute Result');
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            // echo'<pre>';print_r($excel_data);echo'</pre>';die();
+
+            $this->export->create_excel($excel_data);
+
+        }else if($type == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => "Participant Sample Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample Report', 'pdf_topic' => 'Sample Report');
+
+            $this->export->create_pdf($pdf_data);
+
+        }
+        
 	}
 
 
@@ -336,8 +396,13 @@ class Analysis extends DashboardController {
             $data = [
             	'round_uuid' => $round_uuid,
             	'participants_info' => $this->ParticipantInfo($round_id,$equipment_id,$sample_id),
-                'results_table'    =>  $this->createParticipantResultsTable($round_id,$equipment_id,$sample_id)
+                'results_table'    =>  $this->createParticipantResultsTable('table',$round_id,$equipment_id,$sample_id),
+                'excel_link'    =>  base_url('Analysis/createParticipantResultsTable/excel/' . $round_id . '/' . $equipment_id . '/' . $sample_id),
+                'pdf_link'    =>  base_url('Analysis/createParticipantResultsTable/pdf/' . $round_id . '/' . $equipment_id . '/' . $sample_id)
             ];
+
+
+
 
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")

@@ -9,6 +9,8 @@ class M_Participant extends CI_Model {
 		return $query->row();
 	}
 
+	
+
 	public function findParticipantByIdentifier($identifier, $value){
         $this->db->where($identifier, $value);
         $query = $this->db->get('participants');

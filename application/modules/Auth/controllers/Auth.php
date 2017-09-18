@@ -9,6 +9,8 @@ class Auth extends MY_Controller {
 		
 		$this->load->model('auth_m');
 	}
+
+	
 	
 	public function signup()
 	{
