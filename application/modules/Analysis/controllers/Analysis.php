@@ -204,7 +204,8 @@ class Analysis extends DashboardController {
             $html_body .= '</tbody></table>';
             $pdf_data = array("pdf_title" => "Participant_Sample_Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report', 'pdf_topic' => 'Sample_Report');
 
-            $this->export->create_pdf($pdf_data);
+            $this->export->pdf($html_body,$pdf_data);
+            // $this->export->create_pdf($pdf_data);
 
         }
         

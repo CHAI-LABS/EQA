@@ -124,6 +124,41 @@ endif;
 }
 
 
+function pdf($html, $data){
+    $pdf = $this->pdf->load();
+
+    $pdf->AddPage("P");
+
+    $stylesheet = file_get_contents('./assets/dashboard/css/style.css');
+
+    $pdf->WriteHTML($stylesheet, 1);
+    $pdf->WriteHTML($html, 2);
+
+    $pdf->SetHTMLHeader('<div style="text-align: right; font-weight: bold;">'.$data["pdf_title"].'</div>');
+
+    $pdf->SetHTMLFooter('
+
+    <table width="100%" style="vertical-align: bottom; font-family: serif; font-size: 8pt; color: #000000; font-weight: bold;"><tr>
+
+    <td width="33%"><span style="font-weight: bold; font-style: italic;">Exported on: {DATE j-m-Y H:i:s}</span></td>
+
+    <td width="33%" align="center" style="font-weight: bold; font-style: italic;">Page {PAGENO} of {nbpg}</td>
+
+    <td width="33%" style="text-align: right; ">'.$data["pdf_title"].'</td>
+
+    </tr></table>
+
+    ');
+
+    $pdf->output();
+  }
+
+
+}
+
+
+
+
        public function create_high_chart_graph($graph_data=null)
   {
     //$graph_color = array();
@@ -225,70 +260,4 @@ endif;
   }
 
 
-public function phpmailer($email_data=null){
-            $this->load->library('email');
-            $this->load->library('Mailer');
 
-  $mail = new PHPMailer();
-    $mail->IsSMTP();                                      // Set mailer to use SMTP
-    $mail->Host = 'mail.bingwalimited.co.ke';         // Specify main and backup server
-    $mail->Port = 26;                                    // Set the SMTP port
-    $mail->SMTPAuth = true;                               // Enable SMTP authentication
-    $mail->Username = 'no-reply@bingwalimited.co.ke';     // SMTP username
-    $mail->Password = 'h;}H(c^=p)5G';                     // SMTP password
-    $mail->SMTPSecure = 'tls';                            // Enable encryption, 'ssl' also accepted
-    $mail->SMTPDebug = 0;
-
-    $mail->From = 'no-reply@bingwalimited.co.ke';
-    $mail->FromName = 'SokoHewani Limited';
-    $mail->AddAddress($email_data['to'], 'Dear Admin');  // Add a recipient              // Name is optional
-
-    $mail->IsHTML(true);                                  // Set email format to HTML
-
-    $mail->Subject = $email_data['subject'];
-    $mail->Body    = $email_data['message'];
-    $mail->AltBody = 'Email sent by SokoHewani Limited';
-
-    if(!$mail->Send()) {
-       echo 'Message could not be sent.';
-       echo 'Mailer Error: ' . $mail->ErrorInfo;
-       exit;
-    }else{
-      // echo'Email Sent' ;die();
-    }
-
-}
-
-
-
-function pdf($html, $data){
-    $pdf = $this->pdf->load();
-
-    $pdf->AddPage("P");
-
-    $stylesheet = file_get_contents('./assets/dashboard/css/style.css');
-
-    $pdf->WriteHTML($stylesheet, 1);
-    $pdf->WriteHTML($html, 2);
-
-    $pdf->SetHTMLHeader('<div style="text-align: right; font-weight: bold;">'.$data["pdf_title"].'</div>');
-
-    $pdf->SetHTMLFooter('
-
-    <table width="100%" style="vertical-align: bottom; font-family: serif; font-size: 8pt; color: #000000; font-weight: bold;"><tr>
-
-    <td width="33%"><span style="font-weight: bold; font-style: italic;">Exported on: {DATE j-m-Y H:i:s}</span></td>
-
-    <td width="33%" align="center" style="font-weight: bold; font-style: italic;">Page {PAGENO} of {nbpg}</td>
-
-    <td width="33%" style="text-align: right; ">'.$data["pdf_title"].'</td>
-
-    </tr></table>
-
-    ');
-
-    $pdf->output();
-  }
-
-
-}
