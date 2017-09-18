@@ -467,8 +467,12 @@ class PTRounds extends DashboardController{
         $data = [
             'table_view'    =>  $this->createFacilityParticipantsTable($round_uuid),
             'back_link'     =>  base_url("PTRounds/"),
-            'back_name'     =>  "Back to Rounds"
+            'back_name'     =>  "Back to Rounds",
+            'qa_unresponsive'     =>  base_url("PTRounds/QAUnresponsive/$round_uuid"),
+            'qa_unresponsive_count' => $this->M_PTRounds->getQAUnresponsiveCount($round_uuid)->qa_count
         ];
+
+        // echo '<pre>';print_r($this->M_PTRounds->getQAUnresponsiveCount($round_uuid)->qa_count);echo "</pre>";die();
 
        
         $this->assets
@@ -483,7 +487,6 @@ class PTRounds extends DashboardController{
     }
 
     function FacilityParticipants($round_uuid,$facility_id){
-        // $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
 
         $data = [];
         $title = "Ready Participants";
@@ -504,6 +507,75 @@ class PTRounds extends DashboardController{
                 ->setPageTitle($title)
                 ->setPartial('PTRounds/pt_participants_submissions_v', $data)
                 ->adminTemplate();
+    }
+
+
+    function QAUnresponsive($round_uuid){
+
+        $data = [];
+        $title = "Ready Participants";
+
+        $data = [
+            'table_view'    =>  $this->createQAUnresponsiveTable($round_uuid),
+            'back_link'     =>  base_url("PTRounds/ReadyParticipants/$round_uuid")
+        ];
+
+       
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js");
+
+        $this->assets->setJavascript('PTRounds/pt_participants_submissions_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('PTRounds/unresponsive_qa_v', $data)
+                ->adminTemplate();
+    }
+
+
+    function createQAUnresponsiveTable($round_uuid){
+
+        $template = $this->config->item('default');
+
+        $change_state = '';
+
+        $facilities = $this->M_PTRounds->getQAUnresponsive($round_uuid);
+        
+
+        $heading = [
+            "No.",
+            "QA / Supervisor ID",
+            "Name",
+            "Phone Number",
+            "Email"
+        ];
+        $tabledata = [];
+
+
+        
+        if($facilities){
+            $counter = 0;
+            foreach($facilities as $facility){
+                $counter ++;
+                
+                $qa_unresponsive = $this->db->get_where('participant_readiness_v',['facility_id'=> $facility->facility_id, 'user_type' => 'qareviewer', 'status' => 1, 'approved' => 1])->row();
+
+                // echo '<pre>';print_r($qa_unresponsive);echo "</pre>";die();
+            
+                
+                $tabledata[] = [
+                    $counter,
+                    $qa_unresponsive->username,
+                    $qa_unresponsive->lastname.' '.$qa_unresponsive->firstname,
+                    $qa_unresponsive->phone,
+                    $qa_unresponsive->email_address
+                ];
+            }
+        }
+        $this->table->set_heading($heading);
+        $this->table->set_template($template);
+
+        return $this->table->generate($tabledata);
     }
 
 

@@ -336,6 +336,30 @@ class Import extends MY_Controller {
 					
 				}
 
+				//A QA / Supervisor for testing purposes
+
+				$insertdata4 = [
+				                'participant_id'    =>  '12881_001',
+				                'participant_fname'    =>  'Willy',
+				                'participant_lname'    =>  'Mareka',
+				                'participant_phonenumber'    =>  '0714135480',
+				                'participant_facility'    =>  3277,
+				                'participant_email'    =>  'marekawilly@gmail.com',
+				                'participant_sex'    =>  'Male',
+				                'participant_age'    =>  23,
+				                'participant_education'    =>  'Higher Diploma',
+				                'participant_experience'    =>  'Very Little',
+				                'user_type'    =>  'qareviewer',
+				                'participant_password'    =>  '$2y$10$kHEgvCOIRVePKcwc00n0puvWsrCXN6ab2HIxwvKsNsCbvt8UK49au',
+				                'avatar'    =>  '',
+				                'approved'    =>  1,
+				                'status'    =>  1,
+				                'date_registered'    =>  '',
+				                'confirm_token'    =>  null
+			            	];
+
+			            	$this->db->insert('participants', $insertdata4);
+
 				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_batch_tube, pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();	
 			}
 		}
