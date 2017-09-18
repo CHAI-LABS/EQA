@@ -189,7 +189,7 @@ class Analysis extends DashboardController {
         }else if($type == 'excel'){
 
             $excel_data = array();
-            $excel_data = array('doc_creator' => 'External Quality Assurance', 'doc_title' => 'Participant Sample Report', 'file_name' => 'Sample Report', 'excel_topic' => 'Sample Report');
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report', 'file_name' => 'Sample_Report', 'excel_topic' => 'Sample_Report');
 
             $column_data = array('No.','Facility Name','CD4 Absolute Result');
             $excel_data['column_data'] = $column_data;
@@ -202,7 +202,7 @@ class Analysis extends DashboardController {
         }else if($type == 'pdf'){
 
             $html_body .= '</tbody></table>';
-            $pdf_data = array("pdf_title" => "Participant Sample Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample Report', 'pdf_topic' => 'Sample Report');
+            $pdf_data = array("pdf_title" => "Participant_Sample_Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report', 'pdf_topic' => 'Sample_Report');
 
             $this->export->create_pdf($pdf_data);
 
