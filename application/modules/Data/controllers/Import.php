@@ -188,7 +188,7 @@ class Import extends MY_Controller {
 								'round_id'    =>  1,
 				                'participant_id'    =>  $participant,
 				                'equipment_id'    =>  $equip_id,
-				                'status'    =>  0,
+				                'status'    =>  1,
 				                'verdict'    =>  2
 			            ];
 
@@ -320,7 +320,7 @@ class Import extends MY_Controller {
 
 			            	$this->db->insert('pt_batch_tube', $insertdata7);
 			            	$batch_counter++;
-			            	
+
 
 			            	$insertdata7 = [
 			            		'batch_id'    =>  $submission_id,

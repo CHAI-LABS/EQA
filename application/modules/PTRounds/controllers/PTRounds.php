@@ -465,18 +465,93 @@ class PTRounds extends DashboardController{
         $title = "Ready Participants";
 
         $data = [
-            'table_view'    =>  $this->createFacilityParticipantsTable($round_uuid)
+            'table_view'    =>  $this->createFacilityParticipantsTable($round_uuid),
+            'back_link'     =>  base_url("PTRounds/"),
+            'back_name'     =>  "Back to Rounds"
         ];
 
        
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js");
-        // $this->assets->setJavascript('QAReviewer/participants_js');
+
+        $this->assets->setJavascript('PTRounds/pt_participants_submissions_js');
         $this->template
                 ->setPageTitle($title)
                 ->setPartial('PTRounds/pt_participants_submissions_v', $data)
                 ->adminTemplate();
+    }
+
+    function FacilityParticipants($round_uuid,$facility_id){
+        // $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
+
+        $data = [];
+        $title = "Ready Participants";
+
+        $data = [
+            'table_view'    =>  $this->createFacilityParticipantsResults($round_uuid,$facility_id),
+            'back_link'     =>  base_url("PTRounds/PTRounds/ReadyParticipants/$round_uuid"),
+            'back_name'     =>  "Back to Ready Participants"
+        ];
+
+       
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js");
+
+        $this->assets->setJavascript('PTRounds/pt_participants_submissions_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('PTRounds/pt_participants_submissions_v', $data)
+                ->adminTemplate();
+    }
+
+
+    function createFacilityParticipantsResults($round_uuid,$facility_id){
+
+        $template = $this->config->item('default');
+
+        $change_state = '';
+
+        $facility_participants = $this->M_PTRounds->getFacilityParticipants($round_uuid,$facility_id);
+        // echo '<pre>';print_r($facility_participants);echo "</pre>";die();
+
+        $heading = [
+            "No.",
+            "Participant ID",
+            "Participant",
+            "Phone Number",
+            "Actions"
+        ];
+        $tabledata = [];
+
+
+        // echo '<pre>';print_r($facility_participants);echo "</pre>";die();
+
+        if($facility_participants){
+            $counter = 0;
+            foreach($facility_participants as $participant){
+                $counter ++;
+                $participantid = $participant->participant_id;
+                $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
+                
+
+                $change_state = ' <a href = ' . base_url("PTRounds/PTRounds/ParticipantDetails/$round_uuid/$participantid") . ' class = "btn btn-primary btn-sm"><i class = "icon-note"></i>&nbsp;View Submissions</a>';
+
+                
+                $tabledata[] = [
+                    $counter,
+                    $participant->participant_id,
+                    $participant->participant_lname.' '.$participant->participant_fname,
+                    $participant->participant_phonenumber,
+                    $change_state
+                ];
+            }
+        }
+        $this->table->set_heading($heading);
+        $this->table->set_template($template);
+
+        return $this->table->generate($tabledata);
     }
 
 
@@ -491,6 +566,7 @@ class PTRounds extends DashboardController{
 
         $heading = [
             "No.",
+            "Facility Name",
             "Participant ID",
             "Participant",
             "Phone Number",
@@ -499,22 +575,23 @@ class PTRounds extends DashboardController{
         $tabledata = [];
 
 
+        // echo '<pre>';print_r($facility_participants);echo "</pre>";die();
+
         if($facility_participants){
             $counter = 0;
             foreach($facility_participants as $participant){
                 $counter ++;
                 $participantid = $participant->participant_id;
-                $pid = $this->M_Readiness->findUserByIdentifier('p_id', $participantid)->username;
                 $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
-
-                // echo '<pre>';print_r($pid);echo "</pre>";die();
+                
 
                 $change_state = ' <a href = ' . base_url("PTRounds/PTRounds/ParticipantDetails/$round_uuid/$participantid") . ' class = "btn btn-primary btn-sm"><i class = "icon-note"></i>&nbsp;View Submissions</a>';
 
                 
                 $tabledata[] = [
                     $counter,
-                    $pid,
+                    '<a class="data-toggle="tooltip" data-placement="top" title="Facilities with this equipment"" href = ' . base_url("PTRounds/FacilityParticipants/$round_uuid/$participant->facility_id") . ' >'. $participant->facility_name .'</a>',
+                    $participant->participant_id,
                     $participant->participant_lname.' '.$participant->participant_fname,
                     $participant->participant_phonenumber,
                     $change_state

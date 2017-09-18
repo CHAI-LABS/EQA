@@ -20,7 +20,7 @@
                 &nbsp; Ready Participants
                 <div class = "pull-right">
                 
-                    <a href = "<?= @base_url('PTRounds/'); ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i> Back to Rounds</button></a><br /><br />
+                    <a href = "<?= @$back_link; ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i> <?= @$back_name; ?></button></a><br /><br />
                 
                 </div>
             </div>
