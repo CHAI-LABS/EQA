@@ -570,21 +570,25 @@ class Analysis extends DashboardController {
             $grade = (($acceptable / $samp_counter) * 100);
 
 
-            $overall_grade = $grade . ' %';
+            $overall_grade = round($grade, 2) . ' %';
 
             if($grade == 100){
                 $review = "Satisfactory Performance";
+            }else if($grade > 0 && $grade < 100){
+                $review = "Unsatisfactory Performance";
             }else if($zerocount == $samp_counter){
                 $review = "Non-responsive";
             }else{
                 $review = "Incomplete Submission";
             }
 
-            $part_details = $this->db->get_where('users_v', ['username' =>  $submission->participant_id])->row();
-            
             
 
-            array_push($tabledata, $overall_grade,$review,$part_details->firstname,$part_details->phone,$part_details->email_address);
+            $part_details = $this->db->get_where('users_v', ['username' =>  $submission->participant_id])->row();
+            
+            $name = $part_details->firstname . ' ' . $part_details->lastname;
+
+            array_push($tabledata, $overall_grade,$review,$name,$part_details->phone,$part_details->email_address);
 
             $table[$count] = $tabledata;
            

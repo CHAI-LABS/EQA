@@ -3,3 +3,21 @@
 html{
 	font-family: tahoma;
 }
+
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td.spacings {
+    padding: 15px;
+    text-align: left;
+}
+
+td.spacings {
+  height: 50px;
+    margin: 10px;
+}

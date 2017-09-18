@@ -5,7 +5,7 @@ class Home extends MY_Controller {
 	public function __construct(){
 		parent::__construct();
 
-		$this->load->model('home_m');
+		$this->load->model('Home_m');
 	}
 
 	public function index()
@@ -99,7 +99,8 @@ class Home extends MY_Controller {
                 'email'  	=>  $email,
                 'subject'  	=>  $subject,
                 'message'  	=>  $message,
-                'to'		=>  $email_to
+                'to'		=>  $email_to,
+                'cc'        =>  'ruth3mumo@gmail.com'
             ];
 
             $body = $this->load->view('Template/email/message_v', $data, TRUE);

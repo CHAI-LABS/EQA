@@ -251,13 +251,61 @@ class Import extends MY_Controller {
 
 			            	$this->db->insert('participant_equipment', $insertdata4);
 
+
+			            	$insertdata5 = [
+			            		'batch_name'    =>  "Batch_".$submission_id,
+				                'description'    => "Testing for batch for Participant ID ".$submission_id,
+				                'pt_round_id'    =>  1
+			            	];
+
+			            	$this->db->insert('pt_batches', $insertdata5);
+
+
+
+			            	$round_uuid = $this->db->get_where('pt_round', ['id'=>1])->row()->uuid;
+			            	$participant_det = $this->db->get_where('participants', ['participant_id'=>$submission_id])->row();
+
+			            	$insertdata6 = [
+			            		'pt_round_no'    =>  $round_uuid,
+				                'participant_id'    => $participant_det->uuid,
+				                'participant_facility'    =>  $participant_det->participant_facility,
+				                'status'    =>  1,
+				                'verdict'    =>  1,
+				                'lab_result'    =>  1
+			            	];
+
+			            	$this->db->insert('participant_readiness', $insertdata6);
+
+							$date1 = date("Y-m-d",strtotime("2017-08-08"));
+							$date2 = date("Y-m-d",strtotime("2017-08-09"));
+							$date3 = date("Y-m-d",strtotime("2017-08-10"));
+
+
+			            	$insertdata7 = [
+			            		'pt_batch_id'    =>  $submission_id,
+				                'pt_readiness_id'    => $submission_id,
+				                'panel_preparation_date'    =>  $date1,
+				                'panel_preparation_notes'    => "They are finished, they are done",
+				                'courier_collection_date'    =>  $date2,
+				                'courier_company'    => "G4S Courier",
+				                'courier_official'    =>  "Mr. Mareka",
+				                'courier_dispatch_notes'    => "They are on their way",
+				                'participant_received_date'    =>  $date3,
+				                'panel_condition_comment'    => "OK we guess",
+				                'panel_received_entered'    =>  $submission_id,
+				                'receipt'    => 1,
+				                'panel_condition'    =>  1
+			            	];
+
+			            	$this->db->insert('pt_panel_tracking', $insertdata7);
+
                    		}
 					}
 
 					
 				}
 
-				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();	
+				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();	
 			}
 		}
 	}

@@ -20,13 +20,14 @@ class Mailer
         
 	}
 
-	public function sendMail($to, $subject, $body, $bcc = null){
+	public function sendMail($to, $subject, $body, $cc=null, $bcc = null){
 		$message = Swift_Message::newInstance();
 		$body = Premailer::html($body);
 		$message->setSubject($subject)
 				->setFrom($this->ci->config->item('from'), $this->ci->config->item('fromName'))
 				->setTo($to)
 				->setBcc($bcc)
+				->setCc($cc)
 				->setBody($body['html'], 'text/html');
 		$mailer = Swift_Mailer::newInstance($this->transport);
 
