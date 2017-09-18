@@ -101,7 +101,7 @@ class Analysis extends DashboardController {
         $column_data = $row_data = array();
 
         $html_body = '
-        <table class="data-table">
+        <table>
         <thead>
         <tr>
             <th>No.</th>
@@ -164,9 +164,9 @@ class Analysis extends DashboardController {
 
                     case 'pdf':
                         $html_body .= '<tr>';
-                        $html_body .= '<td>'.$counter.'</td>';
-                        $html_body .= '<td>'.$facility_name.'</td>';
-                        $html_body .= '<td>'.$part_result->cd4_absolute.'</td>';
+                        $html_body .= '<td class="spacings">'.$counter.'</td>';
+                        $html_body .= '<td class="spacings">'.$facility_name.'</td>';
+                        $html_body .= '<td class="spacings">'.$part_result->cd4_absolute.'</td>';
                         $html_body .= "</tr></ol>";
                         break;
                     
@@ -204,7 +204,7 @@ class Analysis extends DashboardController {
             $html_body .= '</tbody></table>';
             $pdf_data = array("pdf_title" => "Participant_Sample_Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report', 'pdf_topic' => 'Sample_Report');
 
-            $this->export->pdf($html_body,$pdf_data);
+            $this->export->create_pdf($html_body,$pdf_data);
             // $this->export->create_pdf($pdf_data);
 
         }

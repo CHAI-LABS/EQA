@@ -81,50 +81,50 @@ endif;
 }
 
 
-    public function create_pdf($pdf_data=NULL){
+//     public function create_pdf($pdf_data=NULL){
 
-if(count($pdf_data)>0): 
+// if(count($pdf_data)>0): 
     
-$image=base_url().'assets/images/mareka.jpg';
-$html_title="<div align=center><img src='$image' height='70' width='70'style='vertical-align: top;'> </img></div>
-<div style='text-align:center; font-family: arial,helvetica,clean,sans-serif;display: block; font-weight: bold; font-size: 14px;'>".$pdf_data['pdf_title']."</div>
+// $image=base_url().'assets/images/mareka.jpg';
+// $html_title="<div align=center><img src='$image' height='70' width='70'style='vertical-align: top;'> </img></div>
+// <div style='text-align:center; font-family: arial,helvetica,clean,sans-serif;display: block; font-weight: bold; font-size: 14px;'>".$pdf_data['pdf_title']."</div>
 
-<div style='text-align:center; font-family: arial,helvetica,clean,sans-serif;display: block; font-weight: bold; font-size: 14px;'>SokoHewani Limited</div>
+// <div style='text-align:center; font-family: arial,helvetica,clean,sans-serif;display: block; font-weight: bold; font-size: 14px;'>SokoHewani Limited</div>
 
-<div style='text-align:center; font-family: arial,helvetica,clean,sans-serif;display: block; font-weight: bold;display: block; font-size: 13px;'>".$pdf_data['pdf_topic']." Report</div><hr/>";
+// <div style='text-align:center; font-family: arial,helvetica,clean,sans-serif;display: block; font-weight: bold;display: block; font-size: 13px;'>".$pdf_data['pdf_topic']." Report</div><hr/>";
 
-$table_style='<style>table.data-table {border: 1px solid #DDD;margin: 10px auto;border-spacing: 0px;}
-                     table.data-table th {border: none;color: #036;text-align: center;border: 1px solid #DDD;border-top: none;max-width: 450px;}
-                     table.data-table td, table th {padding: 4px;}
-                     table.data-table td {border: none;border-left: 1px solid #DDD;border-right: 1px solid #DDD;height: 30px;margin: 0px;border-bottom: 1px solid #DDD;}
-              </style>';
+// $table_style='<style>table.data-table {border: 1px solid #DDD;margin: 10px auto;border-spacing: 0px;}
+//                      table.data-table th {border: none;color: #036;text-align: center;border: 1px solid #DDD;border-top: none;max-width: 450px;}
+//                      table.data-table td, table th {padding: 4px;}
+//                      table.data-table td {border: none;border-left: 1px solid #DDD;border-right: 1px solid #DDD;height: 30px;margin: 0px;border-bottom: 1px solid #DDD;}
+//               </style>';
             
-            $this->mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
-            $this->mpdf->ignore_invalid_utf8 = true;
-            $this->mpdf->WriteHTML($html_title);
-            $this->mpdf->defaultheaderline = 1;  
-            $this->mpdf->simpleTables = true;
-            $this->mpdf->WriteHTML($table_style.$pdf_data['pdf_html_body']);
-            $this->mpdf->SetFooter("{DATE D j M Y }|{PAGENO}/{nb}|Prepared by: EQA");
+//             $this->mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
+//             $this->mpdf->ignore_invalid_utf8 = true;
+//             $this->mpdf->WriteHTML($html_title);
+//             $this->mpdf->defaultheaderline = 1;  
+//             $this->mpdf->simpleTables = true;
+//             $this->mpdf->WriteHTML($table_style.$pdf_data['pdf_html_body']);
+//             $this->mpdf->SetFooter("{DATE D j M Y }|{PAGENO}/{nb}|Prepared by: EQA");
 
             
-    if($pdf_data['pdf_view_option']=='save_file'):
-         //change the pdf to a binary file then use codeigniter write function to write the file as pdf in a specific folder 
+//     if($pdf_data['pdf_view_option']=='save_file'):
+//          //change the pdf to a binary file then use codeigniter write function to write the file as pdf in a specific folder 
          
-         // $this->mpdf->Output(realpath($path).'arif.pdf','F'); 
-            if(write_file( './pdf/'.$pdf_data['file_name'].'.pdf',$this->mpdf->Output($pdf_data['file_name'],'S'))):return true; else: return false; endif;
-            else:
-            //show the pdf on the bowser let the user determine where to save it;
-            $this->mpdf->Output($pdf_data['file_name'],'I');
-            exit;
-    endif;      
+//          // $this->mpdf->Output(realpath($path).'arif.pdf','F'); 
+//             if(write_file( './pdf/'.$pdf_data['file_name'].'.pdf',$this->mpdf->Output($pdf_data['file_name'],'S'))):return true; else: return false; endif;
+//             else:
+//             //show the pdf on the bowser let the user determine where to save it;
+//             $this->mpdf->Output($pdf_data['file_name'],'I');
+//             exit;
+//     endif;      
 
     
-endif;
-}
+// endif;
+// }
 
 
-function pdf($html, $data){
+function create_pdf($html, $data){
     $pdf = $this->pdf->load();
 
     $pdf->AddPage("P");
@@ -151,7 +151,6 @@ function pdf($html, $data){
     ');
 
     $pdf->output();
-  }
 
 
 }
@@ -258,6 +257,8 @@ function pdf($html, $data){
 
     return $high_chart;     
   }
+
+}
 
 
 
