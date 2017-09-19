@@ -92,8 +92,137 @@ class Analysis extends DashboardController {
 
 
 
-	public function createParticipantResultsTable($type,$round_id,$equipment_id,$sample_id)
+    public function createParticipantResultsAbsolute($type, $round_id,$equipment_id,$sample_id,$cdtype)
+    {
+        
+        // echo'<pre>';print_r($cdtype);echo'</pre>';die();
+
+        // $this->auth->check();
+
+        $template = $this->config->item('default');
+        $column_data = $row_data = array();
+
+        $html_body = '
+        <table>
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Facility Name</th>
+            <th>'.$cdtype.' Absolute Result</th>
+        </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
+
+        $heading = [
+            "No.",
+            "Facility",
+            $cdtype." Absolute Result"
+        ];
+        $tabledata = [];
+
+        
+        $part_results = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample_id])->result();
+         
+
+        if($part_results){
+            $counter = 0;
+            foreach($part_results as $part_result){
+                $counter ++;
+
+                $participant_id = $this->db->get_where('participant_readiness_v', ['p_id' => $part_result->participant_id])->row();
+
+
+                if($participant_id){
+                    $pid = $participant_id->username;
+
+                    $facilityid = $this->db->get_where('participant_readiness_v', ['username' => $pid])->row();
+
+                    if($facilityid){
+                        $facility_id = $facilityid->facility_id;
+
+                        $facility_name = $this->db->get_where('facility_v', ['facility_id' =>  $facility_id])->row()->facility_name;
+                    }else{
+                        $facility_name = "No Facility";
+                    }
+                }else{
+                    $facility_name = "No Facility";
+                }
+
+                $type_absolute = $cdtype.'_absolute';
+
+                // echo'<pre>';print_r($type_absolute);echo'</pre>';die();
+
+                switch ($type) {
+                    case 'table':
+                        $tabledata[] = [
+                    $counter,
+                    $facility_name,
+                    $part_result->$type_absolute
+                ];
+                        break;
+
+                    case 'excel':
+                        array_push($row_data, array($counter, $facility_name, $part_result->$type_absolute));
+
+                        
+                        break;
+
+                    case 'pdf':
+                        $html_body .= '<tr>';
+                        $html_body .= '<td class="spacings">'.$counter.'</td>';
+                        $html_body .= '<td class="spacings">'.$facility_name.'</td>';
+                        $html_body .= '<td class="spacings">'.$part_result->$type_absolute.'</td>';
+                        $html_body .= "</tr></ol>";
+                        break;
+                    
+                    default:
+                        echo "<pre>";print_r("Something went wrong... Please contact your administrator");echo "</pre>";die();
+                        break;
+                }
+                
+                
+            }
+        }
+
+        if($type == 'table'){
+
+            $this->table->set_heading($heading);
+            $this->table->set_template($template);
+
+            return $this->table->generate($tabledata);
+
+        }else if($type == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report', 'file_name' => 'Sample_Report', 'excel_topic' => 'Sample_Report');
+
+            $column_data = array('No.','Facility Name','CD4 Absolute Result');
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            // echo'<pre>';print_r($excel_data);echo'</pre>';die();
+
+            $this->export->create_excel($excel_data);
+
+        }else if($type == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => "Participant_Sample_Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report', 'pdf_topic' => 'Sample_Report');
+
+            $this->export->create_pdf($html_body,$pdf_data);
+            // $this->export->create_pdf($pdf_data);
+
+        }
+        
+    }
+
+
+
+	public function createParticipantResultsPercent($type, $round_id,$equipment_id,$sample_id,$cdtype)
 	{
+        
+        // echo'<pre>';print_r($cdtype);echo'</pre>';die();
 
         // $this->auth->check();
 
@@ -106,7 +235,7 @@ class Analysis extends DashboardController {
         <tr>
             <th>No.</th>
             <th>Facility Name</th>
-            <th>CD4 Absolute Result</th>
+            <th>'.$cdtype.' Percent Result</th>
         </tr> 
         </thead>
         <tbody>
@@ -115,7 +244,7 @@ class Analysis extends DashboardController {
         $heading = [
             "No.",
             "Facility",
-            "CD4 Absolute Result"
+            $cdtype." Percent Result"
         ];
 		$tabledata = [];
 
@@ -147,26 +276,30 @@ class Analysis extends DashboardController {
                     $facility_name = "No Facility";
                 }
 
+                $type_percent = $cdtype.'_percent';
+
+                // echo'<pre>';print_r($type_absolute);echo'</pre>';die();
+
                 switch ($type) {
                     case 'table':
                         $tabledata[] = [
                     $counter,
                     $facility_name,
-                    $part_result->cd4_absolute
+                    $part_result->$type_percent
                 ];
                         break;
 
                     case 'excel':
-                        array_push($row_data, array($counter, $facility_name, $part_result->cd4_absolute));
+                        array_push($row_data, array($counter, $facility_name, $part_result->$type_percent));
 
-                        // echo'<pre>';print_r($row_data);echo'</pre>';die();
+                        
                         break;
 
                     case 'pdf':
                         $html_body .= '<tr>';
                         $html_body .= '<td class="spacings">'.$counter.'</td>';
                         $html_body .= '<td class="spacings">'.$facility_name.'</td>';
-                        $html_body .= '<td class="spacings">'.$part_result->cd4_absolute.'</td>';
+                        $html_body .= '<td class="spacings">'.$part_result->$type_percent.'</td>';
                         $html_body .= "</tr></ol>";
                         break;
                     
@@ -294,7 +427,131 @@ class Analysis extends DashboardController {
         return $this->table->generate($tabledata);
 	}
 
-	public function ParticipantInfo($round_id,$equipment_id,$sample_id)
+
+
+    public function ParticipantAbsoluteInfo($round_id,$equipment_id,$sample_id, $type)
+    {
+
+        $round_id_name = $this->db->get_where('pt_round', ['id' =>  $round_id])->row()->pt_round_no;
+        $equipment_name = $this->db->get_where('equipment', ['id' =>  $equipment_id])->row()->equipment_name;
+        $sample_name = $this->db->get_where('pt_samples', ['id' =>  $sample_id])->row()->sample_name;
+
+        
+
+        $cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample_id])->row();
+
+        switch ($type) {
+            case 'cd3':
+                $mean = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_mean : 0;
+        $sd = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_sd : 0;
+        $sd2 = ($cd4_calculated_values) ? $cd4_calculated_values->double_cd3_absolute_sd : 0;
+        $upper = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_upper_limit : 0;
+        $lower = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_lower_limit : 0;
+                break;
+
+            case 'cd4':
+                $mean = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_mean : 0;
+        $sd = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_sd : 0;
+        $sd2 = ($cd4_calculated_values) ? $cd4_calculated_values->double_cd4_absolute_sd : 0;
+        $upper = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_upper_limit : 0;
+        $lower = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_lower_limit : 0;
+                break;
+
+            case 'other':
+                $mean = ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_mean : 0;
+        $sd = ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_sd : 0;
+        $sd2 = ($cd4_calculated_values) ? $cd4_calculated_values->double_other_absolute_sd : 0;
+        $upper = ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_upper_limit : 0;
+        $lower = ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_lower_limit : 0;
+                break;
+            
+            default:
+                echo "<pre>";print_r("Something went wrong...Please contact the administrator");echo "</pre>";die();
+                break;
+        }
+
+        
+
+
+        // echo "<pre>";print_r($round_id_name);echo "</pre>";die();
+        $part_info = '';
+
+        $part_info .= '<div class = "row">
+                                    <div class="col-md-6">
+                                        <div class = "card card-outline-danger">
+                                            <div class="card-header col-4">
+                                                <i class = "icon-chart"></i>
+                                                &nbsp;
+
+                                                    General Details
+
+                                            </div>
+
+                                            <div class = "card-block">
+                                            Round ID : <strong>';
+
+                                            $part_info .= $round_id_name;
+
+                                            $part_info .= '</strong> <br/> Equipment : <strong>';
+
+                                            $part_info .= $equipment_name;
+
+                                            $part_info .= '</strong> <br/> Sample : <strong>';
+
+                                            $part_info .= $sample_name;
+
+        $part_info .= ' </strong> <br/></div>
+                       </div>
+                    </div>
+
+                    <div class="col-md-6">
+                                        <div class = "card card-outline-info">
+                                            <div class="card-header col-4">
+                                                <i class = "icon-chart"></i>
+                                                &nbsp;
+
+                                                    Participants Information
+
+                                            </div>
+                                            <div class = "card-block">
+                                                <div class="col-md-6">
+                                                Mean : <strong>';
+
+                                                $part_info .= $mean;
+
+                                                $part_info .= '</strong> <br/> SD : <strong>';
+
+                                                $part_info .= $sd;
+
+                                                $part_info .= '</strong> <br/> 2SD : <strong>';
+
+                                                $part_info .= $sd2;
+
+        $part_info .= ' </strong> <br/>
+                        </div>
+                        <div class="col-md-6">
+                            Upper Limit: <strong>';
+
+                            $part_info .= $upper;
+
+                            $part_info .= '</strong> <br/> Lower Limit : <strong>';
+
+                            $part_info .= $lower;
+
+                            $part_info .= ' </strong> <br/> 
+                        </div>
+                       </div>
+                    </div>
+                  </div>
+                  </div>';
+        
+        return $part_info;
+    }
+
+
+
+
+	public function ParticipantPercentInfo($round_id,$equipment_id,$sample_id, $type)
 	{
 
 		$round_id_name = $this->db->get_where('pt_round', ['id' =>  $round_id])->row()->pt_round_no;
@@ -305,11 +562,37 @@ class Analysis extends DashboardController {
 
 		$cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample_id])->row();
 
-		$mean = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_mean : 0;
-        $sd = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_sd : 0;
-        $sd2 = ($cd4_calculated_values) ? $cd4_calculated_values->double_cd4_absolute_sd : 0;
-        $upper = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_upper_limit : 0;
-        $lower = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_lower_limit : 0;
+        switch ($type) {
+            case 'cd3':
+                $mean = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_mean : 0;
+        $sd = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_sd : 0;
+        $sd2 = ($cd4_calculated_values) ? $cd4_calculated_values->double_cd3_percent_sd : 0;
+        $upper = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_upper_limit : 0;
+        $lower = ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_lower_limit : 0;
+                break;
+
+            case 'cd4':
+                $mean = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_mean : 0;
+        $sd = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_sd : 0;
+        $sd2 = ($cd4_calculated_values) ? $cd4_calculated_values->double_cd4_percent_sd : 0;
+        $upper = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_upper_limit : 0;
+        $lower = ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_lower_limit : 0;
+                break;
+
+            case 'other':
+                $mean = ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_mean : 0;
+        $sd = ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_sd : 0;
+        $sd2 = ($cd4_calculated_values) ? $cd4_calculated_values->double_other_percent_sd : 0;
+        $upper = ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_upper_limit : 0;
+        $lower = ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_lower_limit : 0;
+                break;
+            
+            default:
+                echo "<pre>";print_r("Something went wrong...Please contact the administrator");echo "</pre>";die();
+                break;
+        }
+
+		
 
 
 		// echo "<pre>";print_r($round_id_name);echo "</pre>";die();
@@ -387,23 +670,40 @@ class Analysis extends DashboardController {
         return $part_info;
 	}
 
-	public function ParticipantResults($round_id,$equipment_id,$sample_id)
+	public function ParticipantResults($round_id,$equipment_id,$sample_id,$cdtype,$resulttype)
 	{	
 		$data = [];
         $title = "Participant Results";
+        
 
         $round_uuid = $this->db->get_where('pt_round', ['id' =>  $round_id])->row()->uuid;
+// echo'<pre>';print_r($cdtype);echo'</pre>';die();
 
-            $data = [
-            	'round_uuid' => $round_uuid,
-            	'participants_info' => $this->ParticipantInfo($round_id,$equipment_id,$sample_id),
-                'results_table'    =>  $this->createParticipantResultsTable('table',$round_id,$equipment_id,$sample_id),
-                'excel_link'    =>  base_url('Analysis/createParticipantResultsTable/excel/' . $round_id . '/' . $equipment_id . '/' . $sample_id),
-                'pdf_link'    =>  base_url('Analysis/createParticipantResultsTable/pdf/' . $round_id . '/' . $equipment_id . '/' . $sample_id)
-            ];
+        switch ($resulttype) {
+            case 'absolute':
+                $data = [
+                    'round_uuid' => $round_uuid,
+                    'participants_info' => $this->ParticipantAbsoluteInfo($round_id,$equipment_id,$sample_id,$cdtype),
+                    'results_table'    =>  $this->createParticipantResultsAbsolute('table',$round_id,$equipment_id,$sample_id,$cdtype),
+                    'excel_link'    =>  base_url('Analysis/createParticipantResultsAbsolute/excel/' . $round_id . '/' . $equipment_id . '/' . $sample_id .'/'. $cdtype),
+                    'pdf_link'    =>  base_url('Analysis/createParticipantResultsAbsolute/pdf/' . $round_id . '/' . $equipment_id . '/' . $sample_id .'/'. $cdtype)
+                ];
+                break;
 
-
-
+            case 'percent':
+                $data = [
+                    'round_uuid' => $round_uuid,
+                    'participants_info' => $this->ParticipantPercentInfo($round_id,$equipment_id,$sample_id,$cdtype),
+                    'results_table'    =>  $this->createParticipantResultsPercent('table',$round_id,$equipment_id,$sample_id,$cdtype),
+                    'excel_link'    =>  base_url('Analysis/createParticipantResultsPercent/excel/' . $round_id . '/' . $equipment_id . '/' . $sample_id .'/'. $cdtype),
+                    'pdf_link'    =>  base_url('Analysis/createParticipantResultsPercent/pdf/' . $round_id . '/' . $equipment_id . '/' . $sample_id .'/'. $cdtype)
+                ];
+                break;
+            
+            default:
+                echo "<pre>";print_r("Something went wrong...Please contact the administrator");echo "</pre>";die();
+                break;
+        }   
 
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
@@ -445,7 +745,7 @@ class Analysis extends DashboardController {
                     $table_body = [];
                     $table_body[] = $sample->sample_name;
                     
-                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id)."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+                    
 
                     $cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
 
@@ -453,6 +753,10 @@ class Analysis extends DashboardController {
 
                     switch ($type) {
                         case 'cd3':
+
+                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+
                             $tabledata[] = [
                         $sample->sample_name,
                         ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_mean : 0,
@@ -472,6 +776,10 @@ class Analysis extends DashboardController {
                             break;
 
                         case 'cd4':
+
+                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+
                             $tabledata[] = [
                         $sample->sample_name,
                         ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_mean : 0,
@@ -491,6 +799,10 @@ class Analysis extends DashboardController {
                             break;
 
                         case 'other':
+
+                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+
                             $tabledata[] = [
                         $sample->sample_name,
                         ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_mean : 0,
@@ -549,8 +861,6 @@ class Analysis extends DashboardController {
         foreach($samples as $sample){
                     $table_body = [];
                     $table_body[] = $sample->sample_name;
-                    
-                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id)."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
                     $cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
 
@@ -558,6 +868,9 @@ class Analysis extends DashboardController {
 
                     switch ($type) {
                         case 'cd3':
+
+                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/percent')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
                             $tabledata[] = [
                         $sample->sample_name,
                         ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_mean : 0,
@@ -577,6 +890,9 @@ class Analysis extends DashboardController {
                             break;
 
                         case 'cd4':
+
+                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/percent')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
                             $tabledata[] = [
                         $sample->sample_name,
                         ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_mean : 0,
@@ -596,6 +912,10 @@ class Analysis extends DashboardController {
                             break;
 
                         case 'other':
+
+                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/percent')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+                            
                             $tabledata[] = [
                         $sample->sample_name,
                         ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_mean : 0,
