@@ -208,7 +208,7 @@ class Analysis extends DashboardController {
         }else if($type == 'pdf'){
 
             $html_body .= '</tbody></table>';
-            $pdf_data = array("pdf_title" => "Participant_Sample_Report_for_'.$cdtype.'_absolute", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report_for_'.$cdtype.'_absolute', 'pdf_topic' => 'Sample_Report_for_'.$cdtype.'_absolute');
+            $pdf_data = array("pdf_title" => "Participant_Sample_Report_for_".$cdtype."_absolute", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report_for_'.$cdtype.'_absolute', 'pdf_topic' => 'Sample_Report_for_'.$cdtype.'_absolute');
 
             $this->export->create_pdf($html_body,$pdf_data);
             // $this->export->create_pdf($pdf_data);
@@ -717,8 +717,10 @@ class Analysis extends DashboardController {
                 ->adminTemplate();
 	}
 
-	public function createAbsolutePeerTable($round_id, $equipment_id, $type){
+	public function createAbsolutePeerTable($form, $round_id, $equipment_id, $type){
 		$template = $this->config->item('default');
+
+        $mean = $sd = $sd2 = $upper = $lower = 0;
 
 		$where = ['pt_round_id' =>  $round_id];
         $samples = $this->db->get_where('pt_samples', $where)->result();
@@ -728,6 +730,22 @@ class Analysis extends DashboardController {
                             'round_id'   => $round_id,
                             'equipment_id'  => $equipment_id
                         ];
+
+        $html_body = '
+        <table>
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Sample ID</th>
+            <th>Mean</th>
+            <th>SD</th>
+            <th>Double SD</th>
+            <th>Upper Limit</th>
+            <th>Lower Limit</th>
+        </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
 
 	
         $heading = [
@@ -742,99 +760,149 @@ class Analysis extends DashboardController {
         $tabledata = [];
 
         foreach($samples as $sample){
-                    $table_body = [];
-                    $table_body[] = $sample->sample_name;
-                    
-                    
+            $table_body = [];
+            $table_body[] = $sample->sample_name;
+            
+            
 
-                    $cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+            $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
 
-                    // echo "<pre>";print_r($cd4_calculated_values);echo "</pre>";die();
+            
+            switch ($form) {
+                case 'table':
 
                     switch ($type) {
                         case 'cd3':
 
-                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
 
+                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
-                            $tabledata[] = [
-                        $sample->sample_name,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_mean : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_sd : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->double_cd3_absolute_sd : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_upper_limit : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_lower_limit : 0,
-                        "<div class = 'dropdown'>
-                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
-                                Act
-                            </button>
-                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
-                                $view
-                            </div>
-                        </div>"
-                    ];
-                            break;
+                            if($calculated_values){
+                                $mean = $calculated_values->cd3_absolute_mean;
+                                $sd = $calculated_values->cd3_absolute_sd;
+                                $sd2 = $calculated_values->double_cd3_absolute_sd;
+                                $upper_limit = $calculated_values->cd3_absolute_upper_limit;
+                                $lower_limit = $calculated_values->cd3_absolute_lower_limit;
+                            }else{
+                                // echo "<pre>";print_r('cd3');echo "</pre>";die();
+                            }
+
+                        break;
 
                         case 'cd4':
+                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
 
-                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
-
-                            $tabledata[] = [
-                        $sample->sample_name,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_mean : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_sd : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->double_cd4_absolute_sd : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_upper_limit : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_lower_limit : 0,
-                        "<div class = 'dropdown'>
-                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
-                                Act
-                            </button>
-                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
-                                $view
-                            </div>
-                        </div>"
-                    ];
-                            break;
+                            if($calculated_values){
+                                $mean = $calculated_values->cd4_absolute_mean;
+                                $sd = $calculated_values->cd4_absolute_sd;
+                                $sd2 = $calculated_values->double_cd4_absolute_sd;
+                                $upper_limit = $calculated_values->cd4_absolute_upper_limit;
+                                $lower_limit = $calculated_values->cd4_absolute_lower_limit;
+                            }else{
+                                // echo "<pre>";print_r('cd4');echo "</pre>";die();
+                            }
+                        break;
 
                         case 'other':
+                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
 
-                        $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
-
-                            $tabledata[] = [
-                        $sample->sample_name,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_mean : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_sd : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->double_other_absolute_sd : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_upper_limit : 0,
-                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_lower_limit : 0,
-                        "<div class = 'dropdown'>
-                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
-                                Act
-                            </button>
-                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
-                                $view
-                            </div>
-                        </div>"
-                    ];
-                            break;
+                            if($calculated_values){
+                                $mean = $calculated_values->other_absolute_mean;
+                                $sd = $calculated_values->other_absolute_sd;
+                                $sd2 = $calculated_values->double_other_absolute_sd;
+                                $upper_limit = $calculated_values->other_absolute_upper_limit;
+                                $lower_limit = $calculated_values->other_absolute_lower_limit;
+                            }else{
+                                // echo "<pre>";print_r('other');echo "</pre>";die();
+                            }
+                        break;
                         
                         default:
                             echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
-                            break;
+                        break;
                     }
-                }
 
-                $this->table->set_template($template);
-                $this->table->set_heading($heading);
+                    $tabledata[] = [
+                                $sample->sample_name,
+                                ($calculated_values) ? $mean : 0,
+                                ($calculated_values) ? $sd : 0,
+                                ($calculated_values) ? $sd2 : 0,
+                                ($calculated_values) ? $upper_limit : 0,
+                                ($calculated_values) ? $lower_limit : 0,
+                                "<div class = 'dropdown'>
+                                    <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                        Act
+                                    </button>
+                                    <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                        $view
+                                    </div>
+                                </div>"
+                            ];
+                break;
 
-        return $this->table->generate($tabledata);
+                case 'excel':
+                    array_push($row_data, array($counter, $sample->sample_name, $mean, $sd, $sd2,$upper_limit, $lower_limit));
+                break;
+
+                case 'pdf':
+                    $html_body .= '<tr>';
+                    $html_body .= '<td class="spacings">'.$counter.'</td>';
+                    $html_body .= '<td class="spacings">'.$sample->sample_name.'</td>';
+                    $html_body .= '<td class="spacings">'.$mean.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd2.'</td>';
+                    $html_body .= '<td class="spacings">'.$upper_limit.'</td>';
+                    $html_body .= '<td class="spacings">'.$lower_limit.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+
+            
+        }
+
+        if($type == 'table'){
+
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
+
+            return $this->table->generate($tabledata);
+
+        }else if($type == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report_for_'.$cdtype.'_absolute', 'file_name' => 'Sample_Report_for_'.$cdtype.'_absolute', 'excel_topic' => 'Sample_Report_for_'.$cdtype.'_absolute');
+
+            $column_data = array('No.','Sample ID','Mean','SD','Double SD','Upper Limit','Lower Limit');
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            // echo'<pre>';print_r($excel_data);echo'</pre>';die();
+
+            $this->export->create_excel($excel_data);
+
+        }else if($type == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => "Report_for_".$cdtype."_absolute", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Report_for_'.$cdtype.'_absolute', 'pdf_topic' => 'Report_for_'.$cdtype.'_absolute');
+
+            $this->export->create_pdf($html_body,$pdf_data);
+            // $this->export->create_pdf($pdf_data);
+
+        }              
 	}
 
 
-    public function createPercentPeerTable($round_id, $equipment_id, $type){
+    public function createPercentPeerTable($form, $round_id, $equipment_id, $type){
         $template = $this->config->item('default');
 
         $where = ['pt_round_id' =>  $round_id];
@@ -1265,7 +1333,7 @@ class Analysis extends DashboardController {
                                 </div>
                                 <div class = "card-block">';
 
-            $equipment_tabs .= $this->createAbsolutePeerTable($round_id, $equipment_id,'cd4');
+            $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'cd4');
 
             $equipment_tabs .= '</div>
                             </div>
@@ -1280,7 +1348,7 @@ class Analysis extends DashboardController {
                                 </div>
                                 <div class = "card-block">';
 
-            $equipment_tabs .= $this->createPercentPeerTable($round_id, $equipment_id,'cd4');
+            $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'cd4');
 
             $equipment_tabs .= '</div>
                             </div>
@@ -1301,7 +1369,7 @@ class Analysis extends DashboardController {
                                 </div>
                                 <div class = "card-block">';
 
-            $equipment_tabs .= $this->createAbsolutePeerTable($round_id, $equipment_id,'cd3');
+            $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'cd3');
 
             $equipment_tabs .= '</div>
                             </div>
@@ -1316,7 +1384,7 @@ class Analysis extends DashboardController {
                                 </div>
                                 <div class = "card-block">';
 
-            $equipment_tabs .= $this->createPercentPeerTable($round_id, $equipment_id,'cd3');
+            $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'cd3');
 
             $equipment_tabs .= '</div>
                             </div>
@@ -1336,7 +1404,7 @@ class Analysis extends DashboardController {
                                 </div>
                                 <div class = "card-block">';
 
-            $equipment_tabs .= $this->createAbsolutePeerTable($round_id, $equipment_id,'other');
+            $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'other');
 
             $equipment_tabs .= '</div>
                             </div>
@@ -1351,7 +1419,7 @@ class Analysis extends DashboardController {
                                 </div>
                                 <div class = "card-block">';
 
-            $equipment_tabs .= $this->createPercentPeerTable($round_id, $equipment_id,'other');
+            $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'other');
 
             $equipment_tabs .= '</div>
                             </div>
