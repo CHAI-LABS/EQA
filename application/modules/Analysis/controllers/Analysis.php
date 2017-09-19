@@ -195,9 +195,9 @@ class Analysis extends DashboardController {
         }else if($type == 'excel'){
 
             $excel_data = array();
-            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report', 'file_name' => 'Sample_Report', 'excel_topic' => 'Sample_Report');
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report_for_'.$cdtype.'_absolute', 'file_name' => 'Sample_Report_for_'.$cdtype.'_absolute', 'excel_topic' => 'Sample_Report_for_'.$cdtype.'_absolute');
 
-            $column_data = array('No.','Facility Name','CD4 Absolute Result');
+            $column_data = array('No.','Facility Name',$cdtype.' Absolute Result');
             $excel_data['column_data'] = $column_data;
             $excel_data['row_data'] = $row_data;
 
@@ -208,7 +208,7 @@ class Analysis extends DashboardController {
         }else if($type == 'pdf'){
 
             $html_body .= '</tbody></table>';
-            $pdf_data = array("pdf_title" => "Participant_Sample_Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report', 'pdf_topic' => 'Sample_Report');
+            $pdf_data = array("pdf_title" => "Participant_Sample_Report_for_'.$cdtype.'_absolute", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report_for_'.$cdtype.'_absolute', 'pdf_topic' => 'Sample_Report_for_'.$cdtype.'_absolute');
 
             $this->export->create_pdf($html_body,$pdf_data);
             // $this->export->create_pdf($pdf_data);
@@ -322,9 +322,9 @@ class Analysis extends DashboardController {
         }else if($type == 'excel'){
 
             $excel_data = array();
-            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report', 'file_name' => 'Sample_Report', 'excel_topic' => 'Sample_Report');
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report_for_'.$cdtype.'_percent', 'file_name' => 'Sample_Report_for_'.$cdtype.'_percent', 'excel_topic' => 'Sample_Report_for_'.$cdtype.'_percent');
 
-            $column_data = array('No.','Facility Name','CD4 Absolute Result');
+            $column_data = array('No.','Facility Name',$cdtype.' Percent Result');
             $excel_data['column_data'] = $column_data;
             $excel_data['row_data'] = $row_data;
 
@@ -335,7 +335,7 @@ class Analysis extends DashboardController {
         }else if($type == 'pdf'){
 
             $html_body .= '</tbody></table>';
-            $pdf_data = array("pdf_title" => "Participant_Sample_Report", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report', 'pdf_topic' => 'Sample_Report');
+            $pdf_data = array("pdf_title" => "Participant_Sample_Report_for_".$cdtype."_percent", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Sample_Report_for_'.$cdtype.'_percent', 'pdf_topic' => 'Sample_Report_for_'.$cdtype.'_percent');
 
             $this->export->create_pdf($html_body,$pdf_data);
             // $this->export->create_pdf($pdf_data);
