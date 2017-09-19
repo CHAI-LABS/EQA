@@ -417,7 +417,7 @@ class Analysis extends DashboardController {
                 ->adminTemplate();
 	}
 
-	public function createPeerTable($round_id, $equipment_id){
+	public function createAbsolutePeerTable($round_id, $equipment_id, $type){
 		$template = $this->config->item('default');
 
 		$where = ['pt_round_id' =>  $round_id];
@@ -441,8 +441,110 @@ class Analysis extends DashboardController {
         ];
         $tabledata = [];
 
-        
+        foreach($samples as $sample){
+                    $table_body = [];
+                    $table_body[] = $sample->sample_name;
+                    
+                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id)."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
+                    $cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+
+                    // echo "<pre>";print_r($cd4_calculated_values);echo "</pre>";die();
+
+                    switch ($type) {
+                        case 'cd3':
+                            $tabledata[] = [
+                        $sample->sample_name,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_mean : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->double_cd3_absolute_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_upper_limit : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_absolute_lower_limit : 0,
+                        "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Act
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $view
+                            </div>
+                        </div>"
+                    ];
+                            break;
+
+                        case 'cd4':
+                            $tabledata[] = [
+                        $sample->sample_name,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_mean : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->double_cd4_absolute_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_upper_limit : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_lower_limit : 0,
+                        "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Act
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $view
+                            </div>
+                        </div>"
+                    ];
+                            break;
+
+                        case 'other':
+                            $tabledata[] = [
+                        $sample->sample_name,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_mean : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->double_other_absolute_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_upper_limit : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_absolute_lower_limit : 0,
+                        "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Act
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $view
+                            </div>
+                        </div>"
+                    ];
+                            break;
+                        
+                        default:
+                            echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
+                            break;
+                    }
+                }
+
+                $this->table->set_template($template);
+                $this->table->set_heading($heading);
+
+        return $this->table->generate($tabledata);
+	}
+
+
+    public function createPercentPeerTable($round_id, $equipment_id, $type){
+        $template = $this->config->item('default');
+
+        $where = ['pt_round_id' =>  $round_id];
+        $samples = $this->db->get_where('pt_samples', $where)->result();
+        $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
+
+        $where_array = [
+                            'round_id'   => $round_id,
+                            'equipment_id'  => $equipment_id
+                        ];
+
+    
+        $heading = [
+            "Sample ID",
+            "Mean",
+            "SD",
+            "2SD",
+            "Upper Limit",
+            "Lower Limit",
+            "Actions"
+        ];
+        $tabledata = [];
 
         foreach($samples as $sample){
                     $table_body = [];
@@ -454,14 +556,16 @@ class Analysis extends DashboardController {
 
                     // echo "<pre>";print_r($cd4_calculated_values);echo "</pre>";die();
 
-                    $tabledata[] = [
-	                    $sample->sample_name,
-	                    ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_mean : 0,
-	                    ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_sd : 0,
-	                    ($cd4_calculated_values) ? $cd4_calculated_values->double_cd4_absolute_sd : 0,
-	                    ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_upper_limit : 0,
-	                    ($cd4_calculated_values) ? $cd4_calculated_values->cd4_absolute_lower_limit : 0,
-	                    "<div class = 'dropdown'>
+                    switch ($type) {
+                        case 'cd3':
+                            $tabledata[] = [
+                        $sample->sample_name,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_mean : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->double_cd3_percent_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_upper_limit : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd3_percent_lower_limit : 0,
+                        "<div class = 'dropdown'>
                             <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
                                 Act
                             </button>
@@ -469,15 +573,59 @@ class Analysis extends DashboardController {
                                 $view
                             </div>
                         </div>"
-                	];
+                    ];
+                            break;
 
+                        case 'cd4':
+                            $tabledata[] = [
+                        $sample->sample_name,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_mean : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->double_cd4_percent_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_upper_limit : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->cd4_percent_lower_limit : 0,
+                        "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Act
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $view
+                            </div>
+                        </div>"
+                    ];
+                            break;
+
+                        case 'other':
+                            $tabledata[] = [
+                        $sample->sample_name,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_mean : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->double_other_percent_sd : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_upper_limit : 0,
+                        ($cd4_calculated_values) ? $cd4_calculated_values->other_percent_lower_limit : 0,
+                        "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Act
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $view
+                            </div>
+                        </div>"
+                    ];
+                            break;
+                        
+                        default:
+                            echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
+                            break;
+                    }
                 }
 
                 $this->table->set_template($template);
                 $this->table->set_heading($heading);
 
         return $this->table->generate($tabledata);
-	}
+    }
+
 
     public function createParticipantTable($round_id, $equipment_id){
         $template = $this->config->item('default');
@@ -766,7 +914,7 @@ class Analysis extends DashboardController {
             
             $equipment_tabs .= '<div class = "row">
 				  
-						<div class="col-md-6">
+						<div class="col-md-12">
 							<div class = "card">
 					            <div class="card-header col-6">
 					            	<i class = "icon-chart"></i>
@@ -782,24 +930,116 @@ class Analysis extends DashboardController {
 						    </div>
 					    </div>
 
-						<div class="col-md-6">
-							<div class = "card ">
-					            <div class="card-header col-6">
-					            	<i class = "icon-chart"></i>
-				                &nbsp;
-				                Peer Results
-					            </div>
-					            <div class = "card-block">';
+				</div>';
 
-            $equipment_tabs .= $this->createPeerTable($round_id, $equipment_id);
+
+            $equipment_tabs .= '<div class = "row">
+                  
+                        <div class="col-md-6">
+                            <div class = "card">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+
+                                    CD4 Absolute Peer Results
+                                </div>
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createAbsolutePeerTable($round_id, $equipment_id,'cd4');
 
             $equipment_tabs .= '</div>
-						    </div>
-					    </div>
-				</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class = "card ">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+                                CD4 Percent Peer Results
+                                </div>
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createPercentPeerTable($round_id, $equipment_id,'cd4');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+                </div>';
 
 
-				<div class = "row">
+
+            $equipment_tabs .= '<div class = "row">
+                  
+                        <div class="col-md-6">
+                            <div class = "card">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+
+                                    CD3 Absolute Peer Results
+                                </div>
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createAbsolutePeerTable($round_id, $equipment_id,'cd3');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class = "card ">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+                                CD3 Percent Peer Results
+                                </div>
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createPercentPeerTable($round_id, $equipment_id,'cd3');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+                </div>';
+
+
+            $equipment_tabs .= '<div class = "row">
+                  
+                        <div class="col-md-6">
+                            <div class = "card">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+
+                                    Other Absolute Peer Results
+                                </div>
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createAbsolutePeerTable($round_id, $equipment_id,'other');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class = "card ">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+                                Other Percent Peer Results
+                                </div>
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createPercentPeerTable($round_id, $equipment_id,'other');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+                </div>';
+
+
+			$equipment_tabs .= 	'<div class = "row">
 				    <div class="col-md-12">
 				        <div class = "card card-outline-danger">
 				            <div class="card-header col-12">
