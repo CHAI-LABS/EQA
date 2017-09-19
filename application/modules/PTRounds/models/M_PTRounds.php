@@ -104,7 +104,7 @@ class M_PTRounds extends MY_Model{
         $this->db->from('data_entry_v dev');
         $this->db->join('pt_ready_participants prp', 'prp.participant_id = dev.participant_id');
         $this->db->where('prp.pt_round_uuid', $round_uuid);
-        $this->db->where('dev.eq_status', 0);
+        $this->db->where('dev.verdict', 2);
         $this->db->group_by('prp.facility_code');
         $this->db->order_by('prp.facility_code','asc');
         
@@ -113,27 +113,14 @@ class M_PTRounds extends MY_Model{
     }
 
     public function getQAUnresponsiveCount($round_uuid){
-        // $this->db->select('COUNT(DISTINCT(facility_id))');
-        // $this->db->from('data_entry_v dev');
-        // $this->db->join('pt_ready_participants prp', 'prp.participant_id = dev.participant_id');
-        // $this->db->where('prp.pt_round_uuid', $round_uuid);
-        // $this->db->where('dev.eq_status', 0);
-        // $this->db->group_by('prp.facility_code');
-        // $this->db->order_by('prp.facility_code','asc');
         
-
-        // return $this->db->get()->row();
-
-
         $sql = "SELECT COUNT(DISTINCT(facility_id)) AS qa_count
-         FROM data_entry_v dev
-
-JOIN pt_ready_participants prp ON prp.participant_id = dev.participant_id
-
-WHERE dev.eq_status = 0
-AND prp.pt_round_uuid = '$round_uuid'
-GROUP BY prp.facility_id
-ORDER BY prp.facility_id";
+                FROM data_entry_v dev
+                JOIN pt_ready_participants prp ON prp.participant_id = dev.participant_id
+                WHERE dev.verdict = 2
+                AND prp.pt_round_uuid = '$round_uuid'
+                GROUP BY prp.facility_id
+                ORDER BY prp.facility_id";
 
         $query = $this->db->query($sql);
 

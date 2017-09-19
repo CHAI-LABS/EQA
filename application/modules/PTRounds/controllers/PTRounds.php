@@ -540,37 +540,45 @@ class PTRounds extends DashboardController{
         $change_state = '';
 
         $facilities = $this->M_PTRounds->getQAUnresponsive($round_uuid);
-        
+        // echo '<pre>';print_r($facilities);echo "</pre>";die();
 
-        $heading = [
-            "No.",
-            "QA / Supervisor ID",
-            "Name",
-            "Phone Number",
-            "Email"
-        ];
+        
         $tabledata = [];
 
 
         
         if($facilities){
             $counter = 0;
+            $heading = [
+                        "No.",
+                        "QA / Supervisor ID",
+                        "Name",
+                        "Phone Number",
+                        "Email"
+                    ];
+                    
             foreach($facilities as $facility){
                 $counter ++;
                 
                 $qa_unresponsive = $this->db->get_where('participant_readiness_v',['facility_id'=> $facility->facility_id, 'user_type' => 'qareviewer', 'status' => 1, 'approved' => 1])->row();
 
-                // echo '<pre>';print_r($qa_unresponsive);echo "</pre>";die();
-            
-                
-                $tabledata[] = [
-                    $counter,
-                    $qa_unresponsive->username,
-                    $qa_unresponsive->lastname.' '.$qa_unresponsive->firstname,
-                    $qa_unresponsive->phone,
-                    $qa_unresponsive->email_address
-                ];
+                    
+
+                    $tabledata[] = [
+                        $counter,
+                        $qa_unresponsive->username,
+                        $qa_unresponsive->lastname.' '.$qa_unresponsive->firstname,
+                        $qa_unresponsive->phone,
+                        $qa_unresponsive->email_address
+                    ];    
             }
+        }else{
+            $heading = [
+                        "QA Table Empty"
+                    ];
+            $tabledata[] = [
+                    "No data of any QA / Supervisors that have not approved"
+                ];
         }
         $this->table->set_heading($heading);
         $this->table->set_template($template);
