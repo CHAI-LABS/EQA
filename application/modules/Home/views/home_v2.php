@@ -352,21 +352,21 @@
                 <div class="col-xs-12 col-sm-4 col-md-4">
                     <div class="fun-fact-item" data-sr='enter'>
                         <p>Over</p>
-                        <h2 class="counter">300</h2>
+                        <h2 class="counter"><?= @$cd4_count?></h2>
                         <p>CD4 Facilities</p>
                     </div>
                 </div>
                 <div class="col-xs-12 col-sm-4 col-md-4">
                     <div class="fun-fact-item" data-sr='enter'>
                         <p>Over</p>
-                        <h2 class="counter">250</h2>
+                        <h2 class="counter"><?= @$rounds_count?></h2>
                         <p>Rounds Done</p>
                     </div>
                 </div>
                 <div class="col-xs-12 col-sm-4 col-md-4">
                     <div class="fun-fact-item" data-sr='enter'>
                         <p>Over</p>
-                        <h2 class="counter">350</h2>
+                        <h2 class="counter"><?= @$participant_count?></h2>
                         <p>Participants</p>
                     </div>
                 </div>

@@ -158,7 +158,7 @@
     </div>
 </div>
 
-<div class="row">
+<!-- <div class="row">
     <div class="col-sm-6 col-lg-3">
         <div class="card">
             <div class="card-block">
@@ -191,7 +191,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <div class="row">
     <div class="col-md-12">

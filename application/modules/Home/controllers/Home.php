@@ -10,7 +10,28 @@ class Home extends MY_Controller {
 
 	public function index()
 	{
-		$this->template->setPageTitle('External Quality Assurance Programme')->setPartial('home_v2')->frontEndTemplate2();
+        $this->db->where('cd4', 1);
+        $this->db->from('facility_v');
+        $cd4 =  $this->db->count_all_results();
+
+        $rounds = $this->db->count_all('pt_round_v');
+
+        $this->db->where('approved', 1);
+        $this->db->where('user_type', "participant");
+        $this->db->from('participant_readiness_v');
+        $participants =  $this->db->count_all_results();
+
+        // echo'<pre>';print_r($participants);echo'</pre>';die();
+
+        $data = [
+                'cd4_count'    =>  $cd4,
+                'rounds_count'    =>  $rounds,
+                'participant_count'    =>  $participants
+            ];
+
+		$this->template->setPageTitle('External Quality Assurance Programme')
+                        ->setPartial('home_v2', $data)
+                        ->frontEndTemplate2();
 	}
 
     public function FAQ()
