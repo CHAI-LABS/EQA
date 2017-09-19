@@ -372,14 +372,42 @@ class Analysis extends DashboardController {
 	}
 
 
-	public function createNHRLTable($round_id, $equipment_id){
+	public function createNHRLTable($form, $round_id, $equipment_id){
 		$template = $this->config->item('default');
+
+        $tabledata = [];
+
+        $column_data = $row_data = array();
+
+        $counter = 0;
 
 		$where = ['pt_round_id' =>  $round_id];
         $samples = $this->db->get_where('pt_samples', $where)->result();
         $testers = $this->db->get_where('pt_testers', $where)->result();
         $labs = $this->db->get_where('pt_labs', $where)->result();
-        $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
+
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+
+        $html_body = '
+                    <table>
+                    <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Sample ID</th>
+                        <th>Mean</th>
+                        <th>SD</th>
+                        <th>Double SD</th>
+                        <th>Upper Limit</th>
+                        <th>Lower Limit</th>
+                    </tr> 
+                    </thead>
+                    <tbody>
+                    <ol type="a">';
 
         $heading = [
             "Sample ID",
@@ -389,33 +417,89 @@ class Analysis extends DashboardController {
             "Upper Limit",
             "Lower Limit"
         ];
-        $tabledata = [];
 
-// echo "<pre>";print_r($nhrl_results);echo "</pre>";die();
         foreach($samples as $sample){
-                    $table_body = [];
-                    $table_body[] = $sample->sample_name;
-                    
+            $counter++;
 
-                    $calculated_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'pt_sample_id'  =>  $sample->id])->row(); 
+                $table_body = [];
+                $table_body[] = $sample->sample_name;
+                
+
+                $calculated_values = $this->db->get_where('pt_testers_calculated_v', ['pt_round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'pt_sample_id'  =>  $sample->id])->row(); 
+
+                $mean = ($calculated_values) ? $calculated_values->mean : 0;
+                $sd = ($calculated_values) ? $calculated_values->sd : 0;
+                $sd2 = ($calculated_values) ? $calculated_values->doublesd : 0;
+                $upper_limit = ($calculated_values) ? $calculated_values->upper_limit : 0;
+                $lower_limit = ($calculated_values) ? $calculated_values->lower_limit : 0;
+
+
+            switch ($form) {
+                case 'table':
 
                     $tabledata[] = [
-	                    $sample->sample_name,
-	                    ($calculated_values) ? $calculated_values->mean : 0,
-	                    ($calculated_values) ? $calculated_values->sd : 0,
-	                    ($calculated_values) ? $calculated_values->doublesd : 0,
-	                    ($calculated_values) ? $calculated_values->upper_limit : 0,
-	                    ($calculated_values) ? $calculated_values->lower_limit : 0
-                	];
+                        $sample->sample_name,
+                        $mean,
+                        $sd,
+                        $sd2,
+                        $upper_limit,
+                        $lower_limit
+                    ];
+                break;
 
-                }
+                case 'excel':
+                    array_push($row_data, array($counter, $sample->sample_name, $mean, $sd, $sd2,$upper_limit, $lower_limit));
+                break;
 
+                case 'pdf':
+                
+
+                    $html_body .= '<tr>';
+                    $html_body .= '<td class="spacings">'.$counter.'</td>';
+                    $html_body .= '<td class="spacings">'.$sample->sample_name.'</td>';
+                    $html_body .= '<td class="spacings">'.$mean.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd2.'</td>';
+                    $html_body .= '<td class="spacings">'.$upper_limit.'</td>';
+                    $html_body .= '<td class="spacings">'.$lower_limit.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+        }
                 // echo "<pre>";print_r($tabledata);echo "</pre>";die();
 
-                $this->table->set_template($template);
-                $this->table->set_heading($heading);
+        if($form == 'table'){
 
-        return $this->table->generate($tabledata);
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
+
+            return $this->table->generate($tabledata);
+
+        }else if($form == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'NHRL_'.$round_name.'_'.$equipment_name.'_Results', 'file_name' => 'NHRL_'.$round_name.'_'.$equipment_name.'_Results', 'excel_topic' => 'NHRL_'.$equipment_name.'_Results');
+            // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
+
+            $column_data = array('No.','Sample ID','Mean','SD','Double SD','Upper Limit','Lower Limit');
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            $this->export->create_excel($excel_data);
+
+        }else if($form == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => 'NHRL_'.$round_name.'_'.$equipment_name.'_Results', 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'NHRL_'.$round_name.'_'.$equipment_name.'_Results', 'pdf_topic' => 'NHRL_'.$round_name.'_'.$equipment_name.'_Results');
+
+            $this->export->create_pdf($html_body,$pdf_data);
+
+        }
 	}
 
 
@@ -1059,24 +1143,55 @@ class Analysis extends DashboardController {
     }
 
 
-    public function createParticipantTable($round_id, $equipment_id){
+    public function createParticipantTable($form, $round_id, $equipment_id){
         $template = $this->config->item('default');
-        $tablevalues = $tablebody = $table = [];
+        $column_data = $row_data = $tablevalues = $tablebody = $table = [];
         $count = $zerocount = $sub_counter = 0;
 
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+        $round_uuid = $rounds->uuid;
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+        $html_body = '
+        <table>
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Facility</th>
+            <th>Batch</th>';
+            
         $heading = [
             "No.",
             "Facility",
-            "Batch No"
+            "Batch"
         ];
+
+        $column_data = array('No.','Facility','Batch');
         
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
 
         foreach ($samples as $sample) {
             array_push($heading, $sample->sample_name,"Comment");
+            array_push($column_data, $sample->sample_name,"Comment");
+            $html_body .= '<th>'.$sample->sample_name.'</th> <th>Comment</th>';
         }
 
         array_push($heading, 'Overall Grade', "Review Comment",'Participant','Cell','Email');
+        array_push($column_data, 'Overall Grade', "Review Comment",'Participant','Cell','Email');
+
+        $html_body .= ' 
+        <th>Overall Grade</th>
+            <th>Review Comment</th>
+            <th>Participant</th>
+            <th>Cell</th>
+            <th>Email</th>
+            </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
 
 
         $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
@@ -1085,10 +1200,9 @@ class Analysis extends DashboardController {
 
         foreach ($submissions as $submission) {
             $sub_counter++;
-
+            $samp_counter = $acceptable = $unacceptable = 0;
             $tabledata = [];
-
-            // echo "<pre>";print_r($submission);echo "</pre>";die();
+ 
 
             $facilityid = $this->db->get_where('participant_readiness_v', ['username' => $submission->participant_id])->row();
 
@@ -1100,9 +1214,17 @@ class Analysis extends DashboardController {
                 $facility_name = "No Facility";
             }
 
-            array_push($tabledata, $sub_counter, $facility_name, 0);
+            
+            $batch = $this->db->get_where('pt_ready_participants', ['participant_id' => $submission->participant_id, 'pt_round_uuid' => $round_uuid])->row();
 
-            $samp_counter = $acceptable = $unacceptable = 0;
+            array_push($tabledata, $sub_counter, $facility_name, $batch->batch);
+
+            $html_body .= '<tr>
+                            <td class="spacings">'.$sub_counter.'</td>';
+            $html_body .= '<td class="spacings">'.$facility_name.'</td>';
+            $html_body .= '<td class="spacings">'.$batch->batch.'</td>';
+
+            
 
             foreach ($samples as $sample) {
                 $samp_counter++;
@@ -1126,9 +1248,12 @@ class Analysis extends DashboardController {
                
                 if($part_cd4){
 
+                    $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+
                     if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
                         $acceptable++;
                         $comment = "Acceptable";
+
                     }else{
                         $unacceptable++;
                         $comment = "Unacceptable";
@@ -1142,7 +1267,8 @@ class Analysis extends DashboardController {
                     
                 }else{
                     array_push($tabledata, 0, "Unacceptable");
-                }    
+                }   
+                $html_body .= '<td class="spacings">'.$comment.'</td>'; 
             }
 
             
@@ -1163,23 +1289,74 @@ class Analysis extends DashboardController {
             }
 
             
-
             $part_details = $this->db->get_where('users_v', ['username' =>  $submission->participant_id])->row();
             
             $name = $part_details->firstname . ' ' . $part_details->lastname;
 
             array_push($tabledata, $overall_grade,$review,$name,$part_details->phone,$part_details->email_address);
 
-            $table[$count] = $tabledata;
+
+            // echo "<pre>";print_r($tabledata);echo "</pre>";die();
+            switch ($form) {
+                case 'table':
+                    
+                    $table[$count] = $tabledata;
+
+                break;
+
+                case 'excel':
+                    array_push($row_data, $tabledata);
+                break;
+
+                case 'pdf':
+                 
+                    
+                    $html_body .= '<td class="spacings">'.$overall_grade.' %</td>';
+                    $html_body .= '<td class="spacings">'.$review.'</td>';
+                    $html_body .= '<td class="spacings">'.$name.'</td>';
+                    $html_body .= '<td class="spacings">'.$part_details->phone.'</td>';
+                    $html_body .= '<td class="spacings">'.$part_details->email_address.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+
+
            
             $count++;
                       
         }
 
-        $this->table->set_template($template);
-        $this->table->set_heading($heading);
+        if($form == 'table'){
 
-        return $this->table->generate($table);
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
+
+            return $this->table->generate($table);
+
+        }else if($form == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participants_'.$round_name.'_'.$equipment_name, 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'excel_topic' => 'Participants_'.$equipment_name);
+
+            
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            $this->export->create_excel($excel_data);
+
+        }else if($form == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_topic' => 'Participants_'.$round_name.'_'.$equipment_name);
+
+            $this->export->create_pdf($html_body,$pdf_data);
+
+        }
     }
 
 
@@ -1352,10 +1529,16 @@ class Analysis extends DashboardController {
 				                &nbsp;
 
 				                    NHRL Results
+
+                                    <div class = "pull-right">
+                                        <a href = "'.base_url("Analysis/createNHRLTable/excel/$round_id/$equipment_id/").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+
+                                        <a href = "'.base_url("Analysis/createNHRLTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                    </div>
 					            </div>
 					            <div class = "card-block">';
 
-            $equipment_tabs .= $this->createNHRLTable($round_id, $equipment_id);
+            $equipment_tabs .= $this->createNHRLTable('table', $round_id, $equipment_id);
 
             $equipment_tabs .= '</div>
 						    </div>
@@ -1513,11 +1696,18 @@ class Analysis extends DashboardController {
 				                <i class = "icon-chart"></i>
 				                &nbsp;
 				                    Participant Results
+
+
+                                    <div class = "pull-right">
+                                        <a href = "'.base_url("Analysis/createParticipantTable/excel/$round_id/$equipment_id/").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+
+                                        <a href = "'.base_url("Analysis/createParticipantTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                    </div>
 				            </div>
 
 				            <div class = "card-block col-md-12">';
 
-            $equipment_tabs .= $this->createParticipantTable($round_id, $equipment_id);
+            $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id);
 
             $equipment_tabs .= '</div>
 
