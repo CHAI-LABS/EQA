@@ -349,12 +349,8 @@ class Analysis extends DashboardController {
 		$data = [];
         $title = "Analysis";
 
-        $where_array = [
-                            'uuid'   => $round_uuid
-                        ];
 
-
-        $pt_id = $this->db->get_where('pt_round', $where_array)->row()->id;
+        $pt_id = $this->db->get_where('pt_round', ['uuid'   => $round_uuid])->row()->id;
 		// $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
 		//echo "<pre>";print_r($equipments);echo "</pre>";die();
 
@@ -384,11 +380,6 @@ class Analysis extends DashboardController {
         $testers = $this->db->get_where('pt_testers', $where)->result();
         $labs = $this->db->get_where('pt_labs', $where)->result();
         $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
-
-		$where_array = [
-                            'pt_round_id'   => $round_id,
-                            'equipment_id'  => $equipment_id
-                        ];
 
         $heading = [
             "Sample ID",
@@ -728,14 +719,16 @@ class Analysis extends DashboardController {
 
         $mean = $sd = $sd2 = $upper_limit = $lower_limit = $counter = 0;
 
-		$where = ['pt_round_id' =>  $round_id];
-        $samples = $this->db->get_where('pt_samples', $where)->result();
-        $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
 
-		$where_array = [
-                            'round_id'   => $round_id,
-                            'equipment_id'  => $equipment_id
-                        ];
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+        // echo "<pre>";print_r($equipment_name);echo "</pre>";die();
+
 
         $html_body = '
         <table>
@@ -770,57 +763,56 @@ class Analysis extends DashboardController {
             $table_body = [];
             $table_body[] = $sample->sample_name;
 
+            $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+
+            switch ($type) {
+                case 'cd3':
+
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+                        $mean = ($calculated_values) ? $calculated_values->cd3_absolute_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd3_absolute_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd3_absolute_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd3_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd3_absolute_lower_limit : 0;
+                    
+                break;
+
+                case 'cd4':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+                        $mean = ($calculated_values) ? $calculated_values->cd4_absolute_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd4_absolute_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd4_absolute_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd4_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd4_absolute_lower_limit : 0;
+                    
+                break;
+
+                case 'other':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+                        $mean = ($calculated_values) ? $calculated_values->other_absolute_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->other_absolute_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_other_absolute_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->other_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->other_absolute_lower_limit : 0;
+                    
+                break;
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
+                break;
+            }
+
             switch ($form) {
                 case 'table':
-
-                $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
-
-                    switch ($type) {
-                        case 'cd3':
-
-                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
-                                $mean = ($calculated_values) ? $calculated_values->cd3_absolute_mean : 0;
-                                $sd = ($calculated_values) ? $calculated_values->cd3_absolute_sd : 0;
-                                $sd2 = ($calculated_values) ? $calculated_values->double_cd3_absolute_sd : 0;
-                                $upper_limit = ($calculated_values) ? $calculated_values->cd3_absolute_upper_limit : 0;
-                                $lower_limit = ($calculated_values) ? $calculated_values->cd3_absolute_lower_limit : 0;
-                            
-                        break;
-
-                        case 'cd4':
-                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
-                                $mean = ($calculated_values) ? $calculated_values->cd4_absolute_mean : 0;
-                                $sd = ($calculated_values) ? $calculated_values->cd4_absolute_sd : 0;
-                                $sd2 = ($calculated_values) ? $calculated_values->double_cd4_absolute_sd : 0;
-                                $upper_limit = ($calculated_values) ? $calculated_values->cd4_absolute_upper_limit : 0;
-                                $lower_limit = ($calculated_values) ? $calculated_values->cd4_absolute_lower_limit : 0;
-                            
-                        break;
-
-                        case 'other':
-                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
-                                $mean = ($calculated_values) ? $calculated_values->other_absolute_mean : 0;
-                                $sd = ($calculated_values) ? $calculated_values->other_absolute_sd : 0;
-                                $sd2 = ($calculated_values) ? $calculated_values->double_other_absolute_sd : 0;
-                                $upper_limit = ($calculated_values) ? $calculated_values->other_absolute_upper_limit : 0;
-                                $lower_limit = ($calculated_values) ? $calculated_values->other_absolute_lower_limit : 0;
-                            
-                        break;
-                        
-                        default:
-                            echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
-                        break;
-                    }
-
 
                     $tabledata[] = [
                                 $sample->sample_name,
@@ -873,23 +865,21 @@ class Analysis extends DashboardController {
         }else if($form == 'excel'){
 
             $excel_data = array();
-            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report_for_'.$type.'_absolute', 'file_name' => 'Sample_Report_for_'.$type.'_absolute', 'excel_topic' => 'Sample_Report_for_'.$type.'_absolute');
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $equipment_name.'_'.$type.'_absolute');
+            // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
 
             $column_data = array('No.','Sample ID','Mean','SD','Double SD','Upper Limit','Lower Limit');
             $excel_data['column_data'] = $column_data;
             $excel_data['row_data'] = $row_data;
-
-            // echo'<pre>';print_r($excel_data);echo'</pre>';die();
 
             $this->export->create_excel($excel_data);
 
         }else if($form == 'pdf'){
 
             $html_body .= '</tbody></table>';
-            $pdf_data = array("pdf_title" => "Report_for_".$type."_absolute", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Report_for_'.$type.'_absolute', 'pdf_topic' => 'Report_for_'.$type.'_absolute');
+            $pdf_data = array("pdf_title" => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'pdf_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
 
             $this->export->create_pdf($html_body,$pdf_data);
-            // $this->export->create_pdf($pdf_data);
 
         }              
 	}
@@ -900,16 +890,16 @@ class Analysis extends DashboardController {
 
         $mean = $sd = $sd2 = $upper_limit = $lower_limit = $counter = 0;
 
-        $where = ['pt_round_id' =>  $round_id];
-        $samples = $this->db->get_where('pt_samples', $where)->result();
-        $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+        
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
 
         $column_data = $row_data = array();
 
-        $where_array = [
-                            'round_id'   => $round_id,
-                            'equipment_id'  => $equipment_id
-                        ];
 
         $html_body = '
         <table>
@@ -1050,25 +1040,22 @@ class Analysis extends DashboardController {
         }else if($form == 'excel'){
 
             $excel_data = array();
-            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participant_Sample_Report_for_'.$type.'_absolute', 'file_name' => 'Sample_Report_for_'.$type.'_absolute', 'excel_topic' => 'Sample_Report_for_'.$type.'_absolute');
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'excel_topic' => $equipment_name.'_'.$type.'_percent');
 
             $column_data = array('No.','Sample ID','Mean','SD','Double SD','Upper Limit','Lower Limit');
             $excel_data['column_data'] = $column_data;
             $excel_data['row_data'] = $row_data;
-
-            // echo'<pre>';print_r($excel_data);echo'</pre>';die();
 
             $this->export->create_excel($excel_data);
 
         }else if($form == 'pdf'){
 
             $html_body .= '</tbody></table>';
-            $pdf_data = array("pdf_title" => "Report_for_".$type."_absolute", 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Report_for_'.$type.'_absolute', 'pdf_topic' => 'Report_for_'.$type.'_absolute');
+            $pdf_data = array("pdf_title" => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'pdf_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_percent');
 
             $this->export->create_pdf($html_body,$pdf_data);
-            // $this->export->create_pdf($pdf_data);
 
-        }              
+        }            
     }
 
 
@@ -1203,8 +1190,7 @@ class Analysis extends DashboardController {
 
         $counter = $tab = 0;
         
-        $where = ['pt_round_id' =>  $round_id];
-        $samples = $this->db->get_where('pt_samples', $where)->result();
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
 
         
         $equipments = $this->Analysis_m->Equipments();
