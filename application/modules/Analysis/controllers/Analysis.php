@@ -796,8 +796,8 @@ class Analysis extends DashboardController {
 
 
 
-	public function createAbsolutePeerTable($form, $round_id, $equipment_id, $type){
-		$template = $this->config->item('default');
+    public function createAbsolutePeerTable($form, $round_id, $equipment_id, $type){
+        $template = $this->config->item('default');
 
         $column_data = $row_data = array();
 
@@ -819,7 +819,7 @@ class Analysis extends DashboardController {
         <thead>
         <tr>
             <th>No.</th>
-            <th>Sample ID</th>
+            <th>Sample</th>
             <th>Mean</th>
             <th>SD</th>
             <th>Double SD</th>
@@ -830,9 +830,9 @@ class Analysis extends DashboardController {
         <tbody>
         <ol type="a">';
 
-	
+    
         $heading = [
-            "Sample ID",
+            "Sample",
             "Mean",
             "SD",
             "2SD",
@@ -854,8 +854,6 @@ class Analysis extends DashboardController {
 
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
 
-                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
                         $mean = ($calculated_values) ? $calculated_values->cd3_absolute_mean : 0;
                         $sd = ($calculated_values) ? $calculated_values->cd3_absolute_sd : 0;
                         $sd2 = ($calculated_values) ? $calculated_values->double_cd3_absolute_sd : 0;
@@ -867,8 +865,6 @@ class Analysis extends DashboardController {
                 case 'cd4':
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
 
-                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
                         $mean = ($calculated_values) ? $calculated_values->cd4_absolute_mean : 0;
                         $sd = ($calculated_values) ? $calculated_values->cd4_absolute_sd : 0;
                         $sd2 = ($calculated_values) ? $calculated_values->double_cd4_absolute_sd : 0;
@@ -879,8 +875,6 @@ class Analysis extends DashboardController {
 
                 case 'other':
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                    $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
                         $mean = ($calculated_values) ? $calculated_values->other_absolute_mean : 0;
                         $sd = ($calculated_values) ? $calculated_values->other_absolute_sd : 0;
@@ -897,6 +891,8 @@ class Analysis extends DashboardController {
 
             switch ($form) {
                 case 'table':
+
+                $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
                     $tabledata[] = [
                                 $sample->sample_name,
@@ -952,7 +948,7 @@ class Analysis extends DashboardController {
             $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $equipment_name.'_'.$type.'_absolute');
             // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
 
-            $column_data = array('No.','Sample ID','Mean','SD','Double SD','Upper Limit','Lower Limit');
+            $column_data = array('No.','Sample','Mean','SD','Double SD','Upper Limit','Lower Limit');
             $excel_data['column_data'] = $column_data;
             $excel_data['row_data'] = $row_data;
 
@@ -966,23 +962,26 @@ class Analysis extends DashboardController {
             $this->export->create_pdf($html_body,$pdf_data);
 
         }              
-	}
+    }
 
 
-    public function createPercentPeerTable($form, $round_id, $equipment_id, $type){
-        $template = $this->config->item('default');
+
+	public function createPercentPeerTable($form, $round_id, $equipment_id, $type){
+		$template = $this->config->item('default');
+
+        $column_data = $row_data = array();
 
         $mean = $sd = $sd2 = $upper_limit = $lower_limit = $counter = 0;
 
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
-        
+
         $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
         $round_name = str_replace(' ', '_', $rounds->pt_round_no);
 
         $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
         $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
 
-        $column_data = $row_data = array();
+        // echo "<pre>";print_r($equipment_name);echo "</pre>";die();
 
 
         $html_body = '
@@ -990,7 +989,7 @@ class Analysis extends DashboardController {
         <thead>
         <tr>
             <th>No.</th>
-            <th>Sample ID</th>
+            <th>Sample</th>
             <th>Mean</th>
             <th>SD</th>
             <th>Double SD</th>
@@ -1001,9 +1000,9 @@ class Analysis extends DashboardController {
         <tbody>
         <ol type="a">';
 
-    
+	
         $heading = [
-            "Sample ID",
+            "Sample",
             "Mean",
             "SD",
             "2SD",
@@ -1013,64 +1012,57 @@ class Analysis extends DashboardController {
         ];
         $tabledata = [];
 
-
         foreach($samples as $sample){
             $counter++;
             $table_body = [];
             $table_body[] = $sample->sample_name;
 
+            $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+
+            switch ($type) {
+                case 'cd3':
+
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->cd3_percent_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd3_percent_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd3_percent_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd3_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd3_percent_lower_limit : 0;
+                    
+                break;
+
+                case 'cd4':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->cd4_percent_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd4_percent_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd4_percent_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd4_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd4_percent_lower_limit : 0;
+                    
+                break;
+
+                case 'other':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->other_percent_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->other_percent_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_other_percent_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->other_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->other_percent_lower_limit : 0;
+                    
+                break;
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
+                break;
+            }
+
             switch ($form) {
                 case 'table':
 
-                $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
-
-                    switch ($type) {
-                        case 'cd3':
-
-                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd3/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
-                                $mean = ($calculated_values) ? $calculated_values->cd3_percent_mean : 0;
-                                $sd = ($calculated_values) ? $calculated_values->cd3_percent_sd : 0;
-                                $sd2 = ($calculated_values) ? $calculated_values->double_cd3_percent_sd : 0;
-                                $upper_limit = ($calculated_values) ? $calculated_values->cd3_percent_upper_limit : 0;
-                                $lower_limit = ($calculated_values) ? $calculated_values->cd3_percent_lower_limit : 0;
-                            
-                        break;
-
-                        case 'cd4':
-                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/cd4/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
-                                $mean = ($calculated_values) ? $calculated_values->cd4_percent_mean : 0;
-                                $sd = ($calculated_values) ? $calculated_values->cd4_percent_sd : 0;
-                                $sd2 = ($calculated_values) ? $calculated_values->double_cd4_percent_sd : 0;
-                                $upper_limit = ($calculated_values) ? $calculated_values->cd4_percent_upper_limit : 0;
-                                $lower_limit = ($calculated_values) ? $calculated_values->cd4_percent_lower_limit : 0;
-                            
-                        break;
-
-                        case 'other':
-                            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                            $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/other/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
-                                $mean = ($calculated_values) ? $calculated_values->other_percent_mean : 0;
-                                $sd = ($calculated_values) ? $calculated_values->other_percent_sd : 0;
-                                $sd2 = ($calculated_values) ? $calculated_values->double_other_percent_sd : 0;
-                                $upper_limit = ($calculated_values) ? $calculated_values->other_percent_upper_limit : 0;
-                                $lower_limit = ($calculated_values) ? $calculated_values->other_percent_lower_limit : 0;
-                            
-                        break;
-                        
-                        default:
-                            echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
-                        break;
-                    }
-
-
+                $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/percent')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
                     $tabledata[] = [
                                 $sample->sample_name,
@@ -1110,8 +1102,7 @@ class Analysis extends DashboardController {
                 default:
                     echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
                 break;
-            }  
- 
+            }
         }
 
         if($form == 'table'){
@@ -1125,8 +1116,9 @@ class Analysis extends DashboardController {
 
             $excel_data = array();
             $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'excel_topic' => $equipment_name.'_'.$type.'_percent');
+            // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
 
-            $column_data = array('No.','Sample ID','Mean','SD','Double SD','Upper Limit','Lower Limit');
+            $column_data = array('No.','Sample','Mean','SD','Double SD','Upper Limit','Lower Limit');
             $excel_data['column_data'] = $column_data;
             $excel_data['row_data'] = $row_data;
 
@@ -1139,8 +1131,11 @@ class Analysis extends DashboardController {
 
             $this->export->create_pdf($html_body,$pdf_data);
 
-        }            
-    }
+        }              
+	}
+
+
+    
 
 
     public function createParticipantTable($form, $round_id, $equipment_id){

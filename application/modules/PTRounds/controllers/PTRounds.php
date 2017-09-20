@@ -494,7 +494,9 @@ class PTRounds extends DashboardController{
         $data = [
             'table_view'    =>  $this->createFacilityParticipantsResults($round_uuid,$facility_id),
             'back_link'     =>  base_url("PTRounds/PTRounds/ReadyParticipants/$round_uuid"),
-            'back_name'     =>  "Back to Ready Participants"
+            'back_name'     =>  "Back to Ready Participants",
+            'qa_unresponsive'     =>  base_url("PTRounds/QAUnresponsive/$round_uuid"),
+            'qa_unresponsive_count' => $this->M_PTRounds->getQAUnresponsiveCount($round_uuid)->qa_count
         ];
 
        

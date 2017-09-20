@@ -5,7 +5,7 @@ class Participants extends DashboardController{
         parent::__construct();
 	$this->load->module(['API', 'Participant', 'Facilities']);
         // $this->load->model('m_participant');
-        // $this->load->model('API/m_facilities');
+        $this->load->model('API/m_facilities');
     }
     function listing(){
         $this->assets

@@ -73,6 +73,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
+	// 'username' => 'eqaadmin',
+	// 'password' => 'eqaadmin2017',
+	// 'database' => 'eqa',
+
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',

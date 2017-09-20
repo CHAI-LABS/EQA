@@ -24,9 +24,12 @@
                 showLoaderOnConfirm: true
             }, function(){
                 $.get(url, function(data){
+
                     if(data.status == true){
+                        // alert('true');
                         window.location = "<?= @base_url('Users/Participants/listing'); ?>";
                     }else{
+                        // alert('false');
                         sweetAlert("Oops...", data.message, "error");
                     }
                 });
