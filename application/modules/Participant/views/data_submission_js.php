@@ -47,8 +47,9 @@ $(document).ready(function(){
             processData: false,
             contentType: false,
 		   success: function(html){   
+            // alert(html);
 		   		if(html){
-// alert(html);
+
                 	$("#data-info").html("Successfully saved the data");
                     window.location = "<?= @base_url('Participant/PTRound/Round/'); ?>"+round;
                 }else{

@@ -124,6 +124,26 @@ class Import extends MY_Controller {
 	}
 
 
+	function changeParticipantID (){
+		$participants = $this->db->get('participants')->result();
+		$counter = 0;
+
+		foreach ($participants as $participant) {
+			$counter++;
+
+			$facility = $this->db->get_where('facility_v', ['facility_id'=>$participant->participant_facility])->row();
+
+			// echo "<pre>"; print_r($facility->facility_code);echo "</pre>";die();
+
+			$this->db->set('participant_id',$facility->facility_code.'-001');
+			$this->db->where('id',$counter);
+			$this->db->update('participants');
+
+		}
+		echo "<pre>"; print_r("Participant ID updated");echo "</pre>";die();
+	}
+
+
 	function importR17DataSubmissions(){
 		$file_path = './uploads/data/R17_Results.xlsx';
 		$participant = 0;
@@ -189,7 +209,7 @@ class Import extends MY_Controller {
 				                'participant_id'    =>  $participant,
 				                'equipment_id'    =>  $equip_id,
 				                'status'    =>  1,
-				                'verdict'    =>  1
+				                'verdict'    =>  2
 			            ];
 
 			            // $this->db->insert('pt_data_submission', $insertdata);
@@ -360,10 +380,15 @@ class Import extends MY_Controller {
 
 			            	$this->db->insert('participants', $insertdata4);
 
-				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_batch_tube, pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();	
+				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_batch_tube, pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();
+
+				 //         	$this->db->set('participant_id',$facility->facility_code.'-001');
+				// $this->db->where('id',$submission_id);
+				// $this->db->update('participants');		
 			}
 		}
 	}
+
 
 
 

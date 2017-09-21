@@ -70,12 +70,15 @@ class Analysis extends DashboardController {
                 }else{
                     $status = "<label class = 'tag tag-success tag-sm'>Done</label>";
                 }
+
+                $from = date('dS F, Y', strtotime($round->from));
+                $to = date('dS F, Y', strtotime($round->to));
                 
                 $tabledata[] = [
                     $counter,
                     $round->pt_round_no,
-                    $round->from,
-                    $round->to,
+                    $from,
+                    $to,
                     $round->tag,
                     $round->lab_unit,
                     $status,
@@ -1116,7 +1119,6 @@ class Analysis extends DashboardController {
 
             $excel_data = array();
             $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'excel_topic' => $equipment_name.'_'.$type.'_percent');
-            // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
 
             $column_data = array('No.','Sample','Mean','SD','Double SD','Upper Limit','Lower Limit');
             $excel_data['column_data'] = $column_data;
@@ -1210,7 +1212,9 @@ class Analysis extends DashboardController {
             }
 
             
-            $batch = $this->db->get_where('pt_ready_participants', ['participant_id' => $submission->participant_id, 'pt_round_uuid' => $round_uuid])->row();
+            $batch = $this->db->get_where('pt_ready_participants', ['p_id' => $submission->participant_id, 'pt_round_uuid' => $round_uuid])->row();
+
+            
 
             array_push($tabledata, $sub_counter, $facility_name, $batch->batch);
 
@@ -1218,8 +1222,6 @@ class Analysis extends DashboardController {
                             <td class="spacings">'.$sub_counter.'</td>';
             $html_body .= '<td class="spacings">'.$facility_name.'</td>';
             $html_body .= '<td class="spacings">'.$batch->batch.'</td>';
-
-            
 
             foreach ($samples as $sample) {
                 $samp_counter++;
@@ -1283,15 +1285,16 @@ class Analysis extends DashboardController {
                 $review = "Incomplete Submission";
             }
 
-            
-            $part_details = $this->db->get_where('users_v', ['username' =>  $submission->participant_id])->row();
+            $username = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row()->participant_id;
+            // echo "<pre>";print_r($part_cd4);echo "</pre>";die();
+            $part_details = $this->db->get_where('users_v', ['username' =>  $username])->row();
             
             $name = $part_details->firstname . ' ' . $part_details->lastname;
 
             array_push($tabledata, $overall_grade,$review,$name,$part_details->phone,$part_details->email_address);
 
 
-            // echo "<pre>";print_r($tabledata);echo "</pre>";die();
+            
             switch ($form) {
                 case 'table':
                     

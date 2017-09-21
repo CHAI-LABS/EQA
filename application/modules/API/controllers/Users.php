@@ -101,7 +101,7 @@ class Users extends MY_Controller{
                  $activation = $status = $details = $approval = "";
                  $facility = $this->db->get_where('facility', ['id'=>$participant->participant_facility])->row();
                  // echo "<pre>";print_r($participants);echo "</pre>";die();
-                 $details = "<a class = 'btn btn-sm btn-warning' href = '".base_url('Users/Participants/details/' . $participant->uuid)."'>Details</a>";
+                 $details = "<a class = 'btn btn-sm btn-warning dropdown-item' href = '".base_url('Users/Participants/details/' . $participant->uuid)."'><i class = 'fa fa-newspaper-o'></i>&nbsp;Details</a>";
 
                  if($participant->confirm_token != NULL && $participant->status == 0){
                      $activation = "<span class = 'tag tag-danger'>Not Activated</span>";
@@ -109,21 +109,33 @@ class Users extends MY_Controller{
                      $activation = "<span class = 'tag tag-success'>Activated</span>";
                  }
 
-                 if($participant->status == 1){
+                 if($participant->approved == 1){
                      $status = "<span class = 'tag tag-success'>Active</span>";
                  }else{
                      $status = "<span class = 'tag tag-danger'>Deactivated</span>";
                  }
 
                  if($participant->approved == 1){
-                     $approval = "<a class = 'btn btn-success btn-sm approval' href = '".base_url('Users/Participants/approval/' . $participant->uuid)."'>Approved</a>";
+                    $approval = "<a class = 'btn btn-danger btn-sm dropdown-item approval' href = '".base_url('Users/Participants/approval/' . $participant->uuid)."'><i class = 'fa fa-thumbs-o-down'></i>&nbsp;Disapprove</a>";
+
                  }else{
-                     $approval = "<a class = 'btn btn-danger btn-sm approval' href = '".base_url('Users/Participants/approval/' . $participant->uuid)."'>Not Approved</a>";
+                     $approval = "<a class = 'btn btn-success btn-sm dropdown-item approval' href = '".base_url('Users/Participants/approval/' . $participant->uuid)."'><i class = 'fa fa-thumbs-o-up'></i>&nbsp;Approve</a>";
                  }
                  $usertype = "Participant";
                 if($participant->user_type == "qareviewer"){
                     $usertype = "QA Reviewer";      
                 }
+
+                $view = "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton2' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Quick Actions
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton2'>
+                                $approval
+                                $details
+                            </div>
+                        </div>";
+
                  $data[] = [
                      $participant->name,
                      $facility->facility_name,
@@ -132,7 +144,7 @@ class Users extends MY_Controller{
                      $usertype,
                      $activation,
                      $status,
-                     $approval ."&nbsp;". $details
+                     $view
                  ];
              }
          }
