@@ -116,7 +116,7 @@ class Users extends MY_Controller{
                  }
 
                  if($participant->approved == 1){
-                     $approval = "<a class = 'btn btn-success btn-sm' href = '".base_url('Users/Participants/approval/' . $participant->uuid)."'>Approved</a>";
+                     $approval = "<a class = 'btn btn-success btn-sm approval' href = '".base_url('Users/Participants/approval/' . $participant->uuid)."'>Approved</a>";
                  }else{
                      $approval = "<a class = 'btn btn-danger btn-sm approval' href = '".base_url('Users/Participants/approval/' . $participant->uuid)."'>Not Approved</a>";
                  }

@@ -23,6 +23,8 @@ class M_PTRounds extends MY_Model{
         }
     }
 
+    
+
     function findCalendarDetailsByRound($round_id){
         // $sql = "CALL proc_get_calendar_details($round_id)";
         $sql = "SELECT ci.uuid as calendar_item_id, 

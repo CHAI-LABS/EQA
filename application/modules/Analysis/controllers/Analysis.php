@@ -1715,8 +1715,7 @@ class Analysis extends DashboardController {
                
         }
 
-        
-
+       
         $equipment_tabs .= "</div>";
         return $equipment_tabs;
 

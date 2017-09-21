@@ -7,6 +7,8 @@ class PTRound extends MY_Controller {
     {
         parent::__construct();
 
+        $this->load->library('table');
+        $this->load->config('table');
         $this->load->module('Participant');
         $this->load->model('M_PTRound');
         $this->load->model('M_Readiness');
@@ -35,8 +37,7 @@ class PTRound extends MY_Controller {
                 $this->db->where('status','active');
                 $get = $this->db->get('pt_round_v')->row();
 
-                
-
+            
                 if($get == null){
                     $locking = 0;
                 }else{
@@ -96,6 +97,759 @@ class PTRound extends MY_Controller {
 
         return $round_array;
     }
+
+
+    public function Results($round_uuid){
+        $data = [];
+        $title = "Analysis";
+
+
+        $pt_id = $this->db->get_where('pt_round', ['uuid'   => $round_uuid])->row()->id;
+
+        //echo "<pre>";print_r($equipments);echo "</pre>";die();
+
+        
+        $data = [
+            'table_results' => $this->createTables($pt_id)
+        ]; 
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                        ->addJs('dashboard/js/libs/moment.min.js');
+        $this->assets->setJavascript('Analysis/analysis_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Participant/participant_result', $data)
+                ->adminTemplate();
+    }
+
+
+
+    public function createTables($round_id){
+        
+        $datas=[];
+
+        $participant_uuid = $this->session->userdata('uuid');
+
+        $participant = $this->db->get_where('participant_readiness_v', ['uuid' =>  $participant_uuid])->row();
+
+        $counter = $tab = 0;
+        
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+        
+        $equipments = $this->M_PTRound->resultEquipments($participant->p_id);
+        // echo "<pre>";print_r($equipments);echo "</pre>";die();
+        
+        $equipment_tabs = '';
+
+        $equipment_tabs .= "<ul class='nav nav-tabs' role='tablist'>";
+
+        foreach ($equipments as $key => $equipment) {
+            $tab++;
+
+            $equipment_tabs .= "<li class='nav-item'>";
+            if($tab == 1){
+                $equipment_tabs .= "<a class='nav-link active' data-toggle='tab'";
+            }else{
+                $equipment_tabs .= "<a class='nav-link' data-toggle='tab'";
+            }
+
+            $equipmentname = $equipment->equipment_name;
+            $equipmentname = str_replace(' ', '_', $equipmentname);
+            
+            $equipment_tabs .= " href='#".$equipmentname."' role='tab' aria-controls='home'><i class='icon-calculator'></i>&nbsp;";
+            $equipment_tabs .= $equipment->equipment_name;
+            $equipment_tabs .= "&nbsp;";
+            // $equipment_tabs .= "<span class='tag tag-success'>Complete</span>";
+            $equipment_tabs .= "</a>
+                                </li>";
+        }
+
+        $equipment_tabs .= "</ul>
+
+                            <div class='tab-content'>";
+
+        
+        foreach ($equipments as $key => $equipment) {
+            
+
+            $counter++;
+            
+            $equipment_id = $equipment->id;
+            $equipmentname = $equipment->equipment_name;
+            $equipmentname = str_replace(' ', '_', $equipmentname);
+
+            if($counter == 1){
+                
+                $equipment_tabs .= "<div class='tab-pane active' id='". $equipmentname ."' role='tabpanel'>";
+            }else{
+
+                $equipment_tabs .= "<div class='tab-pane' id='". $equipmentname ."' role='tabpanel'>";
+            }
+
+            $round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
+
+            
+            $samp_counter = $acceptable = $unacceptable = $sampcount = $partcount = $passed = $failed = 0;
+
+                foreach ($samples as $sample) {
+                    $sampcount++;
+
+                    $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                    
+
+
+                    if($cd4_values){
+                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                    }else{
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    } 
+
+
+
+                    $part_cd4 = $this->M_PTRound->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
+                    if($part_cd4){
+                        // echo "<pre>";print_r("Upper ".$upper_limit);echo "</pre>";
+                        
+                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                            $acceptable++;
+                            
+                        } else{
+                            $unacceptable++;
+                            
+                        } 
+                    }  
+                } 
+
+                if($acceptable == $sampcount) {
+                    $passed++;
+                }else{
+                    $failed++;
+                }
+            
+
+            $equipment_tabs .= '<div class = "row">
+                  
+                        <div class="col-md-6">
+                            <div class = "card">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+
+                                    CD4 Absolute Peer Results
+                                    <div class = "pull-right">
+                                        <a href = "'.base_url("PTRound/createAbsolutePeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+
+                                        <a href = "'.base_url("PTRound/createAbsolutePeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                    </div>
+                                </div>
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'cd4');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class = "card ">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
+                                CD4 Percent Peer Results
+
+                                    <div class = "pull-right">
+                                        <a href = "'.base_url("PTRound/createPercentPeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+
+                                        <a href = "'.base_url("PTRound/createPercentPeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                    </div>
+                                </div>
+
+                                <div class = "card-block">';
+
+            $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'cd4');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+                </div>';
+
+
+            $equipment_tabs .=  '<div class = "row">
+                    <div class="col-md-12">
+                        <div class = "card card-outline-danger">
+                            <div class="card-header col-12">
+                                <i class = "icon-chart"></i>
+                                &nbsp;
+                                    Participant Results
+
+
+                                    <div class = "pull-right">
+                                        <a href = "'.base_url("PTRound/createParticipantTable/excel/$round_id/$equipment_id/").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+
+                                        <a href = "'.base_url("PTRound/createParticipantTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                    </div>
+                            </div>
+
+                            <div class = "card-block col-md-12">';
+
+            $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id);
+
+            $equipment_tabs .= '</div>
+
+
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>';
+               
+        }
+
+       
+        $equipment_tabs .= "</div>";
+        return $equipment_tabs;
+
+    }
+
+
+
+    public function createPercentPeerTable($form, $round_id, $equipment_id, $type){
+        $template = $this->config->item('default');
+
+        $column_data = $row_data = array();
+
+        $mean = $sd = $sd2 = $upper_limit = $lower_limit = $counter = 0;
+
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+        // echo "<pre>";print_r($equipment_name);echo "</pre>";die();
+
+
+        $html_body = '
+        <table>
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Sample</th>
+            <th>Mean</th>
+            <th>SD</th>
+            <th>Double SD</th>
+            <th>Upper Limit</th>
+            <th>Lower Limit</th>
+        </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
+
+    
+        $heading = [
+            "Sample",
+            "Mean",
+            "SD",
+            "2SD",
+            "Upper Limit",
+            "Lower Limit",
+            "Actions"
+        ];
+        $tabledata = [];
+
+        foreach($samples as $sample){
+            $counter++;
+            $table_body = [];
+            $table_body[] = $sample->sample_name;
+
+            $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+
+            switch ($type) {
+                case 'cd3':
+
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->cd3_percent_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd3_percent_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd3_percent_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd3_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd3_percent_lower_limit : 0;
+                    
+                break;
+
+                case 'cd4':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->cd4_percent_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd4_percent_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd4_percent_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd4_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd4_percent_lower_limit : 0;
+                    
+                break;
+
+                case 'other':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->other_percent_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->other_percent_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_other_percent_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->other_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->other_percent_lower_limit : 0;
+                    
+                break;
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
+                break;
+            }
+
+            switch ($form) {
+                case 'table':
+
+                $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/percent')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+                    $tabledata[] = [
+                                $sample->sample_name,
+                                $mean,
+                                $sd,
+                                $sd2,
+                                $upper_limit,
+                                $lower_limit,
+                                "<div class = 'dropdown'>
+                                    <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                        Act
+                                    </button>
+                                    <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                        $view
+                                    </div>
+                                </div>"
+                            ];
+                break;
+
+                case 'excel':
+                    array_push($row_data, array($counter, $sample->sample_name, $mean, $sd, $sd2,$upper_limit, $lower_limit));
+                break;
+
+                case 'pdf':
+                    $html_body .= '<tr>';
+                    $html_body .= '<td class="spacings">'.$counter.'</td>';
+                    $html_body .= '<td class="spacings">'.$sample->sample_name.'</td>';
+                    $html_body .= '<td class="spacings">'.$mean.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd2.'</td>';
+                    $html_body .= '<td class="spacings">'.$upper_limit.'</td>';
+                    $html_body .= '<td class="spacings">'.$lower_limit.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+        }
+
+        if($form == 'table'){
+
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
+
+            return $this->table->generate($tabledata);
+
+        }else if($form == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'excel_topic' => $equipment_name.'_'.$type.'_percent');
+            // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
+
+            $column_data = array('No.','Sample','Mean','SD','Double SD','Upper Limit','Lower Limit');
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            $this->export->create_excel($excel_data);
+
+        }else if($form == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_percent', 'pdf_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_percent');
+
+            $this->export->create_pdf($html_body,$pdf_data);
+
+        }              
+    }
+
+
+
+    public function createAbsolutePeerTable($form, $round_id, $equipment_id, $type){
+        $template = $this->config->item('default');
+
+        $column_data = $row_data = array();
+
+        $mean = $sd = $sd2 = $upper_limit = $lower_limit = $counter = 0;
+
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+        // echo "<pre>";print_r($equipment_name);echo "</pre>";die();
+
+
+        $html_body = '
+        <table>
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Sample</th>
+            <th>Mean</th>
+            <th>SD</th>
+            <th>Double SD</th>
+            <th>Upper Limit</th>
+            <th>Lower Limit</th>
+        </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
+
+    
+        $heading = [
+            "Sample",
+            "Mean",
+            "SD",
+            "2SD",
+            "Upper Limit",
+            "Lower Limit",
+            "Actions"
+        ];
+        $tabledata = [];
+
+        foreach($samples as $sample){
+            $counter++;
+            $table_body = [];
+            $table_body[] = $sample->sample_name;
+
+            $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+
+            switch ($type) {
+                case 'cd3':
+
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->cd3_absolute_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd3_absolute_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd3_absolute_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd3_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd3_absolute_lower_limit : 0;
+                    
+                break;
+
+                case 'cd4':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->cd4_absolute_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->cd4_absolute_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_cd4_absolute_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->cd4_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->cd4_absolute_lower_limit : 0;
+                    
+                break;
+
+                case 'other':
+                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+
+                        $mean = ($calculated_values) ? $calculated_values->other_absolute_mean : 0;
+                        $sd = ($calculated_values) ? $calculated_values->other_absolute_sd : 0;
+                        $sd2 = ($calculated_values) ? $calculated_values->double_other_absolute_sd : 0;
+                        $upper_limit = ($calculated_values) ? $calculated_values->other_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values) ? $calculated_values->other_absolute_lower_limit : 0;
+                    
+                break;
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
+                break;
+            }
+
+            switch ($form) {
+                case 'table':
+
+                $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+
+                    $tabledata[] = [
+                                $sample->sample_name,
+                                $mean,
+                                $sd,
+                                $sd2,
+                                $upper_limit,
+                                $lower_limit,
+                                "<div class = 'dropdown'>
+                                    <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                        Act
+                                    </button>
+                                    <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                        $view
+                                    </div>
+                                </div>"
+                            ];
+                break;
+
+                case 'excel':
+                    array_push($row_data, array($counter, $sample->sample_name, $mean, $sd, $sd2,$upper_limit, $lower_limit));
+                break;
+
+                case 'pdf':
+                    $html_body .= '<tr>';
+                    $html_body .= '<td class="spacings">'.$counter.'</td>';
+                    $html_body .= '<td class="spacings">'.$sample->sample_name.'</td>';
+                    $html_body .= '<td class="spacings">'.$mean.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd.'</td>';
+                    $html_body .= '<td class="spacings">'.$sd2.'</td>';
+                    $html_body .= '<td class="spacings">'.$upper_limit.'</td>';
+                    $html_body .= '<td class="spacings">'.$lower_limit.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+        }
+
+        if($form == 'table'){
+
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
+
+            return $this->table->generate($tabledata);
+
+        }else if($form == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $equipment_name.'_'.$type.'_absolute');
+            // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
+
+            $column_data = array('No.','Sample','Mean','SD','Double SD','Upper Limit','Lower Limit');
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            $this->export->create_excel($excel_data);
+
+        }else if($form == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'pdf_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
+
+            $this->export->create_pdf($html_body,$pdf_data);
+
+        }              
+    }
+
+
+    public function createParticipantTable($form, $round_id, $equipment_id){
+        $template = $this->config->item('default');
+        $column_data = $row_data = $tablevalues = $tablebody = $table = [];
+        $samp_counter = $count = $zerocount = $sub_counter = $acceptable = $unacceptable = 0;
+
+        $tabledata = [];
+
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+        $round_uuid = $rounds->uuid;
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+        $participant_uuid = $this->session->userdata('uuid');
+        $participant = $this->db->get_where('participant_readiness_v', ['uuid' =>  $participant_uuid])->row();
+
+        $html_body = '
+        <table>
+        <thead>
+        <tr>
+            <th>Batch</th>';
+            
+        $heading = [
+            "Batch"
+        ];
+
+        $column_data = array('No.','Facility','Batch');
+        
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+        foreach ($samples as $sample) {
+            array_push($heading, $sample->sample_name,"Comment");
+            array_push($column_data, $sample->sample_name,"Comment");
+            $html_body .= '<th>'.$sample->sample_name.'</th> <th>Comment</th>';
+        }
+
+        array_push($heading, 'Overall Grade', "Review Comment");
+        array_push($column_data, 'Overall Grade', "Review Comment");
+
+        $html_body .= ' 
+        <th>Overall Grade</th>
+            <th>Review Comment</th>
+            </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
+
+
+        $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
+
+            
+            $batch = $this->db->get_where('pt_ready_participants', ['participant_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid])->row();
+
+            array_push($tabledata, $batch->batch);
+
+            // $html_body .= '<tr><td class="spacings">'.$sub_counter.'</td>';
+            // $html_body .= '<td class="spacings">'.$facility_name.'</td>';
+            $html_body .= '<tr><td class="spacings">'.$batch->batch.'</td>';
+
+            
+
+            foreach ($samples as $sample) {
+                $samp_counter++;
+                
+                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                
+
+
+                if($cd4_values){
+                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                }else{
+                    $upper_limit = 0;
+                    $lower_limit = 0;
+                } 
+
+                
+                $part_cd4 = $this->M_PTRound->absoluteValue($round_id,$equipment_id,$sample->id,$participant->p_id);
+
+               
+                if($part_cd4){
+
+                    $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+
+                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                        $acceptable++;
+                        $comment = "Acceptable";
+
+                    }else{
+                        $unacceptable++;
+                        $comment = "Unacceptable";
+                    }   
+
+                    if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
+                        $zerocount++;
+                    }
+
+                    array_push($tabledata, $part_cd4->cd4_absolute, $comment);
+                    
+                }else{
+                    array_push($tabledata, 0, "Unacceptable");
+                }   
+                $html_body .= '<td class="spacings">'.$comment.'</td>'; 
+            }
+
+            
+
+            $grade = (($acceptable / $samp_counter) * 100);
+
+
+            $overall_grade = round($grade, 2) . ' %';
+
+            if($grade == 100){
+                $review = "Satisfactory Performance";
+            }else if($grade > 0 && $grade < 100){
+                $review = "Unsatisfactory Performance";
+            }else if($zerocount == $samp_counter){
+                $review = "Non-responsive";
+            }else{
+                $review = "Incomplete Submission";
+            }
+
+            
+            $part_details = $this->db->get_where('users_v', ['username' =>  $participant->username])->row();
+            
+            $name = $part_details->firstname . ' ' . $part_details->lastname;
+
+            array_push($tabledata, $overall_grade,$review);
+
+
+            // echo "<pre>";print_r($tabledata);echo "</pre>";die();
+            switch ($form) {
+                case 'table':
+                    
+                    $table[$count] = $tabledata;
+
+                break;
+
+                case 'excel':
+                    array_push($row_data, $tabledata);
+                break;
+
+                case 'pdf':
+                 
+                    
+                    $html_body .= '<td class="spacings">'.$overall_grade.' %</td>';
+                    $html_body .= '<td class="spacings">'.$review.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+
+
+                      
+        
+
+        if($form == 'table'){
+
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
+
+            return $this->table->generate($table);
+
+        }else if($form == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participants_'.$round_name.'_'.$equipment_name, 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'excel_topic' => 'Participants_'.$equipment_name);
+
+            
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            $this->export->create_excel($excel_data);
+
+        }else if($form == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_topic' => 'Participants_'.$round_name.'_'.$equipment_name);
+
+            $this->export->create_pdf($html_body,$pdf_data);
+
+        }
+    }
+
+
+    
 
     public function Round($round_uuid){
         $user = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));

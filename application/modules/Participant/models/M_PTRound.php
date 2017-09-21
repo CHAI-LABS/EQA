@@ -11,6 +11,32 @@ class M_PTRound extends CI_Model {
         return $query->row();
     }
 
+    public function absoluteValue($round_id,$equipment_id,$sample_id,$participant_id){
+
+        $this->db->select("cd4_absolute");
+        $this->db->from("pt_participant_review_v");
+        $this->db->where("round_id",$round_id);
+        $this->db->where("equipment_id",$equipment_id);
+        $this->db->where("sample_id",$sample_id);
+        $this->db->where("participant_id",$participant_id);
+        $query = $this->db->get();
+        
+        return $query->row();
+    }
+
+    public function resultEquipments($participant_id){
+        $sql = "
+            SELECT e.id, e.uuid, e.equipment_name FROM equipment e
+            JOIN participant_equipment pe ON pe.participant_id = $participant_id
+            WHERE e.equipment_status = 1 AND e.id = pe.equipment_id
+        ";
+
+        $query = $this->db->query($sql);
+
+        return $query->result();
+    }
+
+
     public function allowPTRound($ongoing_pt_uuid, $participant_uuid){
         $this->db->select('ppt.uuid, ppt.receipt');
         $this->db->from('pt_panel_tracking ppt');
