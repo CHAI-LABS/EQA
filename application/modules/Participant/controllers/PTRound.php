@@ -9,6 +9,7 @@ class PTRound extends MY_Controller {
 
         $this->load->library('table');
         $this->load->config('table');
+        $this->load->module('Export');
         $this->load->module('Participant');
         $this->load->model('M_PTRound');
         $this->load->model('M_Readiness');
@@ -118,7 +119,7 @@ class PTRound extends MY_Controller {
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
                         ->addJs('dashboard/js/libs/moment.min.js');
-        $this->assets->setJavascript('Analysis/analysis_js');
+        $this->assets->setJavascript('Participant/results_js');
         $this->template
                 ->setPageTitle($title)
                 ->setPartial('Participant/participant_result', $data)
@@ -244,9 +245,9 @@ class PTRound extends MY_Controller {
 
                                     CD4 Absolute Peer Results
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("PTRound/createAbsolutePeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Participant/PTRound/createAbsolutePeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("PTRound/createAbsolutePeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Participant/PTRound/createAbsolutePeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
                                 <div class = "card-block">';
@@ -265,9 +266,9 @@ class PTRound extends MY_Controller {
                                 CD4 Percent Peer Results
 
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("PTRound/createPercentPeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Participant/PTRound/createPercentPeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("PTRound/createPercentPeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Participant/PTRound/createPercentPeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
 
@@ -291,9 +292,9 @@ class PTRound extends MY_Controller {
 
 
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("PTRound/createParticipantTable/excel/$round_id/$equipment_id/").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Participant/PTRound/createParticipantTable/excel/$round_id/$equipment_id/").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("PTRound/createParticipantTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Participant/PTRound/createParticipantTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                             </div>
 
@@ -361,8 +362,7 @@ class PTRound extends MY_Controller {
             "SD",
             "2SD",
             "Upper Limit",
-            "Lower Limit",
-            "Actions"
+            "Lower Limit"
         ];
         $tabledata = [];
 
@@ -416,7 +416,7 @@ class PTRound extends MY_Controller {
             switch ($form) {
                 case 'table':
 
-                $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/percent')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+                // $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/percent')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
                     $tabledata[] = [
                                 $sample->sample_name,
@@ -424,15 +424,7 @@ class PTRound extends MY_Controller {
                                 $sd,
                                 $sd2,
                                 $upper_limit,
-                                $lower_limit,
-                                "<div class = 'dropdown'>
-                                    <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
-                                        Act
-                                    </button>
-                                    <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
-                                        $view
-                                    </div>
-                                </div>"
+                                $lower_limit
                             ];
                 break;
 
@@ -531,8 +523,7 @@ class PTRound extends MY_Controller {
             "SD",
             "2SD",
             "Upper Limit",
-            "Lower Limit",
-            "Actions"
+            "Lower Limit"
         ];
         $tabledata = [];
 
@@ -586,7 +577,7 @@ class PTRound extends MY_Controller {
             switch ($form) {
                 case 'table':
 
-                $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
+                // $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
 
                     $tabledata[] = [
                                 $sample->sample_name,
@@ -594,15 +585,7 @@ class PTRound extends MY_Controller {
                                 $sd,
                                 $sd2,
                                 $upper_limit,
-                                $lower_limit,
-                                "<div class = 'dropdown'>
-                                    <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
-                                        Act
-                                    </button>
-                                    <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
-                                        $view
-                                    </div>
-                                </div>"
+                                $lower_limit
                             ];
                 break;
 
@@ -686,7 +669,7 @@ class PTRound extends MY_Controller {
             "Batch"
         ];
 
-        $column_data = array('No.','Facility','Batch');
+        $column_data = array('Batch');
         
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
 

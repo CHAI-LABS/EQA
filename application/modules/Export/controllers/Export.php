@@ -91,6 +91,7 @@ function create_pdf($html, $data){
     $pdf->WriteHTML($stylesheet, 1);
     $pdf->WriteHTML($html, 2);
 
+
     $pdf->SetHTMLHeader('<div style="text-align: right; font-weight: bold;">'.$data["pdf_title"].'</div>');
 
     $pdf->SetHTMLFooter('
@@ -107,7 +108,7 @@ function create_pdf($html, $data){
 
     ');
 
-    $pdf->output();
+    $pdf->output($data["pdf_title"],'D');
 
 
 }
