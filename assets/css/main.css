@@ -25,3 +25,13 @@ body{
 	color: #616161;
 }
 
+.red{
+	background-color: #F44336 !important;
+	color: #FFFFFF;
+}
+
+.orange{
+	background-color: #f39c12 !important;
+	color: #000000;
+}
+

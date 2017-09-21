@@ -362,7 +362,7 @@ class Analysis extends DashboardController {
 				'sample_tabs' => $this->createTabs($pt_id)
 			];
             
-
+		$this->assets->addCss('css/main.css');
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
@@ -1201,7 +1201,7 @@ class Analysis extends DashboardController {
             $tabledata = [];
  
 
-            $facilityid = $this->db->get_where('participant_readiness_v', ['username' => $submission->participant_id])->row();
+            $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
 
             if($facilityid){
                 $facility_id = $facilityid->facility_id;
