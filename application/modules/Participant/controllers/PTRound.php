@@ -115,6 +115,7 @@ class PTRound extends MY_Controller {
             'table_results' => $this->createTables($pt_id)
         ]; 
 
+        $this->assets->addCss('css/main.css');
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
