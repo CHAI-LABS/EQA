@@ -56,8 +56,9 @@ class PTRound extends MY_Controller {
                         }else{
                             if($checklocking->receipt){
 
-                                $view = "<a class = 'btn btn-success btn-sm' href = '".base_url('Participant/PTRound/Round/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;View</a>";
+                                $view = "<a class = 'btn btn-success btn-sm' href = '".base_url('Participant/PTRound/Round/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;View</a>&nbsp;";
 
+                                $view .= "<a class = 'btn btn-info btn-sm' href = '".base_url('Participant/PTRound/Results/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Results</a>";
                             }else{
 
                                 $view = "<a class = 'btn btn-success btn-sm' href = '".base_url('Participant/PanelTracking/confirm/' . $checklocking->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Confirm Receipt</a>";
