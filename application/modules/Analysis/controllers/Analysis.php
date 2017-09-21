@@ -1534,11 +1534,11 @@ class Analysis extends DashboardController {
                                         <a href = "'.base_url("Analysis/createNHRLTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
 					            </div>
-					            <div class = "card-block">';
+					            <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createNHRLTable('table', $round_id, $equipment_id);
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
 						    </div>
 					    </div>
 
@@ -1560,11 +1560,11 @@ class Analysis extends DashboardController {
                                         <a href = "'.base_url("Analysis/createAbsolutePeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
-                                <div class = "card-block">';
+                                <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'cd4');
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
                             </div>
                         </div>
 
@@ -1582,11 +1582,11 @@ class Analysis extends DashboardController {
                                     </div>
                                 </div>
 
-                                <div class = "card-block">';
+                                <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'cd4');
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
                             </div>
                         </div>
                 </div>';
@@ -1609,11 +1609,11 @@ class Analysis extends DashboardController {
                                         <a href = "'.base_url("Analysis/createAbsolutePeerTable/pdf/$round_id/$equipment_id/cd3").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
-                                <div class = "card-block">';
+                                <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'cd3');
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
                             </div>
                         </div>
 
@@ -1630,11 +1630,11 @@ class Analysis extends DashboardController {
                                         <a href = "'.base_url("Analysis/createPercentPeerTable/pdf/$round_id/$equipment_id/cd3").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
-                                <div class = "card-block">';
+                                <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'cd3');
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
                             </div>
                         </div>
                 </div>';
@@ -1656,11 +1656,11 @@ class Analysis extends DashboardController {
                                         <a href = "'.base_url("Analysis/createAbsolutePeerTable/pdf/$round_id/$equipment_id/other").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
-                                <div class = "card-block">';
+                                <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'other');
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
                             </div>
                         </div>
 
@@ -1677,11 +1677,11 @@ class Analysis extends DashboardController {
                                         <a href = "'.base_url("Analysis/createPercentPeerTable/pdf/$round_id/$equipment_id/other").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
-                                <div class = "card-block">';
+                                <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'other');
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
                             </div>
                         </div>
                 </div>';
@@ -1703,11 +1703,11 @@ class Analysis extends DashboardController {
                                     </div>
 				            </div>
 
-				            <div class = "card-block col-md-12">';
+				            <div class = "card-block col-md-12"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id);
 
-            $equipment_tabs .= '</div>
+            $equipment_tabs .= '</div></div>
 
 
 				        </div>

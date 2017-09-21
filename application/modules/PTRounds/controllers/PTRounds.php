@@ -12,9 +12,6 @@ class PTRounds extends DashboardController{
         $this->load->model('M_Readiness');
         $this->load->model('M_PTRounds');
         $this->load->model('M_PTRound');
-    
-        // $this->load->model('Participant/M_PTRound');
-        // $this->load->model('Participant/M_Readiness');
 
         $this->menu = [
             'information'   =>  [
@@ -542,7 +539,6 @@ class PTRounds extends DashboardController{
         $change_state = '';
 
         $facilities = $this->M_PTRounds->getQAUnresponsive($round_uuid);
-        // echo '<pre>';print_r($facilities);echo "</pre>";die();
 
         
         $tabledata = [];
@@ -564,6 +560,7 @@ class PTRounds extends DashboardController{
                 
                 $qa_unresponsive = $this->db->get_where('participant_readiness_v',['facility_id'=> $facility->facility_id, 'user_type' => 'qareviewer', 'status' => 1, 'approved' => 1])->row();
 
+                // echo '<pre>';print_r($facilities);echo "</pre>";die();
                     
 
                     $tabledata[] = [
@@ -614,8 +611,8 @@ class PTRounds extends DashboardController{
             $counter = 0;
             foreach($facility_participants as $participant){
                 $counter ++;
-                $participantid = $participant->participant_id;
-                $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
+                $participantid = $participant->p_id;
+                // $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
                 
 
                 $change_state = ' <a href = ' . base_url("PTRounds/PTRounds/ParticipantDetails/$round_uuid/$participantid") . ' class = "btn btn-primary btn-sm"><i class = "icon-note"></i>&nbsp;View Submissions</a>';
@@ -663,7 +660,7 @@ class PTRounds extends DashboardController{
             $counter = 0;
             foreach($facility_participants as $participant){
                 $counter ++;
-                $participantid = $participant->participant_id;
+                $participantid = $participant->p_id;
                 $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
                 
 

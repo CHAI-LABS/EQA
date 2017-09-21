@@ -104,7 +104,7 @@ class M_PTRounds extends MY_Model{
     public function getQAUnresponsive($round_uuid){
         $this->db->select('facility_id');
         $this->db->from('data_entry_v dev');
-        $this->db->join('pt_ready_participants prp', 'prp.participant_id = dev.participant_id');
+        $this->db->join('pt_ready_participants prp', 'prp.p_id = dev.participant_id');
         $this->db->where('prp.pt_round_uuid', $round_uuid);
         $this->db->where('dev.verdict', 2);
         $this->db->group_by('prp.facility_code');
@@ -118,7 +118,7 @@ class M_PTRounds extends MY_Model{
         
         $sql = "SELECT COUNT(DISTINCT(facility_id)) AS qa_count
                 FROM data_entry_v dev
-                JOIN pt_ready_participants prp ON prp.participant_id = dev.participant_id
+                JOIN pt_ready_participants prp ON prp.p_id = dev.participant_id
                 WHERE dev.verdict = 2
                 AND prp.pt_round_uuid = '$round_uuid'
                 GROUP BY prp.facility_id

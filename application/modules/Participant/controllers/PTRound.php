@@ -694,7 +694,7 @@ class PTRound extends MY_Controller {
         $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
 
             
-            $batch = $this->db->get_where('pt_ready_participants', ['participant_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid])->row();
+            $batch = $this->db->get_where('pt_ready_participants', ['p_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid])->row();
 
             array_push($tabledata, $batch->batch);
 

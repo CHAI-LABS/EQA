@@ -209,7 +209,7 @@ class Import extends MY_Controller {
 				                'participant_id'    =>  $participant,
 				                'equipment_id'    =>  $equip_id,
 				                'status'    =>  1,
-				                'verdict'    =>  2
+				                'verdict'    =>  1
 			            ];
 
 			            // $this->db->insert('pt_data_submission', $insertdata);
