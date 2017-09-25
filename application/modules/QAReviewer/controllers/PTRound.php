@@ -187,10 +187,6 @@ class PTRound extends MY_Controller {
     }
 
 
-    
-
-
-
     function createFacilityParticipantsTable($round_uuid,$facility_id){
 
         $template = $this->config->item('default');
@@ -319,50 +315,6 @@ class PTRound extends MY_Controller {
                 ->adminTemplate();
     }
 
-
-    function sendMessage($round_uuid,$particapant_uuid){
-        if($this->input->post()){
-            $user = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));
-            $email = $user->email_address;
-            $subject = $this->input->post('subject');
-            $message = $this->input->post('message');
-
-            $insertdata = [
-                'to_uuid'       =>  $particapant_uuid,
-                'from'          =>  'QA-Reviewer',
-                'email'         =>  $email,
-                'subject'       =>  $subject,
-                'message'       =>  $message
-            ];
-
-
-            if($this->db->insert('messages', $insertdata)){
-                $this->session->set_flashdata('success', "Successfully sent the message");
-
-                // $this->db->where('uuid', $particapant_uuid);
-                // $user = $this->db->get('participants')->row();
-
-                // if($user){
-                //     $data = [];
-
-                //     $body = $this->load->view('Template/email/message_v', $data, TRUE);
-                //     $this->load->library('Mailer');
-                //     $sent = $this->mailer->sendMail($user->participant_email, $subject, $body);
-                //     if ($sent == FALSE) {
-                //         log_message('error', "The system could not send an email to {$user->participant_email}. Names: $user->participant_lname $user->participant_fname at " . date('Y-m-d H:i:s'));
-                //     }
-                // }
-
-            }else{
-                $this->session->set_flashdata('error', "There was a problem sending the message. Please try again");
-            }
-
-            // $user_id = $this->db->insert_id();
-
-            
-            redirect('QAReviewer/PTRound/Round/'.$round_uuid, 'refresh');
-        }
-    }
 
 
     function MarkSubmissions($round_uuid,$round_id, $pid){

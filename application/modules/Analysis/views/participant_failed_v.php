@@ -19,7 +19,7 @@
                 <i class = "icon-wrench"></i>
                 &nbsp;
                 
-                    Failed Participant List
+                    <?= @$title; ?>
 
                 <div class = "pull-right">
                     
@@ -28,7 +28,9 @@
                 </div>
             </div>
             <div class = "card-block">
-                <?= @$table_view; ?>
+                <div class="table-responsive">
+                    <?= @$table_view; ?>
+                </div>
             </div>
         </div>
     </div>

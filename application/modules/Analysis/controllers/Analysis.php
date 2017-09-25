@@ -1165,7 +1165,6 @@ class Analysis extends DashboardController {
                 break;
 
                 case 'other':
-                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
 
                         $mean = ($calculated_values) ? $calculated_values->other_percent_mean : 0;
                         $sd = ($calculated_values) ? $calculated_values->other_percent_sd : 0;
@@ -1259,10 +1258,13 @@ class Analysis extends DashboardController {
         $data = [];
         $title = "Failed Participant";
 
+        $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
+        $equipment = $this->db->get_where('equipments_v', ['id' => $equipment_id])->row();
         
             $data = [
-                'round_uuid' => $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid,
-                'table_view' => $this->createdFailedParticipants($round_id,$equipment_id)
+                'title' => 'Failed Participant List for <strong>'.$equipment->equipment_name. '</strong> in PT Round <strong>'.$round->pt_round_no .'</strong>',
+                'round_uuid' => $round->uuid,
+                'table_view' => $this->createdFailedParticipants('table',$round_id,$equipment_id)
             ];
 
         $this->assets
@@ -1279,8 +1281,300 @@ class Analysis extends DashboardController {
     }
 
 
-    public function createdFailedParticipants($round_id,$equipment_id){
+    function newCAPAMessage($round_uuid,$email){
+        $data = [];
+        $title = "CAPA Message";
+
+        $data = [
+            'round_uuid' => $round_uuid,
+            'email' => $email
+        ];
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        $this->assets->setJavascript('Analysis/failed_participant_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Analysis/capa_message_v', $data)
+                ->adminTemplate();
+    }
+
+
+    function sendCAPAMessage($round_uuid){
+        if($this->input->post()){
+            $email = $this->input->post('email');
+            $subject = $this->input->post('subject');
+            $message = $this->input->post('message');
+
+            // echo "<pre>";print_r($email);echo "</pre>";die();
+            if($email == null || $email == '' || is_numeric($email)){
+                $this->session->set_flashdata('error', "There was no email address added. Please add an email address to send to first");
+            }else{
+                if($subject == null || $subject == ''){
+                    $subject = 'CAPA Message from NHRL';
+                }
+
+                $insertdata = [
+                    'from'          =>  'nhrlCD4eqa@nphls.or.ke',
+                    'email'         =>  $email,
+                    'subject'       =>  $subject,
+                    'message'       =>  $message
+                ];
+
+                if($this->db->insert('messages', $insertdata)){
+                    $this->session->set_flashdata('success', "Successfully sent the message");
+
+                    $body = $this->load->view('Template/email/message_v', $insertdata, TRUE);
+                    $this->load->library('Mailer');
+                    $sent = $this->mailer->sendMail($email, $subject, $body);
+                    if ($sent == FALSE) {
+                        log_message('error', "The system could not send an email to {$user->participant_email}. Names: $user->participant_lname $user->participant_fname at " . date('Y-m-d H:i:s'));
+                    }
+
+                }else{
+                    echo "<pre>";print_r("no email");echo "</pre>";die();
+                    $this->session->set_flashdata('error', "There was a problem sending the message. Please try again");
+                }
+            }
+            
+            redirect('Analysis/Results/'.$round_uuid, 'refresh');
+        }
+    }
+
+
+    public function createdFailedParticipants($form, $round_id, $equipment_id){
+        $template = $this->config->item('default');
+        $column_data = $row_data = $tablevalues = $tablebody = $table = [];
+        $count = $zerocount = $sub_counter = 0;
+
+        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
+        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
+        $round_uuid = $rounds->uuid;
+
+        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+        $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
+        <table>
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Facility</th>
+            <th>Batch</th>';
+            
+        $heading = [
+            "No.",
+            "Facility",
+            "Batch"
+        ];
+
+        $column_data = array('No.','Facility','Batch');
+        
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+        foreach ($samples as $sample) {
+            array_push($heading, $sample->sample_name,"Comment");
+            array_push($column_data, $sample->sample_name,"Comment");
+            $html_body .= '<th>'.$sample->sample_name.'</th> <th>Comment</th>';
+        }
+
+        array_push($heading, 'Overall Grade', "Review Comment",'Participant','Cell','Email', 'Send');
+        array_push($column_data, 'Overall Grade', "Review Comment",'Participant','Cell','Email');
+
+        $html_body .= ' 
+        <th>Overall Grade</th>
+            <th>Review Comment</th>
+            <th>Participant</th>
+            <th>Cell</th>
+            <th>Email</th>
+            </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
+
+
         $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
+
+
+        foreach ($submissions as $submission) {
+            $sub_counter++;
+            $samp_counter = $acceptable = $unacceptable = 0;
+            $tabledata = [];
+ 
+
+            $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
+
+            if($facilityid){
+                $facility_id = $facilityid->facility_id;
+
+                $facility_name = $this->db->get_where('facility_v', ['facility_id' =>  $facility_id])->row()->facility_name;
+            }else{
+                $facility_name = "No Facility";
+            }
+
+            
+            $batch = $this->db->get_where('pt_ready_participants', ['p_id' => $submission->participant_id, 'pt_round_uuid' => $round_uuid])->row();
+
+            array_push($tabledata, $sub_counter, $facility_name, $batch->batch);
+
+            $html_body .= '<tr><td class="spacings">'.$sub_counter.'</td>';
+            $html_body .= '<td class="spacings">'.$facility_name.'</td>';
+            $html_body .= '<td class="spacings">'.$batch->batch.'</td>';
+
+            foreach ($samples as $sample) {
+                $samp_counter++;
+                
+                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                if($cd4_values){
+                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                }else{
+                    $upper_limit = 0;
+                    $lower_limit = 0;
+                } 
+
+                
+                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$submission->participant_id);
+
+               
+                if($part_cd4){
+
+                    $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+
+                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                        $acceptable++;
+                        $comment = "Acceptable";
+
+                    }else{
+                        $unacceptable++;
+                        $comment = "Unacceptable";
+                    }   
+
+                    if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
+                        $zerocount++;
+                    }
+
+                    array_push($tabledata, $part_cd4->cd4_absolute, $comment);
+                    
+                }else{
+                    array_push($tabledata, 0, "Unacceptable");
+                }   
+                $html_body .= '<td class="spacings">'.$comment.'</td>'; 
+            }
+
+            
+
+            $grade = (($acceptable / $samp_counter) * 100);
+
+
+            $overall_grade = round($grade, 2) . ' %';
+
+            if($grade == 100){
+                $review = "Satisfactory Performance";
+            }else if($grade > 0 && $grade < 100){
+                $review = "Unsatisfactory Performance";
+            }else if($zerocount == $samp_counter){
+                $review = "Non-responsive";
+            }else{
+                $review = "Incomplete Submission";
+            }
+
+            $username = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row()->participant_id;
+            // echo "<pre>";print_r($part_cd4);echo "</pre>";die();
+            $part_details = $this->db->get_where('users_v', ['username' =>  $username])->row();
+            
+            $name = $part_details->firstname . ' ' . $part_details->lastname;
+
+            $capa = '<a href = ' . base_url("Analysis/newCAPAMessage/$round_uuid/$part_details->email_address") . ' class = "btn btn-warning btn-sm"><i class = "icon-envelope"></i>&nbsp;Send Capa </a>';
+
+            array_push($tabledata, $overall_grade,$review,$name,$part_details->phone,$part_details->email_address, $capa);
+    
+            switch ($form) {
+                case 'table':
+                    if($review == "Unsatisfactory Performance"){
+                        $table[$count] = $tabledata;
+                    }
+
+                break;
+
+                case 'excel':
+
+                    array_push($row_data, $tabledata);
+                break;
+
+                case 'pdf':
+                  
+                    $html_body .= '<td class="spacings">'.$overall_grade.' %</td>';
+                    $html_body .= '<td class="spacings">'.$review.'</td>';
+                    $html_body .= '<td class="spacings">'.$name.'</td>';
+                    $html_body .= '<td class="spacings">'.$part_details->phone.'</td>';
+                    $html_body .= '<td class="spacings">'.$part_details->email_address.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+
+            $count++;
+                      
+        }
+
+        if($form == 'table'){
+
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
+
+            return $this->table->generate($table);
+
+        }else if($form == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participants_'.$round_name.'_'.$equipment_name, 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'excel_topic' => 'Participants_'.$equipment_name);
+
+            
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            $this->export->create_excel($excel_data);
+
+        }else if($form == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_topic' => 'Participants_'.$round_name.'_'.$equipment_name);
+
+            $this->export->create_pdf($html_body,$pdf_data);
+
+        }
     }
 
 
@@ -1602,9 +1896,6 @@ class Analysis extends DashboardController {
 
                     $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
 
-                    
-
-
                     if($cd4_values){
                         $upper_limit = $cd4_values->cd4_absolute_upper_limit;
                         $lower_limit = $cd4_values->cd4_absolute_lower_limit;
@@ -1612,8 +1903,6 @@ class Analysis extends DashboardController {
                         $upper_limit = 0;
                         $lower_limit = 0;
                     } 
-
-
 
                     $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
                     if($part_cd4){

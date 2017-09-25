@@ -1,4 +1,4 @@
-
+<?php $assets_url = $this->config->item('assets_url'); ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -304,43 +304,27 @@ a {
             <td class="content-wrap">
               <meta itemprop="name" content="Confirm Email"/>
               <table width="100%" cellpadding="0" cellspacing="0">
-              <?php if($to == 'nhrlCD4eqa@nphls.or.ke'){ ?>
+              
                     <tr>
                       <td class="content-block">
-                          <h4>Dear NHRL, </h4>
+                        <h4>Dear Participant,</h4>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="content-block">
+                        <?= @$message; ?>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="content-block">
+                        If you wish to fill in the Corrective And Preventive Action (CAPA) Form , log in right now by clicking the button below:
                       </td>
                     </tr>
                 
-                    <tr>
-                      <td class="content-block">
-                        <?= @$subject; ?>
-                      </td>
-                    </tr>
-
-                <?php }else{ ?>
-                    <tr>
-                      <td class="content-block">
-                        <h4>Dear <?= @$names; ?>,</h4>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="content-block">
-                        A message has been sent to your inbox
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="content-block">
-                        If you wish to view it, log in right now by clicking the box below:
-                      </td>
-                    </tr>
-
-                <?php } ?>
-                
-
                 <tr>
                   <td class="content-block" itemprop="handler" itemscope itemtype="http://schema.org/HttpActionHandler">
-                    <a href="<?= @$url; ?>" class="btn-primary" itemprop="url">NHRL Proficiency Testing Programme: Flow cytometry log in</a>
+                    <a href="<?= @$this->config->item('server_url'); ?>Participant/Readiness/CapaForm/<?= @$round_uuid; ?>" class="btn-primary" itemprop="url">NHRL CAPA: Click to log in</a>
                   </td>
                 </tr>
                 <tr>

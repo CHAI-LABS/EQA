@@ -148,59 +148,6 @@ class Dashboard extends DashboardController {
 	}
 
 
-	private function createMessagesTable(){
-		$participant_uuid = $this->session->userdata('uuid');
-        $template = $this->config->item('default');
-        $change_state = "";
-
-
-
-        $heading = [
-            "No.",
-            "From",
-            "Subject",
-            "Status",
-            "Actions"
-        ];
-        $tabledata = [];
-
-
-        $this->db->where('to_uuid',$participant_uuid);
-        $this->db->where('deleted',0);
-        $messages = $this->db->get('messages_v')->result();
-
-
-        if($messages){
-            $counter = 0;
-            foreach($messages as $message){
-                $counter ++;
-                $uuid = $message->uuid;
-
-
-                $change_state = ' <a href = ' . base_url("Dashboard/myMessage/$uuid") . ' class = "btn btn-primary btn-sm"><i class = "icon-note"></i>&nbsp;Open</a>';
-
-                if($message->status == 1){
-                    $status = "<label class = 'tag tag-danger tag-sm'>Read</label>";
-                    $change_state .= ' <a style="color:#fff !important;" id='.$message->uuid.' class = "btn btn-danger btn-sm btn-delete"><i class = "icon-note"></i>&nbsp;Delete</a>'; 
-                }else{
-                	$status = "<label class = 'tag tag-info tag-sm'>New</label>";
-                }
-     
-                $tabledata[] = [
-                    $counter,
-                    $message->from.' : '.$message->email,
-                    $message->subject,
-                    $status,
-                    $change_state
-                ];
-            }
-        }
-        $this->table->set_heading($heading);
-        $this->table->set_template($template);
-
-        return $this->table->generate($tabledata);
-    }
-
     function myMessage($message_uuid){
     	$this->db->where('uuid', $message_uuid);
         $message = $this->db->get('messages_v')->row();
