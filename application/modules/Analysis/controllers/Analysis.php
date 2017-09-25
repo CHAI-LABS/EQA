@@ -1255,7 +1255,33 @@ class Analysis extends DashboardController {
 	}
 
 
-    
+    function failedList($round_id,$equipment_id){
+        $data = [];
+        $title = "Failed Participant";
+
+        
+            $data = [
+                'round_uuid' => $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid,
+                'table_view' => $this->createdFailedParticipants($round_id,$equipment_id)
+            ];
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        $this->assets->setJavascript('Analysis/failed_participant_js');
+        $this->template
+                ->setModal("Analysis/capa_message_v", "Add New Message")
+                ->setPageTitle($title)
+                ->setPartial('Analysis/participant_failed_v', $data)
+                ->adminTemplate();
+    }
+
+
+    public function createdFailedParticipants($round_id,$equipment_id){
+        $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
+    }
 
 
     public function createParticipantTable($form, $round_id, $equipment_id){
@@ -1334,7 +1360,6 @@ class Analysis extends DashboardController {
 
         $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
 
-        
 
         foreach ($submissions as $submission) {
             $sub_counter++;
@@ -1498,8 +1523,6 @@ class Analysis extends DashboardController {
         }
     }
 
-
-
 	public function createTabs($round_id){
         
         $datas=[];
@@ -1648,12 +1671,12 @@ class Analysis extends DashboardController {
 
             $equipment_tabs .= $passed;
 
-            $equipment_tabs .= ' </strong><br/>
+            $equipment_tabs .= ' </strong><br/><a href="'.base_url("Analysis/failedList/$round_id/$equipment_id/").'">
                 No. of Failed : <strong>';
 
             $equipment_tabs .= $failed;
 
-            $equipment_tabs .= ' </strong><br/>
+            $equipment_tabs .= ' </a></strong><br/>
 				            </div>
 				        </div>
 				    </div>
