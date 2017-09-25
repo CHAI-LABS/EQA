@@ -47,10 +47,7 @@ class PTRound extends MY_Controller {
                     $this->db->where_not_in('type','future');
                     
                     $ongoing_check = $this->db->get('pt_round_v')->row();
-                    // $ongoing_check = $this->db->get_where('pt_round_v', ['type'=>'ongoing','status' => 'active'])->row();
-
-                    // echo "<pre>";print_r($ongoing_check);echo "</pre>";die();
-
+                 
                     if($ongoing_check){
                         $ongoing_pt = $ongoing_check->uuid;
                     }else{
@@ -70,8 +67,7 @@ class PTRound extends MY_Controller {
                                 if($ongoing_check->type == 'previous'){
                                     $view .= "<a class = 'btn btn-info btn-sm' href = '".base_url('Participant/PTRound/Results/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Results</a>";
                                 }
-
-                                
+             
                             }else{
 
                                 $view = "<a class = 'btn btn-success btn-sm' href = '".base_url('Participant/PanelTracking/confirm/' . $checklocking->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Confirm Receipt</a>";
@@ -382,6 +378,29 @@ class PTRound extends MY_Controller {
 
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
         <table>
         <thead>
         <tr>
@@ -545,6 +564,29 @@ class PTRound extends MY_Controller {
 
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
         <table>
         <thead>
         <tr>
@@ -706,6 +748,29 @@ class PTRound extends MY_Controller {
 
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
         <table>
         <thead>
         <tr>
@@ -865,6 +930,29 @@ class PTRound extends MY_Controller {
         $participant = $this->db->get_where('participant_readiness_v', ['uuid' =>  $participant_uuid])->row();
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
         <table>
         <thead>
         <tr>

@@ -106,6 +106,30 @@ class Analysis extends DashboardController {
         $column_data = $row_data = array();
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
+
         <table>
         <thead>
         <tr>
@@ -233,6 +257,30 @@ class Analysis extends DashboardController {
         $column_data = $row_data = array();
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
+
         <table>
         <thead>
         <tr>
@@ -397,6 +445,30 @@ class Analysis extends DashboardController {
 
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/><br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
+
                     <table>
                     <thead>
                     <tr>
@@ -818,6 +890,29 @@ class Analysis extends DashboardController {
 
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
         <table>
         <thead>
         <tr>
@@ -988,6 +1083,29 @@ class Analysis extends DashboardController {
 
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
         <table>
         <thead>
         <tr>
@@ -1153,6 +1271,29 @@ class Analysis extends DashboardController {
         $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
 
         $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                Equipment Name : ' . $equipment_name . '
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
         <table>
         <thead>
         <tr>
