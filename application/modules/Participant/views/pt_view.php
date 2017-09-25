@@ -15,6 +15,25 @@
                 <div class = "table-responsive">
                     <table class = "table table-outline mb-0 hidden-sm-down">
                         <thead class = "thead-default">
+                            <th colspan = "<?= @$colspan; ?>"><center>Future Rounds</center></th>
+                        </thead>
+                        <thead>
+                            <th>Round ID</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </thead>
+                        <tbody>
+                            <?php if($pt_rounds['future']) { ?>
+                                <?= @$pt_rounds['future']; ?>
+                            <?php } else { ?>
+                            <tr>
+                                <td colspan = "<?= @$colspan; ?>"><center>There are no future rounds</center></td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
+
+                        <thead class = "thead-default">
                             <th colspan = "<?= @$colspan; ?>"><center>Ongoing Round</center></th>
                         </thead>
                         <thead id = "title">
@@ -32,8 +51,9 @@
                                 </tr>
                             <?php } ?>
                         </tbody>
+
                         <thead class = "thead-default">
-                            <th colspan = "<?= @$colspan; ?>"><center>Previous and Future Rounds</center></th>
+                            <th colspan = "<?= @$colspan; ?>"><center>Previous Rounds</center></th>
                         </thead>
                         <thead>
                             <th>Round ID</th>
@@ -42,14 +62,15 @@
                             <th>Actions</th>
                         </thead>
                         <tbody>
-                            <?php if($pt_rounds['prevfut']) { ?>
-                                <?= @$pt_rounds['prevfut']; ?>
+                            <?php if($pt_rounds['previous']) { ?>
+                                <?= @$pt_rounds['previous']; ?>
                             <?php } else { ?>
                             <tr>
-                                <td colspan = "<?= @$colspan; ?>"><center>There are no previous or future rounds</center></td>
+                                <td colspan = "<?= @$colspan; ?>"><center>There are no previous rounds</center></td>
                             </tr>
                             <?php } ?>
                         </tbody>
+                        
                     </table>
                 </div>
             </div>

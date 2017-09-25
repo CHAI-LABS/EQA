@@ -29,7 +29,7 @@ class PTRound extends MY_Controller {
 
     function createPTRoundTable(){
         $rounds = $this->db->get('pt_round_v')->result();
-        $ongoing = $prevfut = '';
+        $view = $ongoing = $prev = $fut = '';
         $round_array = [];
         if ($rounds) {
             foreach ($rounds as $round) {
@@ -42,13 +42,21 @@ class PTRound extends MY_Controller {
                 if($get == null){
                     $locking = 0;
                 }else{
-                    $ongoing_check = $this->db->get_where('pt_round_v', ['type'=>'ongoing','status' => 'active'])->row();
 
-                        if($ongoing_check){
-                            $ongoing_pt = $ongoing_check->uuid;
-                        }else{
-                            $ongoing_pt = 0;
-                        }
+                    $this->db->where('status','active');
+                    $this->db->where_not_in('type','future');
+                    
+                    $ongoing_check = $this->db->get('pt_round_v')->row();
+                    // $ongoing_check = $this->db->get_where('pt_round_v', ['type'=>'ongoing','status' => 'active'])->row();
+
+                    // echo "<pre>";print_r($ongoing_check);echo "</pre>";die();
+
+                    if($ongoing_check){
+                        $ongoing_pt = $ongoing_check->uuid;
+                    }else{
+                        $ongoing_pt = 0;
+                    }
+
                     if($ongoing_pt){
                         $checklocking = $this->M_PTRound->allowPTRound($ongoing_pt, $this->session->userdata('uuid'));
 
@@ -59,7 +67,11 @@ class PTRound extends MY_Controller {
 
                                 $view = "<a class = 'btn btn-success btn-sm' href = '".base_url('Participant/PTRound/Round/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;View</a>&nbsp;";
 
-                                $view .= "<a class = 'btn btn-info btn-sm' href = '".base_url('Participant/PTRound/Results/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Results</a>";
+                                if($ongoing_check->type == 'previous'){
+                                    $view .= "<a class = 'btn btn-info btn-sm' href = '".base_url('Participant/PTRound/Results/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Results</a>";
+                                }
+
+                                
                             }else{
 
                                 $view = "<a class = 'btn btn-success btn-sm' href = '".base_url('Participant/PanelTracking/confirm/' . $checklocking->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Confirm Receipt</a>";
@@ -74,6 +86,7 @@ class PTRound extends MY_Controller {
                 
                 $panel_tracking = "<a class = 'btn btn-danger btn-sm' href = '".base_url('Participant/PTRound/Report/' . $round->uuid)."'><i class = 'fa fa-line-chart'></i>&nbsp;Report</a>";
                 $status = ($round->status == "active") ? '<span class = "tag tag-success">Active</span>' : '<span class = "tag tag-danger">Inactive</span>';
+
                 if ($round->type == "ongoing") {
                     $ongoing .= "<tr>
                     <td>{$round->pt_round_no}</td>
@@ -81,8 +94,15 @@ class PTRound extends MY_Controller {
                     <td>{$status}</td>
                     <td>{$view}</td>
                     </tr>";
-                }else{
-                    $prevfut .= "<tr>
+                }else if ($round->type == "future"){
+                    $fut .= "<tr>
+                    <td>{$round->pt_round_no}</td>
+                    <td>{$created}</td>
+                    <td>{$status}</td>
+                    <td>{$view}</td>
+                    </tr>";
+                }else if ($round->type == "previous"){
+                    $prev .= "<tr>
                     <td>{$round->pt_round_no}</td>
                     <td>{$created}</td>
                     <td>{$status}</td>
@@ -94,7 +114,8 @@ class PTRound extends MY_Controller {
 
         $round_array = [
             'ongoing'   =>  $ongoing,
-            'prevfut'   =>  $prevfut
+            'previous'   =>  $prev,
+            'future'   =>  $fut
         ];
 
         return $round_array;
@@ -143,7 +164,6 @@ class PTRound extends MY_Controller {
 
         
         $equipments = $this->M_PTRound->resultEquipments($participant->p_id);
-        // echo "<pre>";print_r($equipments);echo "</pre>";die();
         
         $equipment_tabs = '';
 
