@@ -11,4 +11,7 @@ CREATE TABLE `capa_response` (
   `prevention` TEXT NULL,
   `date_of_submission` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `approved` INT NULL DEFAULT 0,
+  `status` INT NULL DEFAULT 0,
   PRIMARY KEY (`id`));
+
+

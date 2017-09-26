@@ -161,7 +161,8 @@ class Participant extends MY_Controller {
                 'correction'  =>  $correction,
                 'effective'    			=>  $effective,
                 'prevention'  =>  $prevention,
-                'approved'  =>  0
+                'approved'  =>  0,
+                'status'  =>  0
             ];
 
 

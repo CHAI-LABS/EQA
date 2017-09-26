@@ -17,13 +17,13 @@ class Analysis extends DashboardController {
 	{	
 		$data = [];
         $title = "Analysis";
-        // $pt_count = $this->db->count_all('pt_rounds');
 
-            $data = [
-                'table_view'    =>  $this->createPTTable()
-            ];
-
-        
+        $data = [
+            'page_title' => 'PT Round List',
+            'back_text' => 'Back to Dashboard',
+            'back_link' => base_url('Dashboard/'),
+            'table_view'    =>  $this->createPTTable()
+        ];
 
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
@@ -37,6 +37,265 @@ class Analysis extends DashboardController {
                 ->adminTemplate();
 	}
 
+
+    public function Capa()
+    {   
+        $data = [];
+        $title = "Capa Analysis";
+
+        $data = [
+            'page_title'    => 'Capa List',
+            'back_text'     => 'Back to Dashboard',
+            'back_link'     => base_url('Analysis/'),
+            'table_view'    =>  $this->createCapaTable()
+        ];
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        $this->assets->setJavascript('Analysis/analysis_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Analysis/analysis_v', $data)
+                ->adminTemplate();
+    }
+
+
+    public function createCapaTable(){
+        $template = $this->config->item('default');
+
+        $heading = [
+            "No.",
+            "Participant",
+            "Date Submitted",
+            "Reviewed",
+            "Actions"
+        ];
+        $tabledata = [];
+        $this->db->where('approved',1);
+        $capas = $this->db->get('capa_review')->result();
+        
+        if($capas){
+            $counter = 0;
+            foreach($capas as $capa){
+                // echo "<pre>";print_r($capa);echo "</pre>";die();
+                $counter ++;
+
+                $participant_id = $this->db->get_where('participant_readiness_v', ['uuid' => $capa->participant_uuid])->row()->username;
+                
+                if($capa->status == 0){
+                    $status = "<label class = 'tag tag-warning tag-sm'>Not Reviewed</label>"; 
+                }else{
+                    $status = "<label class = 'tag tag-success tag-sm'>Reviewed</label>";
+                }
+
+                $date = date('dS F, Y', strtotime($capa->date_of_submission));
+
+                $view = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('Analysis/CapaView/' . $capa->participant_uuid .'/'. $capa->round_uuid)."'><i class = 'icon-eye'></i>&nbsp;View</a>";
+
+                if($capa->status == 0){
+                    $review = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/MarkReview/1/' . $capa->id)."'><i class = 'icon-eye'></i>&nbsp;Mark as Reviewed</a>";
+                }else{
+                    $review = "<a class = 'btn btn-danger btn-sm dropdown-item' href = '".base_url('Analysis/MarkReview/0/' . $capa->id)."'><i class = 'icon-eye'></i>&nbsp;Mark as not Reviewed</a>";
+                }
+
+                $dropdown = "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Quick Actions
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $view
+                                $review
+                            </div>
+                        </div>";
+                
+                $tabledata[] = [
+                    $counter,
+                    $participant_id,
+                    $date,
+                    $status,
+                    $dropdown
+                ];
+            }
+        }
+        $this->table->set_heading($heading);
+        $this->table->set_template($template);
+
+        return $this->table->generate($tabledata);
+    }
+
+    public function CapaView($participant_uuid, $round_uuid){
+        $data = [];
+        $title = "Capa View";
+
+        // echo "<pre>";print_r($rounds);echo "</pre>";die();
+
+        $data = [
+            'page_title'    => 'Capa View',
+            'back_text'     => 'Back to CAPA Participants',
+            'back_link'     => base_url('Analysis/CAPA/'.$round_uuid),
+            'capa_view'    =>  $this->createCapaView($participant_uuid, $round_uuid)
+        ];
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        $this->assets->setJavascript('Analysis/analysis_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Analysis/capa_view', $data)
+                ->adminTemplate();
+    }
+
+    function createCapaView($participant_uuid, $round_uuid){
+        $capa_view = '';
+
+        $this->db->where('approved',1);
+        $this->db->where('round_uuid',$round_uuid);
+        $this->db->where('participant_uuid',$participant_uuid);
+
+        $capa = $this->db->get('capa_review')->row();
+
+        $date = date('dS F, Y', strtotime($capa->date_of_submission));
+
+        $participant_id = $this->db->get_where('participant_readiness_v', ['uuid' => $participant_uuid])->row()->username;
+
+        if($capa->effective){
+            $effect = "Yes";
+        }else{
+            $effect = "No";
+        }
+
+        // echo "<pre>";print_r($capa);echo "</pre>";die();
+
+        $capa_view .= '<div class = "card">
+                            <div class="card-header">
+                                Occurrence Details
+                            </div>
+
+                            <div class = "card-block">
+                                <div class="col-sm-4"><strong>Participant ID</strong></div>
+                                <div class="col-sm-8">' . $participant_id . '</div>
+                                <br/>&nbsp;<br/>
+                                <div class="col-sm-4"><strong>Description of the occurrence</strong></div>
+                                <div class="col-sm-8">' . $capa->occurrence . '</div>
+                            </div>
+                        </div>';
+
+        $capa_view .= '<div class = "card">
+                            <div class="card-header">
+                                Root Cause
+                            </div>
+                        <div class = "card-block">
+                            <div class="col-sm-4"><strong>Selected applicable testing phase(s)</strong></div>
+                            <div class="col-sm-8">';
+
+        $tests = $this->db->get_where('capa_tests', ['capa_test_id' => $capa->id])->result();
+
+        foreach ($tests as $test) {
+            $capa_view .= $test->applied_test . '<br/>';
+        }
+
+        $capa_view .= '</div>
+                            <br/>&nbsp;<br/>
+                            <div class="col-sm-4"><strong>Description of root cause</strong></div>
+                            <div class="col-sm-8">' . $capa->cause . '</div>
+                            <br/>&nbsp;<br/>
+                            <div class="col-sm-4"><strong>Attributing factor(s)</strong></div>
+                            <div class="col-sm-4">';
+
+        $attributes = $this->db->get_where('capa_attributes', ['capa_attribute_id' => $capa->id])->result();
+
+        foreach ($attributes as $attribute) {
+            if($attribute->attribute_factor == "Other"){
+                $capa_view .= $attribute->attribute_factor . ' - ';
+                $capa_view .= $attribute->specific_other . '<br/>';
+            }else{
+                $capa_view .= $attribute->attribute_factor . '<br/>';
+            }
+            
+        }
+
+        $capa_view .= '</div>
+                        </div>
+                        </div>
+
+                        <div class = "card">
+                            <div class="card-header">
+                                Corrective Action
+                            </div>
+
+                            <div class = "card-block">
+
+                                <div class="col-sm-4"><strong>Describe corrective measures taken</strong></div>
+                                <div class="col-sm-8">' . $capa->correction . '</div>
+                                <br/>&nbsp;<br/>
+                                <div class="col-sm-4"><strong>Was the corrective action effective ?</strong></div>
+                                <div class="col-sm-8">' . $effect . '</div>
+                            </div>
+                        </div>';
+
+        $capa_view .= '<div class = "card">
+                            <div class="card-header">
+                                Preventive Action
+                            </div>
+
+                            <div class = "card-block">
+
+                                <div class="col-sm-4"><strong>Describe action(s) taken to prevent recurrence</strong></div>
+                                <div class="col-sm-8">' . $capa->prevention . '</div>
+                            </div>
+                        </div>';
+
+        $supervisor = $this->db->get_where('participant_readiness_v', ['facility_id' => $capa->facility_id, 'user_type' => 'qareviewer'])->row();
+
+        $capa_view .= '<div class = "card">
+                            <div class="card-header">
+                                Resolution
+                            </div>
+
+                            <div class = "card-block">
+                                <div class="col-sm-4"><strong>QA / Supervisor</strong></div>
+                                <div class="col-sm-8">' . $supervisor->firstname . '  ' . $supervisor->lastname . '</div>
+                                <br/>&nbsp;<br/>
+                                <div class="col-sm-4"><strong>Date of Completion</strong></div>
+                                <div class="col-sm-8">' . $date . '</div>
+                            </div>
+                        </div>';
+        
+
+        return $capa_view;
+    }
+
+    function MarkReview($type, $capa_id){
+        $response = [];
+
+            $update_data = [];
+
+            if($type == 1){
+                $update_data = ['status'  =>  1];
+            }else{
+                $update_data = ['status'  =>  0];
+            }
+
+            $this->db->where('id', $capa_id);
+            if($this->db->update('capa_response', $update_data)){
+                $response = [
+                    'status'    =>  TRUE,
+                    'message'   =>  "Successfully Marked CAPA as Reviewed"
+                ];
+            }else{
+                $response = [
+                    'status'    =>  FALSE,
+                    'message'   =>  "There was a problem marking the CAPA"
+                ];
+            }
+        $this->Capa();
+    }
 
 	public function createPTTable()
 	{
@@ -73,6 +332,20 @@ class Analysis extends DashboardController {
 
                 $from = date('dS F, Y', strtotime($round->from));
                 $to = date('dS F, Y', strtotime($round->to));
+
+                $view = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('Analysis/Results/' . $round_uuid)."'><i class = 'icon-eye'></i>&nbsp;View</a>";
+
+                $capa = "<a class = 'btn btn-danger btn-sm dropdown-item' href = '".base_url('Analysis/Capa/' . $round->uuid)."'><i class = 'icon-eye'></i>&nbsp;CAPA</a>";
+
+                $dropdown = "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Quick Actions
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $view
+                                $capa
+                            </div>
+                        </div>";
                 
                 $tabledata[] = [
                     $counter,
@@ -82,8 +355,7 @@ class Analysis extends DashboardController {
                     $round->tag,
                     $round->lab_unit,
                     $status,
-                    '<a href = ' . base_url("Analysis/Results/$round_uuid") . ' class = "btn btn-primary btn-sm"><i class = "icon-eye"></i>&nbsp;View </a>
-                    '
+                    $dropdown
                 ];
             }
         }
@@ -96,11 +368,8 @@ class Analysis extends DashboardController {
 
 
     public function createParticipantResultsAbsolute($type, $round_id,$equipment_id,$sample_id,$cdtype)
-    {
-        
+    {        
         // echo'<pre>';print_r($cdtype);echo'</pre>';die();
-
-        // $this->auth->check();
 
         $template = $this->config->item('default');
         $column_data = $row_data = array();
@@ -147,11 +416,9 @@ class Analysis extends DashboardController {
             $cdtype." Absolute Result"
         ];
         $tabledata = [];
-
-        
+  
         $part_results = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample_id])->result();
          
-
         if($part_results){
             $counter = 0;
             foreach($part_results as $part_result){
@@ -191,8 +458,7 @@ class Analysis extends DashboardController {
 
                     case 'excel':
                         array_push($row_data, array($counter, $facility_name, $part_result->$type_absolute));
-
-                        
+                     
                         break;
 
                     case 'pdf':
@@ -207,8 +473,6 @@ class Analysis extends DashboardController {
                         echo "<pre>";print_r("Something went wrong... Please contact your administrator");echo "</pre>";die();
                         break;
                 }
-                
-                
             }
         }
 

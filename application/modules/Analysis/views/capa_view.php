@@ -1,3 +1,4 @@
+
 <div class = "card-block">
     <?php if($this->session->flashdata('success')){ ?>
         <div class = 'alert alert-success'>
@@ -9,9 +10,8 @@
         </div>
     <?php } ?>
 </div>
-        
 
-            
+
 <div class = "row">
     <div class="col-md-12">
         <div class = "card">
@@ -22,14 +22,18 @@
                     <?= @$page_title; ?>
 
                 <div class = "pull-right">
-                    <a href = "<?= @$back_link; ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  <?= @$back_text; ?></button></a><br /><br />
+        
+                <a href = "<?= @$back_link; ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i> <?= @$back_text; ?></button></a>     
                 </div>
             </div>
 
             <div class = "card-block">
-                <?= @$table_view; ?>
-            </div>
 
+                <?= @$capa_view; ?>
+          
+            </div>
         </div>
     </div>
 </div>
+        
+
