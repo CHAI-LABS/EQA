@@ -13,6 +13,8 @@ class Readiness extends MY_Controller {
 	public function authenticate($pt_uuid)
 	{	
 		$data['pt_uuid']	=	$pt_uuid;
+		$data['type']	=	"readiness";
+
 		$this->assets
 			->addJs('dashboard/js/libs/jquery.validate.js')
             ->addJs("plugin/sweetalert/sweetalert.min.js");
@@ -42,34 +44,7 @@ class Readiness extends MY_Controller {
 		}
 	}
 
-	public function readinessChecklist($pt_uuid){
-		$this->checkLogin($pt_uuid);
-		// echo "<pre>";print_r("PT UUID ".$pt_uuid);echo "</pre>";die();
-
-		$data = [];
-
-		$user_details = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->flashdata('uuid'));
-		$questions_data = $this->getQuestions();
-		//echo "<pre>";print_r($data['pt_uuid']);echo "</pre>";die();
-        $data = [
-            'user'  =>  $user_details,
-            'questionnair'  =>  $questions_data,
-            'pt_uuid'  =>  $pt_uuid
-        ];
-
-        $title = "Readiness Form";
-
-        $this->assets
-                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
-                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
-                ->addJs('dashboard/js/libs/jquery.validate.js')
-                ->addJs('dashboard/js/libs/select2.min.js');
-        $this->assets->setJavascript('Participant/readiness_form_js');
-        $this->template
-                ->setPageTitle($title)
-                ->setPartial('readiness_form_v', $data)
-                ->readinessTemplate();
-	}
+	
 
 	public function authentication(){
 		$ptround = $this->input->post('ptround');
@@ -198,7 +173,35 @@ class Readiness extends MY_Controller {
 		return $question_view;
 	}
 
-	
+
+	public function readinessChecklist($pt_uuid){
+		$this->checkLogin($pt_uuid);
+		// echo "<pre>";print_r("PT UUID ".$pt_uuid);echo "</pre>";die();
+
+		$data = [];
+
+		$user_details = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->flashdata('uuid'));
+		$questions_data = $this->getQuestions();
+		//echo "<pre>";print_r($data['pt_uuid']);echo "</pre>";die();
+        $data = [
+            'user'  =>  $user_details,
+            'questionnair'  =>  $questions_data,
+            'pt_uuid'  =>  $pt_uuid
+        ];
+
+        $title = "Readiness Form";
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        $this->assets->setJavascript('Participant/readiness_form_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('readiness_form_v', $data)
+                ->readinessTemplate();
+	}
 
 	public function submitReadiness(){
 		$response_array = [];

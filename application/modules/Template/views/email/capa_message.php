@@ -313,6 +313,12 @@ a {
 
                     <tr>
                       <td class="content-block">
+                        <?= @$subject; ?>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="content-block">
                         <?= @$message; ?>
                       </td>
                     </tr>
@@ -324,7 +330,7 @@ a {
                 
                 <tr>
                   <td class="content-block" itemprop="handler" itemscope itemtype="http://schema.org/HttpActionHandler">
-                    <a href="<?= @$this->config->item('server_url'); ?>Participant/Readiness/CapaForm/<?= @$round_uuid; ?>" class="btn-primary" itemprop="url">NHRL CAPA: Click to log in</a>
+                    <a href="<?= @$this->config->item('server_url'); ?>Participant/Participant/CapaForm/<?= @$round_uuid; ?>" class="btn-primary" itemprop="url">NHRL CAPA: Click to log in</a>
                   </td>
                 </tr>
                 <tr>

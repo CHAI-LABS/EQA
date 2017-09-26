@@ -5,9 +5,14 @@
 	      <div class="box-row">
 			<div class="box-cell col-md-7">
 
-				<form method = "post" action='<?php echo base_url('Participant/Readiness/authentication/');?>' class="p-a-4" id="readiness-login-form">
 
-				<?php if($this->session->flashdata('success')){ ?>
+			<?php if($type == 'readiness'){ ?>
+				<form method = "post" action='<?php echo base_url('Participant/Readiness/authentication/');?>' class="p-a-4" id="readiness-login-form">
+			<?php }else if($type == 'capa'){ ?>
+				<form method = "post" action='<?php echo base_url('Participant/Participant/authentication/');?>' class="p-a-4" id="readiness-login-form">
+			<?php } ?>
+
+			<?php if($this->session->flashdata('success')){ ?>
                 <div class = 'alert alert-success'>
                     <?= @$this->session->flashdata('success'); ?>
                 </div>

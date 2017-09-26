@@ -1324,10 +1324,16 @@ class Analysis extends DashboardController {
                     'message'       =>  $message
                 ];
 
+                $data = [
+                    'round_uuid'    =>  $round_uuid,
+                    'subject'       =>  $subject,
+                    'message'       =>  $message
+                ];
+
                 if($this->db->insert('messages', $insertdata)){
                     $this->session->set_flashdata('success', "Successfully sent the message");
 
-                    $body = $this->load->view('Template/email/message_v', $insertdata, TRUE);
+                    $body = $this->load->view('Template/email/capa_message', $data, TRUE);
                     $this->load->library('Mailer');
                     $sent = $this->mailer->sendMail($email, $subject, $body);
                     if ($sent == FALSE) {
