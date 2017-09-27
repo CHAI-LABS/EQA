@@ -265,7 +265,9 @@ class Analysis extends DashboardController {
                                 <div class="col-sm-4"><strong>Date of Completion</strong></div>
                                 <div class="col-sm-8">' . $date . '</div>
                             </div>
-                        </div>';
+                        </div>
+
+                        <a href="'. base_url('Analysis/MarkReview/1/' . $capa->id) .'"><button id="submit-capa" type="submit" class="btn btn-block btn-primary">Mark as Reviewed</button></a>';
         
 
         return $capa_view;
