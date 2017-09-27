@@ -158,7 +158,7 @@ class PTRound extends MY_Controller {
                     <td>{$round->pt_round_no}</td>
                     <td>{$created}</td>
                     <td>{$status}</td>
-                    <td>{$view}</td>
+                    <td>{$dropdown}</td>
                     </tr>";
                 }
             }

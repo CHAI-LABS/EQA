@@ -8,6 +8,7 @@ class Participant extends MY_Controller {
 
 		$this->load->module('Participant');
 		$this->load->model('M_Participant');
+		$this->load->module('Auth');
 		$this->load->model('M_Readiness');
 		$this->load->library('Mailer');
 
