@@ -12,8 +12,33 @@
     <?php } ?>
 </div>
 
+        
+
 
 <div class = "row">
+
+    <div class="col-md-12 container-fluid pt-2">
+            <div class="animated fadeIn">
+                <div class="card-columns col-2">
+                    <div class="card">
+                        <div class="card-header">
+                            Bar Chart
+                            <div class="card-actions">
+                                <a href="http://www.chartjs.org/">
+                                    <small class="text-muted">docs</small>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-block">
+                            <div class="chart-wrapper">
+                                <canvas id="canvas-2"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <div class="col-md-12">
         <div class = "card">
             <div class="card-header col-4">

@@ -661,10 +661,54 @@ class Analysis extends DashboardController {
         
 	}
 
+    public function graphExample(){
+        $labels = $graph_data = $datasets = $data = array();
+
+        $colors = [
+            'rgba(220,220,220,0.5)', 'rgba(151,187,205,0.5)'
+        ];
+
+        $sql = "SELECT ps.sample_name, avg(per.cd3_absolute) as cd3, avg(per.cd4_absolute) as cd4 FROM pt_equipment_results per
+JOIN pt_samples ps ON ps.id = per.sample_id
+GROUP BY per.sample_id;";
+
+        $results = $this->db->query($sql)->result();
+        $cd3datasets = [
+            'label'         =>  'CD3',
+            'backgroundColor'=>$colors[0]
+        ];
+        $cd4datasets = [
+            'label'         =>  'CD4',
+            'backgroundColor'=>$colors[1]
+        ];
+        // echo "<pre>";print_r($results);die;
+        if($results){
+            $counter = 0;
+            foreach ($results as $key => $value) {
+                $data = [];
+                // echo "<pre>";print_r($value);echo "</pre>";die();
+                $cd3datasets['data'][] = $value->cd3;
+                $cd4datasets['data'][] = $value->cd4;
+
+                $labels[] = $value->sample_name;
+                $tabledata[] = [];
+                $counter++;
+            }
+        }
+
+        $graph_data['labels'] = $labels;
+        $graph_data['datasets'] = [$cd3datasets, $cd4datasets];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
 
 	public function Results($round_uuid){
 		$data = [];
         $title = "Analysis";
+
+        $stdvalues = $this->Analysis_m->getstdSample();
+        // echo'<pre>';print_r($stdvalues);echo'</pre>';die();
 
 
         $pt_id = $this->db->get_where('pt_round', ['uuid'   => $round_uuid])->row()->id;
@@ -678,6 +722,7 @@ class Analysis extends DashboardController {
             
 		$this->assets->addCss('css/main.css');
         $this->assets
+                ->addJs("js/Chart.min.js")
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
                         ->addJs('dashboard/js/libs/moment.min.js');

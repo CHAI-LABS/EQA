@@ -87,4 +87,343 @@ class Analysis_m extends CI_Model {
     }
 
 
+
+    public function getstdSample(){
+        $sql = "SELECT 
+        `pds`.`id` AS `id`,
+        `pds`.`round_id` AS `round_id`,
+        `per`.`sample_id` AS `sample_id`,
+        `pds`.`equipment_id` AS `equipment_id`,
+        ROUND(AVG((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)),
+                0) AS `cd3_absolute_mean`,
+        ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)),
+                2) AS `cd3_absolute_sd`,
+        (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)),
+                2)) AS `double_cd3_absolute_sd`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)),
+                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)),
+                2))) AS `cd3_absolute_upper_limit`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)),
+                0) - (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)),
+                2))) AS `cd3_absolute_lower_limit`,
+        CEILING(((STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END)) / AVG((CASE
+                    WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                    ELSE NULL
+                END))) * 100)) AS `cd3_absolute_cv`,
+        (CASE
+            WHEN
+                (CEILING(((STDDEV_SAMP((CASE
+                            WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                            ELSE NULL
+                        END)) / AVG((CASE
+                            WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
+                            ELSE NULL
+                        END))) * 100)) > 28)
+            THEN
+                'Failed'
+            ELSE 'Passed'
+        END) AS `cd3_absolute_outcome`,
+        ROUND(AVG((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)),
+                0) AS `cd3_percent_mean`,
+        ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)),
+                2) AS `cd3_percent_sd`,
+        (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)),
+                2)) AS `double_cd3_percent_sd`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)),
+                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)),
+                2))) AS `cd3_percent_upper_limit`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)),
+                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)),
+                2))) AS `cd3_percent_lower_limit`,
+        CEILING(((STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END)) / AVG((CASE
+                    WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                    ELSE NULL
+                END))) * 100)) AS `cd3_percent_cv`,
+        (CASE
+            WHEN
+                (CEILING(((STDDEV_SAMP((CASE
+                            WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                            ELSE NULL
+                        END)) / AVG((CASE
+                            WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
+                            ELSE NULL
+                        END))) * 100)) > 28)
+            THEN
+                'Failed'
+            ELSE 'Passed'
+        END) AS `cd3_percent_outcome`,
+        ROUND(AVG((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)),
+                0) AS `cd4_absolute_mean`,
+        ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)),
+                2) AS `cd4_absolute_sd`,
+        (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)),
+                2)) AS `double_cd4_absolute_sd`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)),
+                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)),
+                2))) AS `cd4_absolute_upper_limit`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)),
+                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)),
+                2))) AS `cd4_absolute_lower_limit`,
+        CEILING(((STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END)) / AVG((CASE
+                    WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                    ELSE NULL
+                END))) * 100)) AS `cd4_absolute_cv`,
+        (CASE
+            WHEN
+                (CEILING(((STDDEV_SAMP((CASE
+                            WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                            ELSE NULL
+                        END)) / AVG((CASE
+                            WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
+                            ELSE NULL
+                        END))) * 100)) > 28)
+            THEN
+                'Failed'
+            ELSE 'Passed'
+        END) AS `cd4_absolute_outcome`,
+        ROUND(AVG((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)),
+                0) AS `cd4_percent_mean`,
+        ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)),
+                2) AS `cd4_percent_sd`,
+        (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)),
+                2)) AS `double_cd4_percent_sd`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)),
+                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)),
+                2))) AS `cd4_percent_upper_limit`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)),
+                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)),
+                2))) AS `cd4_percent_lower_limit`,
+        CEILING(((STDDEV_SAMP((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END)) / AVG((CASE
+                    WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                    ELSE NULL
+                END))) * 100)) AS `cd4_percent_cv`,
+        (CASE
+            WHEN
+                (CEILING(((STDDEV_SAMP((CASE
+                            WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                            ELSE NULL
+                        END)) / AVG((CASE
+                            WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
+                            ELSE NULL
+                        END))) * 100)) > 28)
+            THEN
+                'Failed'
+            ELSE 'Passed'
+        END) AS `cd4_percent_outcome`,
+        ROUND(AVG((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)),
+                0) AS `other_absolute_mean`,
+        ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)),
+                2) AS `other_absolute_sd`,
+        (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)),
+                2)) AS `double_other_absolute_sd`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)),
+                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)),
+                2))) AS `other_absolute_upper_limit`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)),
+                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)),
+                2))) AS `other_absolute_lower_limit`,
+        CEILING(((STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END)) / AVG((CASE
+                    WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                    ELSE NULL
+                END))) * 100)) AS `other_absolute_cv`,
+        (CASE
+            WHEN
+                (CEILING(((STDDEV_SAMP((CASE
+                            WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                            ELSE NULL
+                        END)) / AVG((CASE
+                            WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
+                            ELSE NULL
+                        END))) * 100)) > 28)
+            THEN
+                'Failed'
+            ELSE 'Passed'
+        END) AS `other_absolute_outcome`,
+        ROUND(AVG((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)),
+                0) AS `other_percent_mean`,
+        ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)),
+                2) AS `other_percent_sd`,
+        (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)),
+                2)) AS `double_other_percent_sd`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)),
+                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)),
+                2))) AS `other_percent_upper_limit`,
+        (ROUND(AVG((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)),
+                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)),
+                2))) AS `other_percent_lower_limit`,
+        CEILING(((STDDEV_SAMP((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END)) / AVG((CASE
+                    WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                    ELSE NULL
+                END))) * 100)) AS `other_percent_cv`,
+        (CASE
+            WHEN
+                (CEILING(((STDDEV_SAMP((CASE
+                            WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                            ELSE NULL
+                        END)) / AVG((CASE
+                            WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
+                            ELSE NULL
+                        END))) * 100)) > 28)
+            THEN
+                'Failed'
+            ELSE 'Passed'
+        END) AS `other_percent_outcome`,
+        `pds`.`doc_path` AS `doc_path`
+    FROM
+        (`pt_data_submission` `pds`
+        JOIN `pt_equipment_results` `per` ON ((`pds`.`id` = `per`.`equip_result_id`)))
+        WHERE equipment_id = 5 AND sample_id = 1
+    GROUP BY `per`.`sample_id` , `pds`.`equipment_id`";
+
+    $query = $this->db->query($sql);
+
+    return $query->result();
+
+    }
+
+
 }
