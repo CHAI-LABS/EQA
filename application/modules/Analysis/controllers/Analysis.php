@@ -335,7 +335,9 @@ class Analysis extends DashboardController {
                 $from = date('dS F, Y', strtotime($round->from));
                 $to = date('dS F, Y', strtotime($round->to));
 
-                $view = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('Analysis/Results/' . $round_uuid)."'><i class = 'icon-eye'></i>&nbsp;View</a>";
+                $view = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('Analysis/Results/' . $round_uuid)."'><i class = 'icon-eye'></i>&nbsp;Data Results</a>";
+
+                $graph = "<a class = 'btn btn-danger btn-sm dropdown-item' href = '".base_url('Analysis/Graphs/' . $round_uuid)."'><i class = 'icon-eye'></i>&nbsp;Graph Results</a>";
 
                 $capa = "<a class = 'btn btn-danger btn-sm dropdown-item' href = '".base_url('Analysis/Capa/' . $round->uuid)."'><i class = 'icon-eye'></i>&nbsp;CAPA</a>";
 
@@ -344,6 +346,7 @@ class Analysis extends DashboardController {
                                 Quick Actions
                             </button>
                             <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $graph
                                 $view
                                 $capa
                             </div>
@@ -661,25 +664,82 @@ class Analysis extends DashboardController {
         
 	}
 
-    public function graphExample(){
+   
+
+
+	public function Results($round_uuid){
+		$data = [];
+        $title = "Analysis";
+
+        $pt_id = $this->db->get_where('pt_round', ['uuid'   => $round_uuid])->row()->id;
+		// $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
+		//echo "<pre>";print_r($equipments);echo "</pre>";die();
+
+		
+			$data = [
+				'sample_tabs' => $this->createTabs($pt_id)
+			];
+            
+		$this->assets->addCss('css/main.css');
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                        ->addJs('dashboard/js/libs/moment.min.js');
+        $this->assets->setJavascript('Analysis/analysis_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Analysis/nhrl_peer_results_v', $data)
+                ->adminTemplate();
+	}
+
+
+    public function Graphs($round_uuid){
+        $data = [];
+        $title = "Graph Analysis";
+        // echo "<pre>";print_r($round_uuid);echo "</pre>";die();
+
+        
+            $data = [
+                'round' => $round_uuid
+            ];
+            
+        $this->assets->addCss('css/main.css');
+        $this->assets
+                ->addJs("js/Chart.min.js")
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                        ->addJs('dashboard/js/libs/moment.min.js');
+        $this->assets->setJavascript('Analysis/chart_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Analysis/analysis_graphs', $data)
+                ->adminTemplate();
+    }
+
+
+     public function graphExample(){
         $labels = $graph_data = $datasets = $data = array();
 
-        $colors = [
-            'rgba(220,220,220,0.5)', 'rgba(151,187,205,0.5)'
-        ];
+        // $colors = [
+        //     'rgba(220,220,220,0.5)', 'rgba(151,187,205,0.5)'
+        // ];
 
-        $sql = "SELECT ps.sample_name, avg(per.cd3_absolute) as cd3, avg(per.cd4_absolute) as cd4 FROM pt_equipment_results per
-JOIN pt_samples ps ON ps.id = per.sample_id
-GROUP BY per.sample_id;";
+        $sql = "SELECT ps.sample_name, avg(per.cd3_absolute) as cd3, avg(per.cd4_absolute) as cd4 FROM pt_equipment_results per JOIN pt_samples ps ON ps.id = per.sample_id GROUP BY per.sample_id;";
 
         $results = $this->db->query($sql)->result();
         $cd3datasets = [
             'label'         =>  'CD3',
-            'backgroundColor'=>$colors[0]
+            'backgroundColor' => 'rgba(220,220,220,0.5)',
+            'borderColor' => 'rgba(220,220,220,0.8)',
+            'highlightFill' => 'rgba(220,220,220,0.75)',
+            'highlightStroke' => 'rgba(220,220,220,1)'
         ];
         $cd4datasets = [
             'label'         =>  'CD4',
-            'backgroundColor'=>$colors[1]
+            'backgroundColor' => 'rgba(151,187,205,0.5)',
+            'borderColor' => 'rgba(151,187,205,0.8)',
+            'highlightFill' => 'rgba(151,187,205,0.75)',
+            'highlightStroke' => 'rgba(151,187,205,1)'
         ];
         // echo "<pre>";print_r($results);die;
         if($results){
@@ -702,32 +762,6 @@ GROUP BY per.sample_id;";
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
 
-
-	public function Results($round_uuid){
-		$data = [];
-        $title = "Analysis";
-
-        $pt_id = $this->db->get_where('pt_round', ['uuid'   => $round_uuid])->row()->id;
-		// $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
-		//echo "<pre>";print_r($equipments);echo "</pre>";die();
-
-		
-			$data = [
-				'sample_tabs' => $this->createTabs($pt_id)
-			];
-            
-		$this->assets->addCss('css/main.css');
-        $this->assets
-                ->addJs("js/Chart.min.js")
-                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
-                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
-                        ->addJs('dashboard/js/libs/moment.min.js');
-        $this->assets->setJavascript('Analysis/analysis_js');
-        $this->template
-                ->setPageTitle($title)
-                ->setPartial('Analysis/nhrl_peer_results_v', $data)
-                ->adminTemplate();
-	}
 
 
 	public function createNHRLTable($form, $round_id, $equipment_id){
@@ -2179,6 +2213,86 @@ GROUP BY per.sample_id;";
         }
     }
 
+
+    public function ParticipantGraph($round_uuid){
+        $labels = $graph_data = $datasets = $data = array();
+        $partcount = $passed = $failed = 0;
+        $equipment_id = null;
+
+        $round_id = $this->db->get_where('pt_round', ['uuid' => $round_uuid])->row()->id;
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+        $participants = $this->Analysis_m->getReadyParticipants($round_id);
+
+        foreach ($participants as $participant) {
+                $partcount ++;
+                $sampcount = $acceptable = $unacceptable = 0;
+
+
+
+                foreach ($samples as $sample) {
+                    $sampcount++;
+
+                    $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
+
+                    if($cd4_values){
+
+                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                    }else{
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    } 
+
+                    $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+                    if($part_cd4){
+                        
+                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                            $acceptable++;   
+                        } else{
+                            $unacceptable++;   
+                        } 
+                    }  
+                } 
+
+                if($acceptable == $sampcount) {
+                    $passed++;
+                }else{
+                    $failed++;
+                }
+            }
+
+
+
+        $total_facilities = $this->Analysis_m->TotalFacilities()->facilities;
+        $no_of_participants = $this->Analysis_m->ParticipatingParticipants($round_uuid)->participants;
+
+        $datasets1 = [
+            'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
+            'backgroundColor' => 'rgba(220,220,220,0.5)',
+            'borderColor' => 'rgba(220,220,220,0.8)',
+            'highlightFill' => 'rgba(220,220,220,0.75)',
+            'highlightStroke' => 'rgba(220,220,220,1)',
+            'data' => [$total_facilities]
+        ];
+        $datasets2 = [
+            'label'         =>  'N0. OF PARTICIPANTS (CURRENT ROUND)',
+            'backgroundColor' => 'rgba(151,187,205,0.5)',
+            'borderColor' => 'rgba(151,187,205,0.8)',
+            'highlightFill' => 'rgba(151,187,205,0.75)',
+            'highlightStroke' => 'rgba(151,187,205,1)',
+            'data' => [$no_of_participants]
+        ];
+
+        $graph_data['labels'] = $labels;
+        $graph_data['datasets'] = [$datasets1, $datasets2];
+
+        // echo "<pre>";print_r($passed);echo "</pre>";die();
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
+
+
 	public function createTabs($round_id){
         
         $datas=[];
@@ -2260,16 +2374,8 @@ GROUP BY per.sample_id;";
 
                     // $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
 
-                    // $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                    // echo "<pre>";print_r($cd4_values);echo "</pre>";die();
-
-                    // echo "<pre>";print_r($cd4_values->cd4_absolute_upper_limit);echo "</pre>";die();
-
-                    // var_dump($cd4_values->cd4_absolute_upper_limit);die();
 
                     if($cd4_values){
-                        // $upper_limit = ($cd4_values->cd4_absolute_upper_limit) ? $cd4_values->cd4_absolute_upper_limit : 0;
-                        // $lower_limit = ($cd4_values->cd4_absolute_lower_limit) ? $cd4_values->cd4_absolute_lower_limit : 0;
 
                         $upper_limit = $cd4_values->cd4_absolute_upper_limit;
                         $lower_limit = $cd4_values->cd4_absolute_lower_limit;

@@ -73,12 +73,16 @@ class Analysis_m extends CI_Model {
 
     }
 
-    public function getReadyParticipants($round_id, $equipment_id){
+    public function getReadyParticipants($round_id, $equipment_id = null){
 
         $this->db->select("participant_id");
         $this->db->from("pt_participant_review_v");
         $this->db->where("round_id",$round_id);
-        $this->db->where("equipment_id",$equipment_id);
+
+        if($equipment_id){
+            $this->db->where("equipment_id",$equipment_id);
+        }
+        
         $this->db->group_by("participant_id");
 
         $query = $this->db->get();
@@ -87,8 +91,35 @@ class Analysis_m extends CI_Model {
     }
 
 
+    public function TotalFacilities(){
+        $this->db->select('COUNT(DISTINCT(prv.facility_code)) AS facilities');
+        $this->db->from('participant_readiness_v prv');
+        $this->db->where('prv.status', 1);
+        $query = $this->db->get();
 
-    public function getRoundResults($round_id, $equipment_id, $sample_id){
+        return $query->row();
+    }
+
+
+    public function ParticipatingParticipants($round_uuid){
+        $this->db->select('COUNT(participant_id) AS participants');
+        $this->db->from('pt_ready_participants');
+        $this->db->where('pt_round_uuid', $round_uuid);
+        $this->db->where('verdict', 1);
+        $query = $this->db->get();
+
+        return $query->row();
+    }
+
+
+    public function getRoundResults($round_id, $equipment_id = null, $sample_id){
+
+        if($equipment_id){
+            $equip_where = 'AND equipment_id = $equipment_id';
+        }else{
+            $equip_where = null;
+        }
+
         $sql = "SELECT 
         `pds`.`id` AS `id`,
         `pds`.`round_id` AS `round_id`,
@@ -417,7 +448,8 @@ class Analysis_m extends CI_Model {
         (`pt_data_submission` `pds`
         JOIN `pt_equipment_results` `per` ON ((`pds`.`id` = `per`.`equip_result_id`)))
         WHERE round_id = $round_id
-        AND equipment_id = $equipment_id
+        $equip_where
+        
         AND sample_id = $sample_id
     GROUP BY `per`.`sample_id` , `pds`.`equipment_id`";
 
