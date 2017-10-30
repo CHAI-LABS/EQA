@@ -88,7 +88,7 @@ class Analysis_m extends CI_Model {
 
 
 
-    public function getstdSample(){
+    public function getRoundResults($round_id, $equipment_id, $sample_id){
         $sql = "SELECT 
         `pds`.`id` AS `id`,
         `pds`.`round_id` AS `round_id`,
@@ -416,12 +416,14 @@ class Analysis_m extends CI_Model {
     FROM
         (`pt_data_submission` `pds`
         JOIN `pt_equipment_results` `per` ON ((`pds`.`id` = `per`.`equip_result_id`)))
-        WHERE equipment_id = 5 AND sample_id = 1
+        WHERE round_id = $round_id
+        AND equipment_id = $equipment_id
+        AND sample_id = $sample_id
     GROUP BY `per`.`sample_id` , `pds`.`equipment_id`";
 
     $query = $this->db->query($sql);
 
-    return $query->result();
+    return $query->row();
 
     }
 

@@ -707,10 +707,6 @@ GROUP BY per.sample_id;";
 		$data = [];
         $title = "Analysis";
 
-        $stdvalues = $this->Analysis_m->getstdSample();
-        // echo'<pre>';print_r($stdvalues);echo'</pre>';die();
-
-
         $pt_id = $this->db->get_where('pt_round', ['uuid'   => $round_uuid])->row()->id;
 		// $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
 		//echo "<pre>";print_r($equipments);echo "</pre>";die();
@@ -1256,40 +1252,65 @@ GROUP BY per.sample_id;";
             $table_body = [];
             $table_body[] = $sample->sample_name;
 
-            $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+            // $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+
+            $calculated_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
             switch ($type) {
                 case 'cd3':
 
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                        $mean = ($calculated_values) ? $calculated_values->cd3_absolute_mean : 0;
-                        $sd = ($calculated_values) ? $calculated_values->cd3_absolute_sd : 0;
-                        $sd2 = ($calculated_values) ? $calculated_values->double_cd3_absolute_sd : 0;
-                        $upper_limit = ($calculated_values) ? $calculated_values->cd3_absolute_upper_limit : 0;
-                        $lower_limit = ($calculated_values) ? $calculated_values->cd3_absolute_lower_limit : 0;
+                    if($calculated_values){
+                        $mean = ($calculated_values->cd3_absolute_mean) ? $calculated_values->cd3_absolute_mean : 0;
+                        $sd = ($calculated_values->cd3_absolute_sd) ? $calculated_values->cd3_absolute_sd : 0;
+                        $sd2 = ($calculated_values->double_cd3_absolute_sd) ? $calculated_values->double_cd3_absolute_sd : 0;
+                        $upper_limit = ($calculated_values->cd3_absolute_upper_limit) ? $calculated_values->cd3_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values->cd3_absolute_lower_limit) ? $calculated_values->cd3_absolute_lower_limit : 0;
+                    }else{
+                        $mean = 0;
+                        $sd = 0;
+                        $sd2 = 0;
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    }
                     
                 break;
 
                 case 'cd4':
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                        $mean = ($calculated_values) ? $calculated_values->cd4_absolute_mean : 0;
-                        $sd = ($calculated_values) ? $calculated_values->cd4_absolute_sd : 0;
-                        $sd2 = ($calculated_values) ? $calculated_values->double_cd4_absolute_sd : 0;
-                        $upper_limit = ($calculated_values) ? $calculated_values->cd4_absolute_upper_limit : 0;
-                        $lower_limit = ($calculated_values) ? $calculated_values->cd4_absolute_lower_limit : 0;
+                    if($calculated_values){
+                        $mean = ($calculated_values->cd4_absolute_mean) ? $calculated_values->cd4_absolute_mean : 0;
+                        $sd = ($calculated_values->cd4_absolute_sd) ? $calculated_values->cd4_absolute_sd : 0;
+                        $sd2 = ($calculated_values->double_cd4_absolute_sd) ? $calculated_values->double_cd4_absolute_sd : 0;
+                        $upper_limit = ($calculated_values->cd4_absolute_upper_limit) ? $calculated_values->cd4_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values->cd4_absolute_lower_limit) ? $calculated_values->cd4_absolute_lower_limit : 0;
+                    }else{
+                        $mean = 0;
+                        $sd = 0;
+                        $sd2 = 0;
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    }
                     
                 break;
 
                 case 'other':
-                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
+                    // echo "<pre>";print_r($calculated_values->other_absolute_mean);echo "</pre>";die();
 
-                        $mean = ($calculated_values) ? $calculated_values->other_absolute_mean : 0;
-                        $sd = ($calculated_values) ? $calculated_values->other_absolute_sd : 0;
-                        $sd2 = ($calculated_values) ? $calculated_values->double_other_absolute_sd : 0;
-                        $upper_limit = ($calculated_values) ? $calculated_values->other_absolute_upper_limit : 0;
-                        $lower_limit = ($calculated_values) ? $calculated_values->other_absolute_lower_limit : 0;
+                    if($calculated_values){
+                        $mean = ($calculated_values->other_absolute_mean) ? $calculated_values->other_absolute_mean : 0;
+                        $sd = ($calculated_values->other_absolute_sd) ? $calculated_values->other_absolute_sd : 0;
+                        $sd2 = ($calculated_values->double_other_absolute_sd) ? $calculated_values->double_other_absolute_sd : 0;
+                        $upper_limit = ($calculated_values->other_absolute_upper_limit) ? $calculated_values->other_absolute_upper_limit : 0;
+                        $lower_limit = ($calculated_values->other_absolute_lower_limit) ? $calculated_values->other_absolute_lower_limit : 0;
+                    }else{
+                        $mean = 0;
+                        $sd = 0;
+                        $sd2 = 0;
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    }
+
                     
                 break;
                 
@@ -1449,39 +1470,63 @@ GROUP BY per.sample_id;";
             $table_body = [];
             $table_body[] = $sample->sample_name;
 
-            $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+            // $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
+
+            $calculated_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
             switch ($type) {
                 case 'cd3':
 
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
+                    if($calculated_values){
                         $mean = ($calculated_values) ? $calculated_values->cd3_percent_mean : 0;
                         $sd = ($calculated_values) ? $calculated_values->cd3_percent_sd : 0;
                         $sd2 = ($calculated_values) ? $calculated_values->double_cd3_percent_sd : 0;
                         $upper_limit = ($calculated_values) ? $calculated_values->cd3_percent_upper_limit : 0;
                         $lower_limit = ($calculated_values) ? $calculated_values->cd3_percent_lower_limit : 0;
+
+                    }else{
+                        $mean = 0;
+                        $sd = 0;
+                        $sd2 = 0;
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    }
                     
                 break;
 
                 case 'cd4':
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-
-                        $mean = ($calculated_values) ? $calculated_values->cd4_percent_mean : 0;
-                        $sd = ($calculated_values) ? $calculated_values->cd4_percent_sd : 0;
-                        $sd2 = ($calculated_values) ? $calculated_values->double_cd4_percent_sd : 0;
-                        $upper_limit = ($calculated_values) ? $calculated_values->cd4_percent_upper_limit : 0;
-                        $lower_limit = ($calculated_values) ? $calculated_values->cd4_percent_lower_limit : 0;
+                    if($calculated_values){
+                        $mean = ($calculated_values->cd4_percent_mean) ? $calculated_values->cd4_percent_mean : 0;
+                        $sd = ($calculated_values->cd4_percent_sd) ? $calculated_values->cd4_percent_sd : 0;
+                        $sd2 = ($calculated_values->double_cd4_percent_sd) ? $calculated_values->double_cd4_percent_sd : 0;
+                        $upper_limit = ($calculated_values->cd4_percent_upper_limit) ? $calculated_values->cd4_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values->cd4_percent_lower_limit) ? $calculated_values->cd4_percent_lower_limit : 0;
+                    }else{
+                        $mean = 0;
+                        $sd = 0;
+                        $sd2 = 0;
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    }
                     
                 break;
 
                 case 'other':
-
-                        $mean = ($calculated_values) ? $calculated_values->other_percent_mean : 0;
-                        $sd = ($calculated_values) ? $calculated_values->other_percent_sd : 0;
-                        $sd2 = ($calculated_values) ? $calculated_values->double_other_percent_sd : 0;
-                        $upper_limit = ($calculated_values) ? $calculated_values->other_percent_upper_limit : 0;
-                        $lower_limit = ($calculated_values) ? $calculated_values->other_percent_lower_limit : 0;
+                    if($calculated_values){
+                        $mean = ($calculated_values->other_percent_mean) ? $calculated_values->other_percent_mean : 0;
+                        $sd = ($calculated_values->other_percent_sd) ? $calculated_values->other_percent_sd : 0;
+                        $sd2 = ($calculated_values->double_other_percent_sd) ? $calculated_values->double_other_percent_sd : 0;
+                        $upper_limit = ($calculated_values->other_percent_upper_limit) ? $calculated_values->other_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values->other_percent_lower_limit) ? $calculated_values->other_percent_lower_limit : 0;
+                    }else{
+                        $mean = 0;
+                        $sd = 0;
+                        $sd2 = 0;
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    }
                     
                 break;
                 
@@ -2211,9 +2256,21 @@ GROUP BY per.sample_id;";
                 foreach ($samples as $sample) {
                     $sampcount++;
 
-                    $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+                    $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
+
+                    // $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                    // $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                    // echo "<pre>";print_r($cd4_values);echo "</pre>";die();
+
+                    // echo "<pre>";print_r($cd4_values->cd4_absolute_upper_limit);echo "</pre>";die();
+
+                    // var_dump($cd4_values->cd4_absolute_upper_limit);die();
 
                     if($cd4_values){
+                        // $upper_limit = ($cd4_values->cd4_absolute_upper_limit) ? $cd4_values->cd4_absolute_upper_limit : 0;
+                        // $lower_limit = ($cd4_values->cd4_absolute_lower_limit) ? $cd4_values->cd4_absolute_lower_limit : 0;
+
                         $upper_limit = $cd4_values->cd4_absolute_upper_limit;
                         $lower_limit = $cd4_values->cd4_absolute_lower_limit;
                     }else{
@@ -2223,7 +2280,6 @@ GROUP BY per.sample_id;";
 
                     $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
                     if($part_cd4){
-                        // echo "<pre>";print_r("Upper ".$upper_limit);echo "</pre>";
                         
                         if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
                             $acceptable++;
