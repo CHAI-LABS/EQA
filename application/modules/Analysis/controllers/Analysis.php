@@ -1479,11 +1479,11 @@ GROUP BY per.sample_id;";
 
                     // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
                     if($calculated_values){
-                        $mean = ($calculated_values) ? $calculated_values->cd3_percent_mean : 0;
-                        $sd = ($calculated_values) ? $calculated_values->cd3_percent_sd : 0;
-                        $sd2 = ($calculated_values) ? $calculated_values->double_cd3_percent_sd : 0;
-                        $upper_limit = ($calculated_values) ? $calculated_values->cd3_percent_upper_limit : 0;
-                        $lower_limit = ($calculated_values) ? $calculated_values->cd3_percent_lower_limit : 0;
+                        $mean = ($calculated_values->cd3_percent_mean) ? $calculated_values->cd3_percent_mean : 0;
+                        $sd = ($calculated_values->cd3_percent_sd) ? $calculated_values->cd3_percent_sd : 0;
+                        $sd2 = ($calculated_values->double_cd3_percent_sd) ? $calculated_values->double_cd3_percent_sd : 0;
+                        $upper_limit = ($calculated_values->cd3_percent_upper_limit) ? $calculated_values->cd3_percent_upper_limit : 0;
+                        $lower_limit = ($calculated_values->cd3_percent_lower_limit) ? $calculated_values->cd3_percent_lower_limit : 0;
 
                     }else{
                         $mean = 0;
