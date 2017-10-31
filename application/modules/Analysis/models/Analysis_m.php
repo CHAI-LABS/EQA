@@ -70,16 +70,16 @@ class Analysis_m extends CI_Model {
         return $query->row();
     }
 
-    // public function getUnavailableAnalyst($round_uuid){
-    //     $this->db->select("count(response) AS analysts");
-    //     $this->db->from("pt_readiness_responses_v");
-    //     $this->db->where("pt_round_uuid",$round_uuid);
-    //     $this->db->where("question_id", 1);
-    //     $this->db->where("response", 1);
-    //     $query = $this->db->get();
+    public function getUnavailableAnalyst($round_uuid){
+        $this->db->select("count(response) AS analysts");
+        $this->db->from("pt_readiness_responses_v");
+        $this->db->where("pt_round_uuid",$round_uuid);
+        $this->db->where("question_id", 1);
+        $this->db->where("response", 1);
+        $query = $this->db->get();
         
-    //     return $query->row();
-    // }
+        return $query->row();
+    }
 
     public function getPendingCapa($round_uuid){
         $this->db->select("count(response) AS capas");

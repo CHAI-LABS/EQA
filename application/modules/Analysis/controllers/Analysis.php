@@ -2216,6 +2216,236 @@ class Analysis extends DashboardController {
     }
 
 
+     public function HistoricalGraph(){
+        $labels = $graph_data = $datasets = $data = array();
+        $participants = $pass = $fail = 0;
+
+        $backgroundColor = [
+            'rgba(211,84,0,0.5)', 'rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
+        ];
+
+        $borderColor = [
+            'rgba(211,84,0,0.8)', 'rgba(52,152,219,0.8)','rgba(46,204,113,0.8)','rgba(231,76,60,0.8)','rgba(127,140,141,0.8)','rgba(241,196,15,0.8)','rgba(52,73,94,0.8)'
+        ];
+
+        $highlightFill = [
+            'rgba(211,84,0,0.75)', 'rgba(52,152,219,0.75)','rgba(46,204,113,0.75)','rgba(231,76,60,0.75)','rgba(127,140,141,0.75)','rgba(241,196,15,0.75)','rgba(52,73,94,0.75)'
+        ];
+
+        $highlightStroke = [
+            'rgba(211,84,0,1)', 'rgba(52,152,219,1)','rgba(46,204,113,1)','rgba(231,76,60,1)','rgba(127,140,141,1)','rgba(241,196,15,1)','rgba(52,73,94,1)'
+        ];
+
+    //     $sql = "SELECT ps.sample_name, avg(per.cd3_absolute) as cd3, avg(per.cd4_absolute) as cd4 FROM pt_equipment_results per JOIN pt_samples ps ON ps.id = per.sample_id GROUP BY per.sample_id;";
+
+    //     $results = $this->db->query($sql)->result();
+    //     $cd3datasets = [
+    //         'label'         =>  'CD3',
+    //         'backgroundColor' => 'rgba(220,220,220,0.5)',
+    //         'borderColor' => 'rgba(220,220,220,0.8)',
+    //         'highlightFill' => 'rgba(220,220,220,0.75)',
+    //         'highlightStroke' => 'rgba(220,220,220,1)'
+    //     ];
+    //     $cd4datasets = [
+    //         'label'         =>  'CD4',
+    //         'backgroundColor' => 'rgba(151,187,205,0.5)',
+    //         'borderColor' => 'rgba(151,187,205,0.8)',
+    //         'highlightFill' => 'rgba(151,187,205,0.75)',
+    //         'highlightStroke' => 'rgba(151,187,205,1)'
+    //     ];
+    //     // echo "<pre>";print_r($results);die;
+    //     if($results){
+    //         $counter = 0;
+    //         foreach ($results as $key => $value) {
+    //             $data = [];
+    //             // echo "<pre>";print_r($value);echo "</pre>";die();
+    //             $cd3datasets['data'][] = $value->cd3;
+    //             $cd4datasets['data'][] = $value->cd4;
+
+    //             $labels[] = $value->sample_name;
+    //             $tabledata[] = [];
+    //             $counter++;
+    //         }
+    //     }
+
+        $datasets1 = [
+            'label'         =>  'PARTICIPANTS',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)',
+            'data' => [$participants]
+        ];
+        $datasets2 = [
+            'label'         =>  'PASS',
+            'backgroundColor' => 'rgba(52,152,219,0.5)',
+            'borderColor' => 'rgba(52,152,219,0.8)',
+            'highlightFill' => 'rgba(52,152,219,0.75)',
+            'highlightStroke' => 'rgba(52,152,219,1)',
+            'data' => [$pass]
+        ];
+        $datasets3 = [
+            'label'         =>  'FAIL',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)',
+            'data' => [$fail]
+        ];
+
+        $graph_data['labels'] = ['NHRL/CD4/2017-17'];
+        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
+
+    public function RemedialGraph($round_uuid){
+        $labels = $graph_data = $datasets = $data = array();
+        $facscalibur = $facspresto = $facscount = $alere_pima = $partec_cyflow = $guava_easycyte = $other = 0;
+
+        // $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
+        // $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
+        // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
+        // $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
+
+        // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
+
+        $datasets1 = [
+            'label'         =>  'FACSCALIBUR',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)',
+            'data' => [$facscalibur]
+        ];
+        $datasets2 = [
+            'label'         =>  'FACSPRESTO',
+            'backgroundColor' => 'rgba(52,152,219,0.5)',
+            'borderColor' => 'rgba(52,152,219,0.8)',
+            'highlightFill' => 'rgba(52,152,219,0.75)',
+            'highlightStroke' => 'rgba(52,152,219,1)',
+            'data' => [$facspresto]
+        ];
+        $datasets3 = [
+            'label'         =>  'FACSCOUNT',
+            'backgroundColor' => 'rgba(46,204,113,0.5)',
+            'borderColor' => 'rgba(46,204,113,0.8)',
+            'highlightFill' => 'rgba(46,204,113,0.75)',
+            'highlightStroke' => 'rgba(46,204,113,1)',
+            'data' => [$facscount]
+        ];
+        $datasets4 = [
+            'label'         =>  'ALERE PIMA',
+            'backgroundColor' => 'rgba(231,76,60,0.5)',
+            'borderColor' => 'rgba(231,76,60,0.8)',
+            'highlightFill' => 'rgba(231,76,60,0.75)',
+            'highlightStroke' => 'rgba(231,76,60,1)',
+            'data' => [$alere_pima]
+        ];
+        $datasets5 = [
+            'label'         =>  'PARTEC CYFLOW',
+            'backgroundColor' => 'rgba(127,140,141,0.5)',
+            'borderColor' => 'rgba(127,140,141,0.8)',
+            'highlightFill' => 'rgba(127,140,141,0.75)',
+            'highlightStroke' => 'rgba(127,140,141,1)',
+            'data' => [$partec_cyflow]
+        ];
+        $datasets6 = [
+            'label'         =>  'GUAVA EASYCYTE',
+            'backgroundColor' => 'rgba(241,196,15,0.5)',
+            'borderColor' => 'rgba(241,196,15,0.8)',
+            'highlightFill' => 'rgba(241,196,15,0.75)',
+            'highlightStroke' => 'rgba(241,196,15,1)',
+            'data' => [$guava_easycyte]
+        ];
+        $datasets7 = [
+            'label'         =>  'OTHER',
+            'backgroundColor' => 'rgba(52,73,94,0.5)',
+            'borderColor' => 'rgba(52,73,94,0.8)',
+            'highlightFill' => 'rgba(52,73,94,0.75)',
+            'highlightStroke' => 'rgba(52,73,94,1)',
+            'data' => [$other]
+        ];
+
+        
+
+        $graph_data['labels'] = $labels;
+        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4, $datasets5, $datasets6, $datasets7];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
+
+    public function JustificationGraph($round_uuid){
+        $labels = $graph_data = $datasets = $data = array();
+        $equipment_breakdown = $equipment_readerror = $reagent_stock_out = $panel_integrity = $failed_login = $no_justification = 0;
+
+        // $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
+        // $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
+        // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
+        // $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
+
+        // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
+
+        $datasets1 = [
+            'label'         =>  'EQUIPMENT BREAKDOWN',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)',
+            'data' => [$equipment_breakdown]
+        ];
+        $datasets2 = [
+            'label'         =>  'EQUIPMENT READ ERROR',
+            'backgroundColor' => 'rgba(52,152,219,0.5)',
+            'borderColor' => 'rgba(52,152,219,0.8)',
+            'highlightFill' => 'rgba(52,152,219,0.75)',
+            'highlightStroke' => 'rgba(52,152,219,1)',
+            'data' => [$equipment_readerror]
+        ];
+        $datasets3 = [
+            'label'         =>  'REAGENT STOCK-OUT',
+            'backgroundColor' => 'rgba(46,204,113,0.5)',
+            'borderColor' => 'rgba(46,204,113,0.8)',
+            'highlightFill' => 'rgba(46,204,113,0.75)',
+            'highlightStroke' => 'rgba(46,204,113,1)',
+            'data' => [$reagent_stock_out]
+        ];
+        $datasets4 = [
+            'label'         =>  'PANEL INTEGRITY',
+            'backgroundColor' => 'rgba(231,76,60,0.5)',
+            'borderColor' => 'rgba(231,76,60,0.8)',
+            'highlightFill' => 'rgba(231,76,60,0.75)',
+            'highlightStroke' => 'rgba(231,76,60,1)',
+            'data' => [$panel_integrity]
+        ];
+        $datasets5 = [
+            'label'         =>  'FAILED LOG-IN',
+            'backgroundColor' => 'rgba(127,140,141,0.5)',
+            'borderColor' => 'rgba(127,140,141,0.8)',
+            'highlightFill' => 'rgba(127,140,141,0.75)',
+            'highlightStroke' => 'rgba(127,140,141,1)',
+            'data' => [$failed_login]
+        ];
+        $datasets6 = [
+            'label'         =>  'NO JUSTIFICATION',
+            'backgroundColor' => 'rgba(241,196,15,0.5)',
+            'borderColor' => 'rgba(241,196,15,0.8)',
+            'highlightFill' => 'rgba(241,196,15,0.75)',
+            'highlightStroke' => 'rgba(241,196,15,1)',
+            'data' => [$no_justification]
+        ];
+
+        
+
+        $graph_data['labels'] = $labels;
+        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4, $datasets5, $datasets6];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
+
     public function DisqualificationGraph($round_uuid){
         $labels = $graph_data = $datasets = $data = array();
         $equipment_breakdown = $reagent_stock_out = $analyst_unavailable = $pending_capa = 0;
@@ -2243,14 +2473,14 @@ class Analysis extends DashboardController {
             'highlightStroke' => 'rgba(52,152,219,1)',
             'data' => [$reagent_stock_out]
         ];
-        // $datasets3 = [
-        //     'label'         =>  'ANALYST UNAVAILABLE',
-        //     'backgroundColor' => 'rgba(46,204,113,0.5)',
-        //     'borderColor' => 'rgba(46,204,113,0.8)',
-        //     'highlightFill' => 'rgba(46,204,113,0.75)',
-        //     'highlightStroke' => 'rgba(46,204,113,1)',
-        //     'data' => [$analyst_unavailable]
-        // ];
+        $datasets3 = [
+            'label'         =>  'ANALYST UNAVAILABLE',
+            'backgroundColor' => 'rgba(46,204,113,0.5)',
+            'borderColor' => 'rgba(46,204,113,0.8)',
+            'highlightFill' => 'rgba(46,204,113,0.75)',
+            'highlightStroke' => 'rgba(46,204,113,1)',
+            'data' => [$analyst_unavailable]
+        ];
         $datasets4 = [
             'label'         =>  'PENDING CAPA',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
@@ -2263,7 +2493,7 @@ class Analysis extends DashboardController {
         
 
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets4];
+        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

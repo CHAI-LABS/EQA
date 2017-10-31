@@ -87,6 +87,87 @@
     });
 
 
+    $.get("<?=@base_url('Analysis/JustificationGraph/');?>" + round, function(barChartData){
+        console.log(barChartData);
+        
+        var ctx = document.getElementById('justification');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: barChartData,
+            options: {
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: 'rgb(0, 0, 0)'
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:false
+                        }
+                    }]
+                },
+                responsive: true
+            }
+        });
+    });
+
+
+    $.get("<?=@base_url('Analysis/RemedialGraph/');?>" + round, function(barChartData){
+        console.log(barChartData);
+        
+        var ctx = document.getElementById('remedial');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: barChartData,
+            options: {
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: 'rgb(0, 0, 0)'
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:false
+                        }
+                    }]
+                },
+                responsive: true
+            }
+        });
+    });
+
+
+    $.get("<?=@base_url('Analysis/HistoricalGraph/');?>" + round, function(barChartData){
+        console.log(barChartData);
+        
+        var ctx = document.getElementById('historical');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: barChartData,
+            options: {
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: 'rgb(0, 0, 0)'
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:false
+                        }
+                    }]
+                },
+                responsive: true
+            }
+        });
+    });
+
+
 
 
     //Bar Graph Below

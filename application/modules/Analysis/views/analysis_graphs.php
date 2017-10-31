@@ -33,6 +33,8 @@
 					<div class="col-md-12 container-fluid">
 			            <div class="animated fadeIn">
 			                <div class="card-columns col-2">
+
+
 			                    <div class="card">
 			                        <div class="card-header">
 			                            PARTICIPATION STATISTICS
@@ -48,14 +50,8 @@
 			                            </div>
 			                        </div>
 			                    </div>
-			                </div>
-			            </div>
-			        </div>
+			                
 
-
-			        <div class="col-md-12 container-fluid">
-			            <div class="animated fadeIn">
-			                <div class="card-columns col-2">
 			                    <div class="card">
 			                        <div class="card-header">
 			                            DISQUALIFIED PARTICIPANTS
@@ -71,6 +67,71 @@
 			                            </div>
 			                        </div>
 			                    </div>
+			               
+
+
+			                    <div class="card">
+			                        <div class="card-header">
+			                            JUSTIFICATION FOR RESULTS NOT RETURNED
+			                            <div class="card-actions">
+			                                <!-- <a href="http://www.chartjs.org/">
+			                                    <small class="text-muted">docs</small>
+			                                </a> -->
+			                            </div>
+			                        </div>
+			                        <div class="card-block">
+			                            <div class="chart-wrapper">
+			                                <canvas id="justification"></canvas>
+			                            </div>
+			                        </div>
+			                    </div>
+			                
+
+			                    <div class="card">
+			                        <div class="card-header">
+			                            REMEDIAL ACTION PER PLATFORM
+			                            <div class="card-actions">
+			                                <!-- <a href="http://www.chartjs.org/">
+			                                    <small class="text-muted">docs</small>
+			                                </a> -->
+			                            </div>
+			                        </div>
+			                        <div class="card-block">
+			                            <div class="chart-wrapper">
+			                                <canvas id="remedial"></canvas>
+			                            </div>
+			                        </div>
+			                    </div>
+
+
+			                </div>
+			            </div>
+			        </div>
+
+			        <div class="col-md-12 container-fluid">
+			            <div class="animated fadeIn">
+			                <div class="card-columns col-2">			                
+
+			       
+			                    <div class="card">
+			                        <div class="card-header">
+			                        	OVERALL HISTORICAL PERFORMANCE
+			                            <div class="card-actions">
+			                                <!-- <a href="http://www.chartjs.org/">
+			                                    <small class="text-muted">docs</small>
+			                                </a> -->
+			                            </div>
+			                        </div>
+			                        <div class="card-block">
+			                            <div class="chart-wrapper">
+			                                <canvas id="historical"></canvas>
+			                            </div>
+			                        </div>
+			                    </div>
+
+
+
+
 			                </div>
 			            </div>
 			        </div>
