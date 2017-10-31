@@ -522,6 +522,12 @@ class Analysis extends DashboardController {
 
         // $this->auth->check();
 
+        $round = $this->db->get_where('pt_round', ['id' => $round_id])->row();
+        $round_name = $round->pt_round_no;
+
+        $equipment = $this->db->get_where('equipments_v', ['id' => $equipment_id])->row();
+        $equipment_name = $equipment->equipment_name;
+
 		$template = $this->config->item('default');
         $column_data = $row_data = array();
 
@@ -717,50 +723,50 @@ class Analysis extends DashboardController {
     }
 
 
-     public function graphExample(){
-        $labels = $graph_data = $datasets = $data = array();
+    //  public function graphExample(){
+    //     $labels = $graph_data = $datasets = $data = array();
 
-        // $colors = [
-        //     'rgba(220,220,220,0.5)', 'rgba(151,187,205,0.5)'
-        // ];
+    //     // $colors = [
+    //     //     'rgba(220,220,220,0.5)', 'rgba(151,187,205,0.5)'
+    //     // ];
 
-        $sql = "SELECT ps.sample_name, avg(per.cd3_absolute) as cd3, avg(per.cd4_absolute) as cd4 FROM pt_equipment_results per JOIN pt_samples ps ON ps.id = per.sample_id GROUP BY per.sample_id;";
+    //     $sql = "SELECT ps.sample_name, avg(per.cd3_absolute) as cd3, avg(per.cd4_absolute) as cd4 FROM pt_equipment_results per JOIN pt_samples ps ON ps.id = per.sample_id GROUP BY per.sample_id;";
 
-        $results = $this->db->query($sql)->result();
-        $cd3datasets = [
-            'label'         =>  'CD3',
-            'backgroundColor' => 'rgba(220,220,220,0.5)',
-            'borderColor' => 'rgba(220,220,220,0.8)',
-            'highlightFill' => 'rgba(220,220,220,0.75)',
-            'highlightStroke' => 'rgba(220,220,220,1)'
-        ];
-        $cd4datasets = [
-            'label'         =>  'CD4',
-            'backgroundColor' => 'rgba(151,187,205,0.5)',
-            'borderColor' => 'rgba(151,187,205,0.8)',
-            'highlightFill' => 'rgba(151,187,205,0.75)',
-            'highlightStroke' => 'rgba(151,187,205,1)'
-        ];
-        // echo "<pre>";print_r($results);die;
-        if($results){
-            $counter = 0;
-            foreach ($results as $key => $value) {
-                $data = [];
-                // echo "<pre>";print_r($value);echo "</pre>";die();
-                $cd3datasets['data'][] = $value->cd3;
-                $cd4datasets['data'][] = $value->cd4;
+    //     $results = $this->db->query($sql)->result();
+    //     $cd3datasets = [
+    //         'label'         =>  'CD3',
+    //         'backgroundColor' => 'rgba(220,220,220,0.5)',
+    //         'borderColor' => 'rgba(220,220,220,0.8)',
+    //         'highlightFill' => 'rgba(220,220,220,0.75)',
+    //         'highlightStroke' => 'rgba(220,220,220,1)'
+    //     ];
+    //     $cd4datasets = [
+    //         'label'         =>  'CD4',
+    //         'backgroundColor' => 'rgba(151,187,205,0.5)',
+    //         'borderColor' => 'rgba(151,187,205,0.8)',
+    //         'highlightFill' => 'rgba(151,187,205,0.75)',
+    //         'highlightStroke' => 'rgba(151,187,205,1)'
+    //     ];
+    //     // echo "<pre>";print_r($results);die;
+    //     if($results){
+    //         $counter = 0;
+    //         foreach ($results as $key => $value) {
+    //             $data = [];
+    //             // echo "<pre>";print_r($value);echo "</pre>";die();
+    //             $cd3datasets['data'][] = $value->cd3;
+    //             $cd4datasets['data'][] = $value->cd4;
 
-                $labels[] = $value->sample_name;
-                $tabledata[] = [];
-                $counter++;
-            }
-        }
+    //             $labels[] = $value->sample_name;
+    //             $tabledata[] = [];
+    //             $counter++;
+    //         }
+    //     }
 
-        $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$cd3datasets, $cd4datasets];
+    //     $graph_data['labels'] = $labels;
+    //     $graph_data['datasets'] = [$cd3datasets, $cd4datasets];
 
-        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
-    }
+    //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    // }
 
 
 
@@ -1896,10 +1902,8 @@ class Analysis extends DashboardController {
                 $review = "Satisfactory Performance";
             }else if($grade > 0 && $grade < 100){
                 $review = "Unsatisfactory Performance";
-            }else if($zerocount == $samp_counter){
-                $review = "Non-responsive";
             }else{
-                $review = "Incomplete Submission";
+                $review = "Non-responsive";
             }
 
             $username = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row()->participant_id;
@@ -2135,10 +2139,8 @@ class Analysis extends DashboardController {
                 $review = "Satisfactory Performance";
             }else if($grade > 0 && $grade < 100){
                 $review = "Unsatisfactory Performance";
-            }else if($zerocount == $samp_counter){
-                $review = "Non-responsive";
             }else{
-                $review = "Incomplete Submission";
+                $review = "Non-responsive";
             }
 
             $username = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row()->participant_id;
@@ -2214,20 +2216,25 @@ class Analysis extends DashboardController {
     }
 
 
-    public function ParticipantGraph($round_uuid){
+    public function ParticipationGraph($round_uuid){
         $labels = $graph_data = $datasets = $data = array();
-        $partcount = $passed = $failed = 0;
-        $equipment_id = null;
+        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
 
         $round_id = $this->db->get_where('pt_round', ['uuid' => $round_uuid])->row()->id;
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
         $participants = $this->Analysis_m->getReadyParticipants($round_id);
+        $equipments = $this->Analysis_m->Equipments();
 
-        foreach ($participants as $participant) {
+        foreach ($equipments as $key => $equipment) {
+            
+
+            $counter++;
+            
+            $equipment_id = $equipment->id;
+
+            foreach ($participants as $participant) {
                 $partcount ++;
-                $sampcount = $acceptable = $unacceptable = 0;
-
-
+                $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
                 foreach ($samples as $sample) {
                     $sampcount++;
@@ -2244,49 +2251,99 @@ class Analysis extends DashboardController {
                     } 
 
                     $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
                     if($part_cd4){
                         
                         if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                            $acceptable++;   
+                            $acceptable++;    
                         } else{
-                            $unacceptable++;   
+                            $unacceptable++;    
                         } 
-                    }  
+
+                        if($part_cd4->cd4_absolute == 0){
+                            $novalue++;
+                        }
+                    } 
                 } 
+
+                if($novalue == $sampcount){
+                    $non_responsive++;
+                }
 
                 if($acceptable == $sampcount) {
                     $passed++;
-                }else{
-                    $failed++;
                 }
+
             }
+        }
 
-
-
+        $unable = $this->Analysis_m->getUnableParticipants($round_uuid)->participants;
+        $disqualified = $this->Analysis_m->getRoundVerdict($round_uuid)->participants;
         $total_facilities = $this->Analysis_m->TotalFacilities()->facilities;
         $no_of_participants = $this->Analysis_m->ParticipatingParticipants($round_uuid)->participants;
+        $failed = $no_of_participants - $passed;
 
         $datasets1 = [
             'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
-            'backgroundColor' => 'rgba(220,220,220,0.5)',
-            'borderColor' => 'rgba(220,220,220,0.8)',
-            'highlightFill' => 'rgba(220,220,220,0.75)',
-            'highlightStroke' => 'rgba(220,220,220,1)',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)',
             'data' => [$total_facilities]
         ];
         $datasets2 = [
             'label'         =>  'N0. OF PARTICIPANTS (CURRENT ROUND)',
-            'backgroundColor' => 'rgba(151,187,205,0.5)',
-            'borderColor' => 'rgba(151,187,205,0.8)',
-            'highlightFill' => 'rgba(151,187,205,0.75)',
-            'highlightStroke' => 'rgba(151,187,205,1)',
+            'backgroundColor' => 'rgba(52,152,219,0.5)',
+            'borderColor' => 'rgba(52,152,219,0.8)',
+            'highlightFill' => 'rgba(52,152,219,0.75)',
+            'highlightStroke' => 'rgba(52,152,219,1)',
             'data' => [$no_of_participants]
         ];
+        $datasets3 = [
+            'label'         =>  'PASSED',
+            'backgroundColor' => 'rgba(46,204,113,0.5)',
+            'borderColor' => 'rgba(46,204,113,0.8)',
+            'highlightFill' => 'rgba(46,204,113,0.75)',
+            'highlightStroke' => 'rgba(46,204,113,1)',
+            'data' => [$passed]
+        ];
+        $datasets4 = [
+            'label'         =>  'FAILED',
+            'backgroundColor' => 'rgba(231,76,60,0.5)',
+            'borderColor' => 'rgba(231,76,60,0.8)',
+            'highlightFill' => 'rgba(231,76,60,0.75)',
+            'highlightStroke' => 'rgba(231,76,60,1)',
+            'data' => [$failed]
+        ];
+        $datasets5 = [
+            'label'         =>  'NON-RESPONSIVE',
+            'backgroundColor' => 'rgba(127,140,141,0.5)',
+            'borderColor' => 'rgba(127,140,141,0.8)',
+            'highlightFill' => 'rgba(127,140,141,0.75)',
+            'highlightStroke' => 'rgba(127,140,141,1)',
+            'data' => [$non_responsive]
+        ];
+        $datasets6 = [
+            'label'         =>  'UNABLE TO REPORT',
+            'backgroundColor' => 'rgba(241,196,15,0.5)',
+            'borderColor' => 'rgba(241,196,15,0.8)',
+            'highlightFill' => 'rgba(241,196,15,0.75)',
+            'highlightStroke' => 'rgba(241,196,15,1)',
+            'data' => [$unable]
+        ];
+        $datasets7 = [
+            'label'         =>  'DISQUALIFIED',
+            'backgroundColor' => 'rgba(52,73,94,0.5)',
+            'borderColor' => 'rgba(52,73,94,0.8)',
+            'highlightFill' => 'rgba(52,73,94,0.75)',
+            'highlightStroke' => 'rgba(52,73,94,1)',
+            'data' => [$disqualified]
+        ];
+
+        // echo "<pre>";print_r($unable);echo "</pre>";die();
 
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2];
-
-        // echo "<pre>";print_r($passed);echo "</pre>";die();
+        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets7, $datasets6, $datasets5, $datasets3, $datasets4];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
@@ -2303,7 +2360,6 @@ class Analysis extends DashboardController {
 
         
         $equipments = $this->Analysis_m->Equipments();
-        // echo "<pre>";print_r($equipments);echo "</pre>";die();
         
         $equipment_tabs = '';
 

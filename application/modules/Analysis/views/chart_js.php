@@ -5,38 +5,37 @@
 
     var round = $('#round').attr('data-type');
 
-    // alert('Round Uuid ' + round);
 
-    $.get("<?=@base_url('Analysis/graphExample/');?>", function(barChartData){
+    // $.get("<?=@base_url('Analysis/graphExample/');?>", function(barChartData){
 
+    //     // console.log(barChartData);
+    //     var ctx = document.getElementById('test');
+    //     var chart = new Chart(ctx, {
+    //         type: 'bar',
+    //         data: barChartData,
+    //         options: {
+    //             legend: {
+    //                 display: true,
+    //                 labels: {
+    //                     fontColor: 'rgb(0, 0, 0)'
+    //                 }
+    //             },
+    //             scales: {
+    //                 yAxes: [{
+    //                     ticks: {
+    //                         beginAtZero:false
+    //                     }
+    //                 }]
+    //             },
+    //             responsive: true
+    //         }
+    //     });
+    // });
+
+
+    $.get("<?=@base_url('Analysis/ParticipationGraph/');?>" + round, function(barChartData){
         console.log(barChartData);
-        var ctx = document.getElementById('test');
-        var chart = new Chart(ctx, {
-            type: 'bar',
-            data: barChartData,
-            options: {
-                legend: {
-                    display: true,
-                    labels: {
-                        fontColor: 'rgb(0, 0, 0)'
-                    }
-                },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:false
-                        }
-                    }]
-                },
-                responsive: true
-            }
-        });
-    });
-
-
-    $.get("<?=@base_url('Analysis/ParticipantGraph/');?>" + round, function(barChartData){
-
-        console.log(barChartData);
+        
         var ctx = document.getElementById('participation');
         var chart = new Chart(ctx, {
             type: 'bar',
@@ -52,8 +51,7 @@
                     yAxes: [{
                         ticks: {
                             beginAtZero:false
-                        },
-                    yAxisID: 'Samples'
+                        }
                     }]
                 },
                 responsive: true

@@ -111,11 +111,37 @@ class Analysis_m extends CI_Model {
         return $query->row();
     }
 
+    public function getRoundVerdict($round_uuid){
+        $this->db->select('COUNT(participant_id) AS participants');
+        $this->db->from('participant_readiness');
+        $this->db->where('pt_round_no', $round_uuid);
+        $this->db->where('verdict', 0);
+        $query = $this->db->get();
+
+        return $query->row();
+    }
+
+    public function getUnableParticipants($round_uuid){
+
+        $sql = "SELECT COUNT(prv.p_id) AS participants
+                FROM participant_readiness_v prv
+                WHERE NOT EXISTS 
+                    (SELECT * 
+                     FROM participant_readiness pr
+                     WHERE prv.uuid = pr.participant_id 
+                     AND pr.pt_round_no = '".$round_uuid."')
+                     AND prv.user_type = 'participant'";
+
+        $query = $this->db->query($sql);
+
+        return $query->row();
+    }
+
 
     public function getRoundResults($round_id, $equipment_id = null, $sample_id){
 
         if($equipment_id){
-            $equip_where = 'AND equipment_id = $equipment_id';
+            $equip_where = 'AND equipment_id = '. $equipment_id;
         }else{
             $equip_where = null;
         }
@@ -449,7 +475,6 @@ class Analysis_m extends CI_Model {
         JOIN `pt_equipment_results` `per` ON ((`pds`.`id` = `per`.`equip_result_id`)))
         WHERE round_id = $round_id
         $equip_where
-        
         AND sample_id = $sample_id
     GROUP BY `per`.`sample_id` , `pds`.`equipment_id`";
 
