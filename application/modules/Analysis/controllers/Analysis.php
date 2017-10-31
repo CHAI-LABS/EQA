@@ -2216,6 +2216,59 @@ class Analysis extends DashboardController {
     }
 
 
+    public function DisqualificationGraph($round_uuid){
+        $labels = $graph_data = $datasets = $data = array();
+        $equipment_breakdown = $reagent_stock_out = $analyst_unavailable = $pending_capa = 0;
+
+        $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
+        $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
+        // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
+        $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
+
+        // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
+
+        $datasets1 = [
+            'label'         =>  'EQUIPMENT BREAKDOWN',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)',
+            'data' => [$equipment_breakdown]
+        ];
+        $datasets2 = [
+            'label'         =>  'REAGENT STOCK-OUT',
+            'backgroundColor' => 'rgba(52,152,219,0.5)',
+            'borderColor' => 'rgba(52,152,219,0.8)',
+            'highlightFill' => 'rgba(52,152,219,0.75)',
+            'highlightStroke' => 'rgba(52,152,219,1)',
+            'data' => [$reagent_stock_out]
+        ];
+        // $datasets3 = [
+        //     'label'         =>  'ANALYST UNAVAILABLE',
+        //     'backgroundColor' => 'rgba(46,204,113,0.5)',
+        //     'borderColor' => 'rgba(46,204,113,0.8)',
+        //     'highlightFill' => 'rgba(46,204,113,0.75)',
+        //     'highlightStroke' => 'rgba(46,204,113,1)',
+        //     'data' => [$analyst_unavailable]
+        // ];
+        $datasets4 = [
+            'label'         =>  'PENDING CAPA',
+            'backgroundColor' => 'rgba(231,76,60,0.5)',
+            'borderColor' => 'rgba(231,76,60,0.8)',
+            'highlightFill' => 'rgba(231,76,60,0.75)',
+            'highlightStroke' => 'rgba(231,76,60,1)',
+            'data' => [$pending_capa]
+        ];
+
+        
+
+        $graph_data['labels'] = $labels;
+        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets4];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
+
     public function ParticipationGraph($round_uuid){
         $labels = $graph_data = $datasets = $data = array();
         $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
@@ -2226,8 +2279,6 @@ class Analysis extends DashboardController {
         $equipments = $this->Analysis_m->Equipments();
 
         foreach ($equipments as $key => $equipment) {
-            
-
             $counter++;
             
             $equipment_id = $equipment->id;

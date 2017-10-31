@@ -60,6 +60,33 @@
     });
 
 
+    $.get("<?=@base_url('Analysis/DisqualificationGraph/');?>" + round, function(barChartData){
+        console.log(barChartData);
+        
+        var ctx = document.getElementById('disqualified');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: barChartData,
+            options: {
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: 'rgb(0, 0, 0)'
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:false
+                        }
+                    }]
+                },
+                responsive: true
+            }
+        });
+    });
+
+
 
 
     //Bar Graph Below
