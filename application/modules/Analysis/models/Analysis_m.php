@@ -81,6 +81,17 @@ class Analysis_m extends CI_Model {
         return $query->row();
     }
 
+    public function getLatestRounds(){
+        $this->db->select("*");
+        $this->db->from("pt_round_v");
+        $this->db->order_by('id', 'DESC');
+        $this->db->limit(6);
+
+        $query = $this->db->get();
+        
+        return $query->result();
+    }
+
     public function getPendingCapa($round_uuid){
         $this->db->select("count(response) AS capas");
         $this->db->from("pt_readiness_responses_v");
