@@ -706,7 +706,8 @@ class Analysis extends DashboardController {
 
         
             $data = [
-                'round' => $round_uuid
+                'round' => $round_uuid,
+                'round_name' => $this->db->get_where('pt_round_v', ['uuid'   => $round_uuid])->row()->pt_round_no
             ];
             
         $this->assets->addCss('css/main.css');

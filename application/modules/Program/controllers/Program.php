@@ -10,12 +10,14 @@ class Program extends MY_Controller {
     }
 
     public function index(){
-        
+        $title = "Program";
+
+
             $data = [
-                $title = "Program Graphs"
+                $page_title = "Program Graphs"
             ];
 
-            $this->assets->addJs('js/Chart.min.js');
+        $this->assets->addJs('js/Chart.min.js');
         $this->assets->setJavascript('Program/program_js');
         $this->template
                 ->setPageTitle($title)
@@ -26,4 +28,4 @@ class Program extends MY_Controller {
 }
 
 /* End of file Program.php */
-/* Location: ./application/modules/QAReviewer/controllers/PTRound.php */
+/* Location: ./application/modules/Program.php */

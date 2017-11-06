@@ -19,15 +19,15 @@
                 <i class = "icon-chart"></i>
                 &nbsp;
 
-                    <?= @$page_title; ?>
+                    Program Graphs
 
                 <!-- <div class = "pull-right">
-                    <a href = "<?= @$back_link; ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  <?= @$back_text; ?></button></a><br /><br />
+                    <a href = "<?= @$back_link; ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  <?= @$page_title; ?></button></a><br /><br />
                 </div> -->
             </div>
 
             <div class = "card-block">
-                Graphs here
+                Graphs Under Development
             </div>
 
         </div>

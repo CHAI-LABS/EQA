@@ -84,6 +84,8 @@ class Dashboard extends DashboardController {
             if($round){
             	$data['round'] = $round->id;
             }
+        }else if($type == "program"){
+        	redirect('Program/', 'refresh');
         }
 
         // echo "<pre>";print_r($data);echo "</pre>";die();

@@ -19,7 +19,7 @@
                 <i class = "icon-chart"></i>
                 &nbsp;
 
-                    Graph Analysis
+                    Graph Analysis for Round <?=@$round_name;?>
 
                 <div class = "pull-right">
                     <a href = "<?= @base_url('Analysis/'); ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to PT Analysis</button></a><br /><br />
