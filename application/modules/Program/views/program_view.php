@@ -9,7 +9,48 @@
         </div>
     <?php } ?>
 </div>
-        
+
+
+<div class = "row">
+    <div class="col-md-12">
+        <div class = "card">
+            <div class="card-header col-4">
+                <i class = "icon-chart"></i>
+                &nbsp;
+
+                    Criteria Selection
+            </div>
+
+            <div class = "card-block">
+                <div class = "card-block col-md-3">
+                    <fieldset class="form-group">
+                        <label>Round</label>
+                        <?= @$round_option; ?>
+                    </fieldset>
+                </div>
+
+                <div class = "card-block col-md-3">
+                    <fieldset class="form-group">
+                        <label>County</label>
+                        <?= @$county_option; ?>
+                    </fieldset>
+                </div>
+
+                <div class = "card-block col-md-3">
+                    <fieldset class="form-group">
+                        <label>Facility</label>
+                        <select id="facility-select" class="form-control select2-single">
+                            <?= @$facility_option; ?>
+                        </select>
+                    </fieldset>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
 
             
 <div class = "row">
@@ -20,14 +61,53 @@
                 &nbsp;
 
                     Program Graphs
-
-                <!-- <div class = "pull-right">
-                    <a href = "<?= @$back_link; ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  <?= @$page_title; ?></button></a><br /><br />
-                </div> -->
             </div>
 
+
+
+
             <div class = "card-block">
-                Graphs Under Development
+                <div class = "row">
+                <div id="round" data-type="<?= @$round; ?>"></div>
+
+                    <div class="col-md-12 container-fluid">
+                        <div class="animated fadeIn">
+                            <div class="card-columns col-2">
+
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        GRAPH 1
+                                        <div class="card-actions">
+                                        </div>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="chart-wrapper">
+                                            <canvas id="graph-1"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        GRAPH 2
+                                        <div class="card-actions">
+                                        </div>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="chart-wrapper">
+                                            <canvas id="graph-2"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
 
         </div>

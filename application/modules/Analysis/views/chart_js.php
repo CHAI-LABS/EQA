@@ -34,7 +34,7 @@
 
 
     $.get("<?=@base_url('Analysis/ParticipationGraph/');?>" + round, function(barChartData){
-        console.log(barChartData);
+        // console.log(barChartData);
         
         var ctx = document.getElementById('participation');
         var chart = new Chart(ctx, {
@@ -61,7 +61,7 @@
 
 
     $.get("<?=@base_url('Analysis/DisqualificationGraph/');?>" + round, function(barChartData){
-        console.log(barChartData);
+        // console.log(barChartData);
         
         var ctx = document.getElementById('disqualified');
         var chart = new Chart(ctx, {
@@ -142,7 +142,7 @@
 
 
     $.get("<?=@base_url('Analysis/HistoricalGraph/');?>" + round, function(barChartData){
-        console.log(barChartData);
+        // console.log(barChartData);
         
         var ctx = document.getElementById('historical');
         var chart = new Chart(ctx, {

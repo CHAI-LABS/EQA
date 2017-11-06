@@ -22,7 +22,7 @@ class Analysis extends DashboardController {
             'page_title' => 'PT Round List',
             'back_text' => 'Back to Dashboard',
             'back_link' => base_url('Dashboard/'),
-            'table_view'    =>  $this->createPTTable()
+            'table_view'    =>  $this->createPTTable()Parti
         ];
 
         $this->assets
