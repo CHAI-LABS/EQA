@@ -50,7 +50,34 @@
 			                            </div>
 			                        </div>
 			                    </div>
-			                
+
+
+			                    
+
+			            
+			                    <!-- <div class="card">
+			                        <div class="card-header">
+			                            JUSTIFICATION FOR RESULTS NOT RETURNED
+			                            <div class="card-actions">
+			                                <a href="http://www.chartjs.org/">
+			                                    <small class="text-muted">docs</small>
+			                                </a>
+			                            </div>
+			                        </div>
+			                        <div class="card-block">
+			                            <div class="chart-wrapper">
+			                                <canvas id="justification"></canvas>
+			                            </div>
+			                        </div>
+			                    </div> -->
+
+
+			                    
+
+
+			                    <div class="card">
+			                       
+			                    </div>
 
 			                    <div class="card">
 			                        <div class="card-header">
@@ -67,33 +94,17 @@
 			                            </div>
 			                        </div>
 			                    </div>
-			               
 
-
-			                    <div class="card">
-			                        <div class="card-header">
-			                            JUSTIFICATION FOR RESULTS NOT RETURNED
-			                            <div class="card-actions">
-			                                <!-- <a href="http://www.chartjs.org/">
-			                                    <small class="text-muted">docs</small>
-			                                </a> -->
-			                            </div>
-			                        </div>
-			                        <div class="card-block">
-			                            <div class="chart-wrapper">
-			                                <canvas id="justification"></canvas>
-			                            </div>
-			                        </div>
-			                    </div>
+			                    
 			                
 
-			                    <div class="card">
+			                    <!-- <div class="card">
 			                        <div class="card-header">
 			                            REMEDIAL ACTION PER PLATFORM
 			                            <div class="card-actions">
-			                                <!-- <a href="http://www.chartjs.org/">
+			                                <a href="http://www.chartjs.org/">
 			                                    <small class="text-muted">docs</small>
-			                                </a> -->
+			                                </a>
 			                            </div>
 			                        </div>
 			                        <div class="card-block">
@@ -101,6 +112,10 @@
 			                                <canvas id="remedial"></canvas>
 			                            </div>
 			                        </div>
+			                    </div> -->
+
+			                    <div class="card">
+			                        
 			                    </div>
 
 
