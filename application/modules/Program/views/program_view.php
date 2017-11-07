@@ -59,7 +59,6 @@
             <div class="card-header col-4">
                 <i class = "icon-chart"></i>
                 &nbsp;
-
                     Program Graphs
             </div>
 
@@ -105,6 +104,31 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-md-12 container-fluid">
+                        <div class="animated fadeIn">
+                            <div class="card-columns col-2">
+
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        SUMMARY OUTCOME: NHRL
+                                        <div class="card-actions">
+                                        </div>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="chart-wrapper">
+                                            <canvas id="graph-3"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
 
 
                 </div>
