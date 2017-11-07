@@ -76,11 +76,18 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        GRAPH 1
+                                        SUMMARY: PARTICIPANTS
                                         <div class="card-actions">
                                         </div>
                                     </div>
                                     <div class="card-block">
+                                        Total # site enrolled :<strong> 35 </strong><br/>
+                                        # of participants :<strong> 35 </strong><br/>
+                                        Disqualified :<strong> 35 </strong><br/>
+                                        Unable to report :<strong> 35 </strong><br/>
+                                        Non-Responsive :<strong> 35 </strong><br/>
+                                        Responded :<strong> 35 </strong><br/>
+                                        <br/><br/>
                                         <div class="chart-wrapper">
                                             <canvas id="graph-1"></canvas>
                                         </div>
@@ -89,11 +96,15 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        GRAPH 2
+                                        SUMMARY OUTCOMES: PASS VS FAILED
                                         <div class="card-actions">
                                         </div>
                                     </div>
                                     <div class="card-block">
+                                        # of responded participants :<strong> 35 </strong><br/>
+                                        # of passed :<strong> 35 </strong><br/>
+                                        # of failed :<strong> 35 </strong><br/>
+                                        <br/><br/>
                                         <div class="chart-wrapper">
                                             <canvas id="graph-2"></canvas>
                                         </div>
@@ -107,12 +118,12 @@
 
                     <div class="col-md-12 container-fluid">
                         <div class="animated fadeIn">
-                            <div class="card-columns col-2">
+                            <!-- <div class="card-columns col-2"> -->
 
 
-                                <div class="card">
+                                <div class="card" style="width:100%";>
                                     <div class="card-header">
-                                        SUMMARY OUTCOME: NHRL
+                                        SUMMARY OUTCOME: NHRL/CD4/2017-17
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -124,7 +135,9 @@
                                 </div>
 
 
-                            </div>
+                            <!-- </div> -->
+
+                            
                         </div>
                     </div>
 

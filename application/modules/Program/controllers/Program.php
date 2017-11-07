@@ -56,7 +56,9 @@ class Program extends MY_Controller {
                 ->addJs('dashboard/js/libs/jquery.validate.js')
                 ->addJs('dashboard/js/libs/select2.min.js')
                 ->addJs('js/Chart.min.js')
-                ->addJs('js/chartsjs-plugin-data-labels.js');
+                ->addJs('js/chartsjs-plugin-data-labels.js')
+                ->addJs('js/Chart.bundle.js')
+                ->addJs('js/Chart.PieceLabel.js');
         $this->assets->setJavascript('Program/program_js');
         $this->template
                 ->setPageTitle($title)
@@ -138,14 +140,14 @@ class Program extends MY_Controller {
         $failed = $no_of_participants - $passed;
         $responsive = $no_of_participants - $non_responsive;
 
-        // $datasets1 = [
-        //     'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
-        //     'backgroundColor' => 'rgba(211,84,0,0.5)',
-        //     'borderColor' => 'rgba(211,84,0,0.8)',
-        //     'highlightFill' => 'rgba(211,84,0,0.75)',
-        //     'highlightStroke' => 'rgba(211,84,0,1)',
-        //     'data' => [$total_facilities]
-        // ];
+        $datasets7 = [
+            'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)',
+            'data' => [$total_facilities]
+        ];
         $datasets1 = [
             'label'         =>  'N0. OF PARTICIPANTS (CURRENT ROUND)',
             'backgroundColor' => 'rgba(52,152,219,0.5)',
@@ -199,7 +201,87 @@ class Program extends MY_Controller {
         // echo "<pre>";print_r($unable);echo "</pre>";die();
 
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets6, $datasets4, $datasets3, $datasets2, $datasets5];
+        $graph_data['datasets'] = [$datasets7, $datasets1, $datasets6, $datasets4, $datasets3, $datasets2, $datasets5];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
+
+
+    public function OverallResponses($round_id, $county_id, $facility_id){
+        $labels = $graph_data = $datasets = $data = array();
+        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
+
+        $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid;
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+        $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
+        $equipments = $this->Program_m->Equipments();
+
+        foreach ($equipments as $key => $equipment) {
+            $counter++;
+            
+            $equipment_id = $equipment->id;
+
+            foreach ($participants as $participant) {
+                $partcount ++;
+                $novalue = $sampcount = $acceptable = $unacceptable = 0;
+
+                foreach ($samples as $sample) {
+                    $sampcount++;
+
+                    $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+
+                    if($cd4_values){
+
+                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                    }else{
+                        $upper_limit = 0;
+                        $lower_limit = 0;
+                    } 
+
+                    $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                    if($part_cd4){
+                        
+                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                            $acceptable++;    
+                        } else{
+                            $unacceptable++;    
+                        } 
+
+                        if($part_cd4->cd4_absolute == 0){
+                            $novalue++;
+                        }
+                    } 
+                } 
+
+                if($novalue == $sampcount){
+                    $non_responsive++;
+                }
+
+                if($acceptable == $sampcount) {
+                    $passed++;
+                }
+
+            }
+        }
+
+        
+
+        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid)->participants;
+        $responsive = $no_of_participants - $non_responsive;
+        $participants = $responsive + $non_responsive;
+
+        $datasets = [
+            'label'         =>  ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'],
+            'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
+            'data' => [$participants, $responsive, $non_responsive]
+        ];
+        $labels = ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'];
+
+        $graph_data['labels'] = $labels;
+        $graph_data['datasets'] = [$datasets];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
