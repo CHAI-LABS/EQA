@@ -27,14 +27,14 @@ var defaults = {
    * @member {String|Array|Function}
    * @default 'center'
    */
-  align: 'end',
+  align: 'center',
 
   /**
    * The label box alignment relative to the element ('start'|'center'|'end')
    * @member {String|Array|Function}
    * @default 'center'
    */
-  anchor: 'end',
+  anchor: 'center',
 
   /**
    * The color used to draw the background of the surrounding frame.
