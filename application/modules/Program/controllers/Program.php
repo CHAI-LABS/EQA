@@ -57,7 +57,6 @@ class Program extends MY_Controller {
                 ->addJs('dashboard/js/libs/select2.min.js')
                 ->addJs('js/Chart.min.js')
                 ->addJs('js/chartsjs-plugin-data-labels.js')
-                ->addJs('js/Chart.bundle.js')
                 ->addJs('js/Chart.PieceLabel.js');
         $this->assets->setJavascript('Program/program_js');
         $this->template

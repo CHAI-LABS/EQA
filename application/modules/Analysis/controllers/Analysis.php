@@ -712,6 +712,9 @@ class Analysis extends DashboardController {
             
         $this->assets->addCss('css/main.css');
         $this->assets
+                ->addJs('js/Chart.min.js')
+                ->addJs('js/chartsjs-plugin-data-labels.js')
+                ->addJs('js/Chart.PieceLabel.js')
                 ->addJs("js/Chart.min.js")
                 ->addJs('js/chartsjs-plugin-data-labels.js')
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
