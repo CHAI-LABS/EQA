@@ -136,6 +136,7 @@ class Program extends MY_Controller {
         $total_facilities = $this->Program_m->TotalFacilities()->facilities;
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid)->participants;
         $failed = $no_of_participants - $passed;
+        $responsive = $no_of_participants - $non_responsive;
 
         // $datasets1 = [
         //     'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
@@ -153,23 +154,16 @@ class Program extends MY_Controller {
             'highlightStroke' => 'rgba(52,152,219,1)',
             'data' => [$no_of_participants]
         ];
-        // $datasets3 = [
-        //     'label'         =>  'PASSED',
-        //     'backgroundColor' => 'rgba(46,204,113,0.5)',
-        //     'borderColor' => 'rgba(46,204,113,0.8)',
-        //     'highlightFill' => 'rgba(46,204,113,0.75)',
-        //     'highlightStroke' => 'rgba(46,204,113,1)',
-        //     'data' => [$passed]
-        // ];
-        // $datasets4 = [
-        //     'label'         =>  'FAILED',
-        //     'backgroundColor' => 'rgba(231,76,60,0.5)',
-        //     'borderColor' => 'rgba(231,76,60,0.8)',
-        //     'highlightFill' => 'rgba(231,76,60,0.75)',
-        //     'highlightStroke' => 'rgba(231,76,60,1)',
-        //     'data' => [$failed]
-        // ];
         $datasets2 = [
+            'label'         =>  'PASSED',
+            'backgroundColor' => 'rgba(46,204,113,0.5)',
+            'borderColor' => 'rgba(46,204,113,0.8)',
+            'highlightFill' => 'rgba(46,204,113,0.75)',
+            'highlightStroke' => 'rgba(46,204,113,1)',
+            'data' => [$passed]
+        ];
+        
+        $datasets3 = [
             'label'         =>  'NON-RESPONSIVE',
             'backgroundColor' => 'rgba(127,140,141,0.5)',
             'borderColor' => 'rgba(127,140,141,0.8)',
@@ -177,7 +171,7 @@ class Program extends MY_Controller {
             'highlightStroke' => 'rgba(127,140,141,1)',
             'data' => [$non_responsive]
         ];
-        $datasets3 = [
+        $datasets4 = [
             'label'         =>  'UNABLE TO REPORT',
             'backgroundColor' => 'rgba(241,196,15,0.5)',
             'borderColor' => 'rgba(241,196,15,0.8)',
@@ -185,19 +179,27 @@ class Program extends MY_Controller {
             'highlightStroke' => 'rgba(241,196,15,1)',
             'data' => [$unable]
         ];
-        $datasets4 = [
-            'label'         =>  'DISQUALIFIED',
+        $datasets5 = [
+            'label'         =>  'FAILED',
             'backgroundColor' => 'rgba(52,73,94,0.5)',
             'borderColor' => 'rgba(52,73,94,0.8)',
             'highlightFill' => 'rgba(52,73,94,0.75)',
             'highlightStroke' => 'rgba(52,73,94,1)',
+            'data' => [$failed]
+        ];
+        $datasets6 = [
+            'label'         =>  'DISQUALIFIED',
+            'backgroundColor' => 'rgba(231,76,60,0.5)',
+            'borderColor' => 'rgba(231,76,60,0.8)',
+            'highlightFill' => 'rgba(231,76,60,0.75)',
+            'highlightStroke' => 'rgba(231,76,60,1)',
             'data' => [$disqualified]
         ];
 
         // echo "<pre>";print_r($unable);echo "</pre>";die();
 
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
+        $graph_data['datasets'] = [$datasets1, $datasets6, $datasets4, $datasets3, $datasets2, $datasets5];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
