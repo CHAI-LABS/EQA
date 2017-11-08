@@ -62,9 +62,6 @@
                     Program Graphs
             </div>
 
-
-
-
             <div class = "card-block">
                 <div class = "row">
                 <div id="round" data-type="<?= @$round; ?>"></div>
@@ -130,6 +127,32 @@
                                     <div class="card-block">
                                         <div class="chart-wrapper">
                                             <canvas id="graph-3"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            <!-- </div> -->
+
+                            
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-12 container-fluid">
+                        <div class="animated fadeIn">
+                            <!-- <div class="card-columns col-2"> -->
+
+
+                                <div class="card" style="width:100%";>
+                                    <div class="card-header">
+                                        DISQUALIFIED PARTICIPANTS: NHRL/CD4/2017-17
+                                        <div class="card-actions">
+                                        </div>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="chart-wrapper">
+                                            <canvas id="graph-4"></canvas>
                                         </div>
                                     </div>
                                 </div>

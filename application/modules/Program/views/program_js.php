@@ -146,6 +146,84 @@ $(document).ready(function(){
 	        });
 	    });
 
+	    $.get("<?=@base_url('Program/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	        console.log(ChartData);
+
+	        var ctx2 = document.getElementById('graph-2');
+	        var chart = new Chart(ctx2, {
+	             	type: 'pie',
+    				data: ChartData,
+			        options: {
+				        datasets: [{
+						    dataLabels: { 
+						    	display: true,          //  disabled by default
+						        colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
+						        minRadius: 30, //  minimum radius for display labels (on pie charts)
+						        align: 'start',
+						        anchor: 'start'
+						    }
+						}],
+						cutoutPercentage: 0,
+			            responsive: true,
+						    pieceLabel: {
+							    render: 'percentage',
+							    fontColor: ['black', 'black', 'black'],
+							    precision: 2,
+							    position: 'outside'
+							  }
+			        }
+	        });
+	    });
+
+
+	    $.get("<?=@base_url('Program/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	        // console.log(ChartData);
+
+	        var ctx1 = document.getElementById('graph-4');
+	        var chart = new Chart(ctx1, {
+	            type: 'bar',
+	            data: ChartData,
+	            options: {
+	                legend: {
+	                	backgroundColor: "rgba(255,99,132,0.2)",
+					    
+	                    display: true,
+	                    position: 'right',
+	                    fullWidth: true,
+	                    labels: {
+	                        fontColor: 'rgb(0, 0, 0)'
+	                    }
+	                },
+	                scales: {
+	                    yAxes: [{
+	                        ticks: {
+	                            beginAtZero:false
+	                        }
+	                    }]
+	                },
+	                tooltips: {
+			            mode: 'nearest',
+			            intersect: true
+			        },
+			        datasets: [{
+					    dataLabels: { 
+					    	display: true,          //  disabled by default
+					        colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
+					        minRadius: 30, //  minimum radius for display labels (on pie charts)
+					        align: 'start',
+					        anchor: 'start'
+					    },
+					    borderColor: "rgba(255,99,132,1)",
+					    borderWidth: 2,
+					    hoverBackgroundColor: "rgba(255,99,132,0.4)",
+					    hoverBorderColor: "rgba(255,99,132,1)",
+					}],
+	                responsive: true,
+   	 				maintainAspectRatio: false
+	            }
+	        });
+	    });
+
 
 
 
