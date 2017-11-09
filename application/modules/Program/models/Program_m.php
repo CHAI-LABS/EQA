@@ -100,9 +100,7 @@ class Program_m extends CI_Model {
         $sql = "SELECT COUNT(participant_id) AS participants 
         FROM pt_ready_participants 
         WHERE pt_round_uuid = '".$round_uuid."' 
-        AND county_id is not null
         $county
-        AND facility_code is not null
         AND verdict = 1; ";
 
         $query = $this->db->query($sql);

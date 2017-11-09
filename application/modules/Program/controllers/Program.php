@@ -156,8 +156,9 @@ class Program extends MY_Controller {
         $labels = $graph_data = $datasets = $data = array();
         $equipment_breakdown = $reagent_stock_out = $analyst_unavailable = $pending_capa = 0;
 
-        $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid;
-
+        $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
+        $round_uuid = $round->uuid;
+        $round_name = $round->pt_round_no;
         $equipment_breakdown = $this->Program_m->getEquipmentBreakdown($round_uuid)->equipments;
         $reagent_stock_out = $this->Program_m->getReagentStock($round_uuid)->reagents;
         // $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid)->analysts;
@@ -199,7 +200,7 @@ class Program extends MY_Controller {
         ];
 
         
-
+        $graph_data['round'] = $round_name;
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
 
@@ -259,8 +260,9 @@ class Program extends MY_Controller {
 
             $labels[] = $county->county_name;
 
-            $round_uuid = $this->db->get_where('pt_round_v', ['id' =>  $round_id])->row()->uuid;
-
+            $round = $this->db->get_where('pt_round_v', ['id' =>  $round_id])->row();
+            $round_uuid = $round->uuid;
+            $round_name = $round->pt_round_no;
             $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid,$county->county_id)->participants;
 
             if($no_of_participants == 0){
@@ -330,7 +332,7 @@ class Program extends MY_Controller {
         }
 
 
-
+        $graph_data['round'] = $round_name;
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$no_participants, $pass, $fail];
         // echo "<pre>";print_r($nopart);echo "</pre>";die;
@@ -601,7 +603,9 @@ class Program extends MY_Controller {
         $labels = $graph_data = $datasets = $data = array();
         $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
 
-        $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid;
+        $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
+        $round_uuid = $round->uuid;
+        $round_name = $round->pt_round_no;
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
@@ -722,9 +726,9 @@ class Program extends MY_Controller {
         ];
 
         // echo "<pre>";print_r($unable);echo "</pre>";die();
-
+        $graph_data['round'] = $round_name;
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets7, $datasets1, $datasets6, $datasets4, $datasets3, $datasets2, $datasets5];
+        $graph_data['datasets'] = [$datasets7, $datasets1, $datasets3, $datasets4, $datasets6, $datasets2, $datasets5];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

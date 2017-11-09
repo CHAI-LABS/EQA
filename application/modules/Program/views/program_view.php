@@ -78,12 +78,12 @@
                                         </div>
                                     </div>
                                     <div class="card-block">
-                                        Total # site enrolled :<strong> 35 </strong><br/>
-                                        # of participants :<strong> 35 </strong><br/>
-                                        Disqualified :<strong> 35 </strong><br/>
-                                        Unable to report :<strong> 35 </strong><br/>
-                                        Non-Responsive :<strong> 35 </strong><br/>
-                                        Responded :<strong> 35 </strong><br/>
+                                        Total # site enrolled :<strong id="enrolled"> 0 </strong><br/>
+                                        # of participants :<strong id="partno"> 0 </strong><br/>
+                                        Disqualified :<strong id="disqualified"> 0 </strong><br/>
+                                        Unable to report :<strong id="unable"> 0 </strong><br/>
+                                        Non-Responsive :<strong id="nonresp"> 0 </strong><br/>
+                                        Responded :<strong id="resp"> 0 </strong>
                                         <br/><br/>
                                         <div class="chart-wrapper">
                                             <canvas id="graph-1"></canvas>
@@ -98,9 +98,9 @@
                                         </div>
                                     </div>
                                     <div class="card-block">
-                                        # of responded participants :<strong> 35 </strong><br/>
-                                        # of passed :<strong> 35 </strong><br/>
-                                        # of failed :<strong> 35 </strong><br/>
+                                        # of responded participants :<strong id="part"> 0 </strong><br/>
+                                        # of passed :<strong id="pass"> 0 </strong><br/>
+                                        # of failed :<strong id="fail"> 0 </strong>
                                         <br/><br/>
                                         <div class="chart-wrapper">
                                             <canvas id="graph-2"></canvas>
@@ -120,7 +120,7 @@
 
                                 <div class="card" style="width:100%";>
                                     <div class="card-header">
-                                        SUMMARY OUTCOME: NHRL/CD4/2017-17
+                                        SUMMARY OUTCOME: <strong id="roundname1">Round Name</strong>
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -143,11 +143,16 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    DISQUALIFIED PARTICIPANTS: NHRL/CD4/2017-17
+                                    DISQUALIFIED PARTICIPANTS: <strong id="roundname2">Round Name</strong>
                                     <div class="card-actions">
                                     </div>
                                 </div>
                                 <div class="card-block">
+                                    EQUIPMENT BREAKDOWN :<strong id="equip"> 0 </strong><br/>
+                                    REAGENT STOCK-OUT :<strong id="reag"> 0 </strong><br/>
+                                    ANALYST UNAVAILABLE :<strong id="anal"> 0 </strong><br/>
+                                    PENDING CAPA :<strong id="pend"> 0 </strong>
+                                    <br/><br/>
                                     <div class="chart-wrapper">
                                         <canvas id="graph-4"></canvas>
                                     </div>
@@ -198,7 +203,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    COUNTY OUTCOMES: NHRL/CD4/2017-17
+                                    COUNTY OUTCOMES: <strong id="roundname3">Round</strong>
                                     <div class="card-actions">
                                     </div>
                                 </div>

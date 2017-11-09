@@ -71,7 +71,8 @@ $(document).ready(function(){
         // alert(" Round  = " + round + " County = " + county + " Facility = " + facility);
 
 	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        // console.log(ChartData);
+
+
 
 	        var ctx1 = document.getElementById('graph-1');
 	        var chart = new Chart(ctx1, {
@@ -80,9 +81,9 @@ $(document).ready(function(){
 			        options: {
 				        datasets: [{
 						    dataLabels: { 
-						    	display: true,          //  disabled by default
-						        colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
-						        minRadius: 30, //  minimum radius for display labels (on pie charts)
+						    	display: true,       
+						        colors: ['#fff', '#ccc', '#000'], 
+						        minRadius: 30,
 						        align: 'start',
 						        anchor: 'start'
 						    }
@@ -102,6 +103,15 @@ $(document).ready(function(){
 	    $.get("<?=@base_url('Program/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
 
+	        var part = ChartData['datasets']['0']['data']['0'];
+	        var pass = ChartData['datasets']['0']['data']['1'];
+	        var fail = ChartData['datasets']['0']['data']['2'];
+
+
+	    	document.getElementById('part').innerHTML = part;
+	    	document.getElementById('pass').innerHTML = pass;
+	    	document.getElementById('fail').innerHTML = fail;
+
 	        var ctx2 = document.getElementById('graph-2');
 	        var chart = new Chart(ctx2, {
 	             	type: 'pie',
@@ -109,9 +119,9 @@ $(document).ready(function(){
 			        options: {
 				        datasets: [{
 						    dataLabels: { 
-						    	display: true,          //  disabled by default
-						        colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
-						        minRadius: 30, //  minimum radius for display labels (on pie charts)
+						    	display: true,         
+						        colors: ['#fff', '#ccc', '#000'], 
+						        minRadius: 30,
 						        align: 'start',
 						        anchor: 'start'
 						    }
@@ -131,6 +141,23 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
+
+	    	var roundname1 = ChartData['round'];
+	    	var enrolled = ChartData['datasets']['0']['data']['0'];
+	        var partno = ChartData['datasets']['1']['data']['0'];
+	        var disqualified = ChartData['datasets']['2']['data']['0'];
+	        var unable = ChartData['datasets']['3']['data']['0'];
+	        var nonresp = ChartData['datasets']['4']['data']['0'];
+	        var resp = ChartData['datasets']['5']['data']['0'];
+
+
+	    	document.getElementById('enrolled').innerHTML = enrolled;
+	    	document.getElementById('roundname1').innerHTML = roundname1;
+	    	document.getElementById('partno').innerHTML = partno;
+	    	document.getElementById('disqualified').innerHTML = disqualified;
+	    	document.getElementById('unable').innerHTML = unable;
+	    	document.getElementById('nonresp').innerHTML = nonresp;
+	    	document.getElementById('resp').innerHTML = resp;
 
 	        var ctx3 = document.getElementById('graph-3');
 	        var chart = new Chart(ctx3, {
@@ -180,6 +207,18 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
+	        var roundname2 = ChartData['round'];
+	        var equip = ChartData['datasets']['0']['data']['0'];
+	        var reag = ChartData['datasets']['1']['data']['0'];
+	        var anal = ChartData['datasets']['2']['data']['0'];
+	        var pend = ChartData['datasets']['3']['data']['0'];
+
+
+	    	document.getElementById('roundname2').innerHTML = roundname2;
+	    	document.getElementById('equip').innerHTML = equip;
+	    	document.getElementById('reag').innerHTML = reag;
+	    	document.getElementById('anal').innerHTML = anal;
+	    	document.getElementById('pend').innerHTML = pend;
 
 	        var ctx4 = document.getElementById('graph-4');
 	        var chart = new Chart(ctx4, {
@@ -289,6 +328,10 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/OverallOutcomeGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
+
+	        var roundname3 = ChartData['round'];
+
+	        document.getElementById('roundname3').innerHTML = roundname3;
 
 	        var ctx5 = document.getElementById('graph-7');
 	        var chart = new Chart(ctx5, {
