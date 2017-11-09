@@ -287,52 +287,44 @@ $(document).ready(function(){
 	    });
 
 
-		// var barChartData = {
-  //           labels: ["January", "February", "March", "April", "May", "June", "July"],
-  //           datasets: [{
-  //               label: 'Dataset 1',
-  //               backgroundColor: '#ccc',
-  //               data: [10, 20, 30, 40]
-  //           }, {
-  //               label: 'Dataset 2',
-  //               backgroundColor: '#000',
-  //               data: [10, 30, 50, 70]
-  //           }, {
-  //               label: 'Dataset 3',
-  //               backgroundColor: 'rgba(127,140,141,0.5)',
-  //               data: [10, 40, 80, 120],
-  //               type: 'line'
-  //           }]
+	    $.get("<?=@base_url('Program/OverallOutcomeGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	        // console.log(ChartData);
 
-  //       };
-
-
-        // var ctx = document.getElementById("graph-5").getContext("2d");
-        // window.myBar = new Chart(ctx, {
-        //     type: 'bar',
-        //     data: barChartData,
-        //     options: {
-        //         title:{
-        //             display:true,
-        //             text:"Chart.js Bar Chart - Stacked"
-        //         },
-        //         tooltips: {
-        //             mode: 'index',
-        //             intersect: false
-        //         },
-        //         responsive: true,
-        //         scales: {
-        //             xAxes: [{
-        //                 stacked: true,
-        //             }],
-        //             yAxes: [{
-        //                 stacked: true
-        //             }]
-        //         }
-        //     }
-        // });
-        
-
+	        var ctx5 = document.getElementById('graph-7');
+	        var chart = new Chart(ctx5, {
+	            type: 'bar',
+	            data: ChartData,
+	            options: {
+	                title:{
+	                    display:false,
+	                    text:"County Outcome"
+	                },
+	                legend: {
+	                	// backgroundColor: "rgba(255,99,132,0.2)",
+					    
+	                    display: true,
+	                    position: 'right',
+	                    fullWidth: true,
+	                    labels: {
+	                        fontColor: 'rgb(0, 0, 0)'
+	                    }
+	                },
+	                tooltips: {
+	                    mode: 'index',
+	                    intersect: false
+	                },
+	                responsive: true,
+	                scales: {
+	                    xAxes: [{
+	                        stacked: true,
+	                    }],
+	                    yAxes: [{
+	                        stacked: true
+	                    }]
+	                }
+	            }
+	        });
+	    });
 
 
 
