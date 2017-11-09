@@ -53,6 +53,18 @@ class Program_m extends CI_Model {
         return $query->row();
     }
 
+    public function getLatestRounds(){
+        $this->db->select("*");
+        $this->db->from("pt_round_v");
+        $this->db->where('type', 'previous');
+        $this->db->order_by('id', 'DESC');
+        $this->db->limit(6);
+
+        $query = $this->db->get();
+        
+        return $query->result();
+    }
+
 
     public function TotalFacilities(){
         $this->db->select('COUNT(DISTINCT(prv.facility_code)) AS facilities');

@@ -2221,7 +2221,7 @@ class Analysis extends DashboardController {
     }
 
 
-     public function HistoricalGraph(){
+    public function HistoricalGraph(){
         $labels = $graph_data = $datasets = $data = array();
         $participants = $pass = $fail = 0;
         $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
