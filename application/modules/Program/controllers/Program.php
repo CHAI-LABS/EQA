@@ -20,10 +20,10 @@ class Program extends MY_Controller {
         foreach ($rounds as $round) {
             $counter++;
             if($counter == 1){
-                $round_list .= '<option selected = "selected" value='.$round->uuid.'>'.$round->pt_round_no.'</option>';
+                $round_list .= '<option selected = "selected" value='.$round->id.'>'.$round->pt_round_no.'</option>';
                 $round = $round->id;
             }else{
-                $round_list .= '<option value='.$round->uuid.'>'.$round->pt_round_no.'</option>';
+                $round_list .= '<option value='.$round->id.'>'.$round->pt_round_no.'</option>';
             }
         }
         $round_list .= '</select>';

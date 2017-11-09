@@ -36,7 +36,7 @@ $(document).ready(function(){
 		var facility = 0;
 
 		if(county == 0){
-			
+			changeGraphs(round,0,0);
 		}else{
 			
 			$.get("<?=@base_url('Program/getFacilities/');?>" + county, function(counties){
@@ -48,9 +48,11 @@ $(document).ready(function(){
 
 				document.getElementById('facility-select').innerHTML += facOptions;
 		    });
+
+		    changeGraphs(round,county,facility);
 		}
 
-        changeGraphs(round,county,facility);
+        
   	});
 
   	$(document).on('change','#facility-select',function(){
@@ -68,7 +70,7 @@ $(document).ready(function(){
 
 
   	function changeGraphs(round, county, facility){
-        // alert(" Round  = " + round + " County = " + county + " Facility = " + facility);
+        alert(" Round  = " + round + " County = " + county + " Facility = " + facility);
 
 	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 
