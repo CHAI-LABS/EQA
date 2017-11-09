@@ -209,7 +209,7 @@ class Program extends MY_Controller {
 
     public function OverallOutcomeGraph($round_id,$county_id,$facility_id){
         $labels = $graph_data = $datasets = $data = $pass = $fail = array();
-        $counter = 0;
+        $counter = $pass_rate = 0;
 
         $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
         ];
@@ -225,7 +225,7 @@ class Program extends MY_Controller {
 
 
         $no_participants = [
-            'label'         =>  'NO. OF PARTICIPANTS',
+            'label'         =>  'Pass Rate (%)',
             'borderColor' => $borderColor[$counter],
             'highlightFill' => $highlightFill[$counter],
             'highlightStroke' => $highlightStroke[$counter],
@@ -263,10 +263,9 @@ class Program extends MY_Controller {
 
             $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid,$county->county_id)->participants;
 
-            // $parttotal += $no_of_participants; 
-
             if($no_of_participants == 0){
                 $failed = $passed = 0;
+                $pass_rate = 0;
 
             }else{
                 $equipments = $this->Program_m->Equipments();
@@ -318,13 +317,14 @@ class Program extends MY_Controller {
 
                 $failed = $no_of_participants - $passed;
 
-               
+                $pass_rate = (($passed / $no_of_participants) * 100);
 
             } 
 
 
 
-            $no_participants['data'][] = $no_of_participants;
+
+            $no_participants['data'][] = round($pass_rate, 2);
             $pass['data'][] = $passed;
             $fail['data'][] = $failed;
         }
@@ -341,7 +341,7 @@ class Program extends MY_Controller {
 
     public function PassFailGraph($round_id,$county_id,$facility_id){
         $labels = $graph_data = $datasets = $data = array();
-        $participants = $pass = $fail = 0;
+        $participants = $pass = $fail = $pass_rate = 0;
         $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
 
         $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
@@ -364,7 +364,7 @@ class Program extends MY_Controller {
                 $counter = 0;
 
                 $no_participants = [
-                    'label'         =>  'NO. OF PARTICIPANTS',
+                    'label'         =>  'PASS RATE (%)',
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
                     'highlightStroke' => $highlightStroke[$counter],
@@ -453,7 +453,9 @@ class Program extends MY_Controller {
                 $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid)->participants;
                 $failed = $no_of_participants - $passed;
 
-                $no_participants['data'][] = $no_of_participants;
+                $pass_rate = (($passed / $no_of_participants) * 100);
+
+                $no_participants['data'][] = round($pass_rate, 2);
                 $pass['data'][] = $passed;
                 $fail['data'][] = $failed;
 
@@ -472,7 +474,7 @@ class Program extends MY_Controller {
 
     public function ResondentNonGraph($round_id,$county_id,$facility_id){
         $labels = $graph_data = $datasets = $data = array();
-        $participants = $pass = $fail = 0;
+        $participants = $pass = $fail = $respondent_rate = 0;
         $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $partcount = $accept = $unaccept = $passed = $failed = $no_non_responsive = $no_responsive = 0;
 
         $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
@@ -495,7 +497,7 @@ class Program extends MY_Controller {
                 $counter = 0;
 
                 $no_participants = [
-                    'label'         =>  'NO. OF PARTICIPANTS',
+                    'label'         =>  'RESPONDENT RATE (%)',
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
                     'highlightStroke' => $highlightStroke[$counter],
@@ -576,9 +578,9 @@ class Program extends MY_Controller {
                 $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid)->participants;
                 $no_responsive = $no_of_participants - $no_non_responsive;
 
-                
+                $respondent_rate = (($no_responsive / $no_of_participants) * 100);
 
-                $no_participants['data'][] = $no_of_participants;
+                $no_participants['data'][] = round($respondent_rate, 2);
                 $responsive['data'][] = $no_responsive;
                 $non_responsive['data'][] = $no_non_responsive;
 

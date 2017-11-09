@@ -317,11 +317,24 @@ $(document).ready(function(){
 	                scales: {
 	                    xAxes: [{
 	                        stacked: true,
+	                        scaleLabel: {
+	                        	display: true,
+					            labelString: 'Counties'
+					        },
+					        ticks: {
+					            stepSize: 1,
+					            min: 0,
+					            autoSkip: false
+					        }
 	                    }],
 	                    yAxes: [{
-	                        stacked: true
+	                        stacked: true,
+	                        scaleLabel: {
+	                        	display: true,
+					            labelString: 'Number #'
+					        }
 	                    }]
-	                }
+	                },
 	            }
 	        });
 	    });
