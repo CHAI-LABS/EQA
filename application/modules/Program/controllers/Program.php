@@ -208,8 +208,8 @@ class Program extends MY_Controller {
 
 
     public function OverallOutcomeGraph($round_id,$county_id,$facility_id){
-        $labels = $graph_data = $datasets = $data = array();
-        $counter = $participants = $pass = $fail = 0;
+        $labels = $graph_data = $datasets = $data = $pass = $fail = array();
+        $counter = 0;
 
         $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
         ];
@@ -254,45 +254,36 @@ class Program extends MY_Controller {
 
         $counties = $this->Program_m->getCounties();
 
-        $parttotal = $part = $nopart = 0;
         foreach ($counties as $county) {
-            $counter = $passed = $failed = 0;
+            $no_of_participants = $passed = $failed = 0;
 
             $labels[] = $county->county_name;
 
             $round_uuid = $this->db->get_where('pt_round_v', ['id' =>  $round_id])->row()->uuid;
+
             $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid,$county->county_id)->participants;
 
-            $parttotal += $no_of_participants; 
+            // $parttotal += $no_of_participants; 
 
-            echo "<pre>";print_r($parttotal);echo "</pre>";
-
-            if($no_of_participants = 0){
+            if($no_of_participants == 0){
                 $failed = $passed = 0;
-                $nopart++;
+
             }else{
-                $part++;
-
-                
                 $equipments = $this->Program_m->Equipments();
-
 
                 foreach ($equipments as $key => $equipment) {
                     $partcount = 0;
 
                     $equipment_id = $equipment->id;
 
-                    $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $county->facility_id);
-
+                    $participants = $this->Program_m->getReadyParticipants($round_id, $county->county_id, $county->facility_id);
                     foreach ($participants as $participant) {
                         $partcount ++;
                         $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
                         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
-
                         foreach ($samples as $sample) {
                             $sampcount++;
-
                             $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
                             if($cd4_values){
@@ -323,20 +314,25 @@ class Program extends MY_Controller {
                     } 
                 } 
 
-            }
+                
 
-            $failed = $no_of_participants - $passed;
+                $failed = $no_of_participants - $passed;
+
+               
+
+            } 
+
+
 
             $no_participants['data'][] = $no_of_participants;
             $pass['data'][] = $passed;
             $fail['data'][] = $failed;
-            
-            $graph_data['labels'] = $labels;
-            $graph_data['datasets'] = [$no_participants,$pass, $fail];
-        } 
+        }
 
-        die;
 
+
+        $graph_data['labels'] = $labels;
+        $graph_data['datasets'] = [$no_participants, $pass, $fail];
         // echo "<pre>";print_r($nopart);echo "</pre>";die;
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));

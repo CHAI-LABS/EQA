@@ -303,7 +303,7 @@ $(document).ready(function(){
 	                	// backgroundColor: "rgba(255,99,132,0.2)",
 					    
 	                    display: true,
-	                    position: 'right',
+	                    position: 'top',
 	                    fullWidth: true,
 	                    labels: {
 	                        fontColor: 'rgb(0, 0, 0)'
