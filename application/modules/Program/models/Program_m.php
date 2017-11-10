@@ -66,10 +66,17 @@ class Program_m extends CI_Model {
     }
 
 
-    public function TotalFacilities(){
-        $this->db->select('COUNT(DISTINCT(prv.facility_code)) AS facilities');
-        $this->db->from('participant_readiness_v prv');
-        $this->db->where('prv.status', 1);
+    public function TotalFacilities($county_id = null){
+        $this->db->select('COUNT(DISTINCT(facility_code)) AS facilities');
+        $this->db->from('participant_readiness_v');
+
+        if($county_id){
+            $this->db->where('county_id', $county_id);
+        }
+
+        $this->db->where('user_type', 'participant');
+        $this->db->where('status', 1);
+        
         $query = $this->db->get();
 
         return $query->row();

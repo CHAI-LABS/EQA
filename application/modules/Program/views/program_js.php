@@ -24,6 +24,7 @@ $(document).ready(function(){
   	});
 
   	$(document).on('change','#county-select',function(){
+  		// alert("changed");
   		$("#facility-select").empty();
 
        	var r = document.getElementById("round-select");
@@ -51,8 +52,6 @@ $(document).ready(function(){
 
 		    changeGraphs(round,county,facility);
 		}
-
-        
   	});
 
   	$(document).on('change','#facility-select',function(){
@@ -70,11 +69,12 @@ $(document).ready(function(){
 
 
   	function changeGraphs(round, county, facility){
-        alert(" Round  = " + round + " County = " + county + " Facility = " + facility);
 
+  		// alert(county);
+  		
 	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 
-
+	    	$('#graph-1').replaceWith('<canvas id="graph-1"></canvas>');
 
 	        var ctx1 = document.getElementById('graph-1');
 	        var chart = new Chart(ctx1, {
@@ -104,6 +104,7 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
+	        $('#graph-2').replaceWith('<canvas id="graph-2"></canvas>');
 
 	        var part = ChartData['datasets']['0']['data']['0'];
 	        var pass = ChartData['datasets']['0']['data']['1'];
@@ -143,6 +144,7 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
+	        $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
 
 	    	var roundname1 = ChartData['round'];
 	    	var enrolled = ChartData['datasets']['0']['data']['0'];
@@ -209,6 +211,8 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
+	        $('#graph-4').replaceWith('<canvas id="graph-4"></canvas>');
+
 	        var roundname2 = ChartData['round'];
 	        var equip = ChartData['datasets']['0']['data']['0'];
 	        var reag = ChartData['datasets']['1']['data']['0'];
@@ -271,6 +275,8 @@ $(document).ready(function(){
 	    $.get("<?=@base_url('Program/PassFailGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
 
+	        $('#graph-5').replaceWith('<canvas id="graph-5"></canvas>');
+
 	        var ctx5 = document.getElementById('graph-5');
 	        var chart = new Chart(ctx5, {
 	            type: 'bar',
@@ -301,6 +307,8 @@ $(document).ready(function(){
 	    $.get("<?=@base_url('Program/ResondentNonGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
 
+	        $('#graph-6').replaceWith('<canvas id="graph-6"></canvas>');
+
 	        var ctx5 = document.getElementById('graph-6');
 	        var chart = new Chart(ctx5, {
 	            type: 'bar',
@@ -330,6 +338,8 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/OverallOutcomeGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        // console.log(ChartData);
+
+	        $('#graph-7').replaceWith('<canvas id="graph-7"></canvas>');
 
 	        var roundname3 = ChartData['round'];
 

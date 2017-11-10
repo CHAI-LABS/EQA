@@ -662,7 +662,7 @@ class Program extends MY_Controller {
 
         $unable = $this->Program_m->getUnableParticipants($round_uuid)->participants;
         $disqualified = $this->Program_m->getRoundVerdict($round_uuid)->participants;
-        $total_facilities = $this->Program_m->TotalFacilities()->facilities;
+        $total_facilities = $this->Program_m->TotalFacilities($county_id)->facilities;
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid)->participants;
         $failed = $no_of_participants - $passed;
         $responsive = $no_of_participants - $non_responsive;
