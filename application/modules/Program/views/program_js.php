@@ -149,10 +149,10 @@ $(document).ready(function(){
 	    	var roundname1 = ChartData['round'];
 	    	var enrolled = ChartData['datasets']['0']['data']['0'];
 	        var partno = ChartData['datasets']['1']['data']['0'];
-	        var disqualified = ChartData['datasets']['2']['data']['0'];
+	        var nonresp = ChartData['datasets']['2']['data']['0'];
 	        var unable = ChartData['datasets']['3']['data']['0'];
-	        var nonresp = ChartData['datasets']['4']['data']['0'];
-	        var resp = ChartData['datasets']['5']['data']['0'];
+	        var disqualified = ChartData['datasets']['4']['data']['0'];
+	        var resp = ChartData['responsive'];
 
 
 	    	document.getElementById('enrolled').innerHTML = enrolled;

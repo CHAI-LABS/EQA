@@ -120,7 +120,7 @@
 
                                 <div class="card" style="width:100%";>
                                     <div class="card-header">
-                                        SUMMARY OUTCOME: <strong id="roundname1">Round Name</strong>
+                                        SUMMARY OUTCOME: <strong id="roundname1">Loading...</strong>
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -143,7 +143,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    DISQUALIFIED PARTICIPANTS: <strong id="roundname2">Round Name</strong>
+                                    DISQUALIFIED PARTICIPANTS: <strong id="roundname2">Loading...</strong>
                                     <div class="card-actions">
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    COUNTY OUTCOMES: <strong id="roundname3">Round</strong>
+                                    COUNTY OUTCOMES: <strong id="roundname3">Loading...</strong>
                                     <div class="card-actions">
                                     </div>
                                 </div>

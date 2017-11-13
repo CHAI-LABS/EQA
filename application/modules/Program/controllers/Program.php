@@ -121,9 +121,6 @@ class Program extends MY_Controller {
                     } 
                 } 
 
-                if($novalue == $sampcount){
-                    $non_responsive++;
-                }
 
                 if($acceptable == $sampcount) {
                     $passed++;
@@ -134,14 +131,13 @@ class Program extends MY_Controller {
 
         
 
-        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid)->participants;
-        $responsive = $no_of_participants - $non_responsive;
-        $participants = $responsive + $non_responsive;
+        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id)->participants;
+        $failed = $no_of_participants - $passed;
 
         $datasets = [
-            'label'         =>  ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'],
+            'label'         =>  ['NO OF PARTICIPANTS','PASSED','FAILED'],
             'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-            'data' => [$participants, $responsive, $non_responsive]
+            'data' => [$no_of_participants, $passed, $failed]
         ];
         $labels = ['NO OF PARTICIPANTS','PASSED','FAILED'];
 
@@ -159,10 +155,10 @@ class Program extends MY_Controller {
         $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
         $round_uuid = $round->uuid;
         $round_name = $round->pt_round_no;
-        $equipment_breakdown = $this->Program_m->getEquipmentBreakdown($round_uuid)->equipments;
-        $reagent_stock_out = $this->Program_m->getReagentStock($round_uuid)->reagents;
-        // $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid)->analysts;
-        $pending_capa = $this->Program_m->getPendingCapa($round_uuid)->capas;
+        $equipment_breakdown = $this->Program_m->getEquipmentBreakdown($round_uuid, $county_id)->equipments;
+        $reagent_stock_out = $this->Program_m->getReagentStock($round_uuid, $county_id)->reagents;
+        // $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid, $county_id)->analysts;
+        $pending_capa = $this->Program_m->getPendingCapa($round_uuid, $county_id)->capas;
 
         // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
@@ -452,7 +448,7 @@ class Program extends MY_Controller {
                 
                 $labels[] = $round->pt_round_no;
 
-                $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid)->participants;
+                $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid, $county_id)->participants;
                 $failed = $no_of_participants - $passed;
 
                 $pass_rate = (($passed / $no_of_participants) * 100);
@@ -577,7 +573,7 @@ class Program extends MY_Controller {
 
                 // echo "<pre>";print_r($no_non_responsive);die;
 
-                $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid)->participants;
+                $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid, $county_id)->participants;
                 $no_responsive = $no_of_participants - $no_non_responsive;
 
                 $respondent_rate = (($no_responsive / $no_of_participants) * 100);
@@ -601,7 +597,7 @@ class Program extends MY_Controller {
 
     public function OverallInfo($round_id, $county_id, $facility_id){
         $labels = $graph_data = $datasets = $data = array();
-        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
+        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $responsive = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
 
         $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
         $round_uuid = $round->uuid;
@@ -663,7 +659,7 @@ class Program extends MY_Controller {
         $unable = $this->Program_m->getUnableParticipants($round_uuid)->participants;
         $disqualified = $this->Program_m->getRoundVerdict($round_uuid)->participants;
         $total_facilities = $this->Program_m->TotalFacilities($county_id)->facilities;
-        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid)->participants;
+        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id)->participants;
         $failed = $no_of_participants - $passed;
         $responsive = $no_of_participants - $non_responsive;
 
@@ -727,6 +723,7 @@ class Program extends MY_Controller {
 
         // echo "<pre>";print_r($unable);echo "</pre>";die();
         $graph_data['round'] = $round_name;
+        $graph_data['responsive'] = $responsive;
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$datasets7, $datasets1, $datasets3, $datasets4, $datasets6, $datasets2, $datasets5];
 
@@ -796,14 +793,14 @@ class Program extends MY_Controller {
 
         
 
-        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid)->participants;
+        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id)->participants;
         $responsive = $no_of_participants - $non_responsive;
-        $participants = $responsive + $non_responsive;
+        // $participants = $responsive + $non_responsive;
 
         $datasets = [
             'label'         =>  ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'],
             'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-            'data' => [$participants, $responsive, $non_responsive]
+            'data' => [$no_of_participants, $responsive, $non_responsive]
         ];
         $labels = ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'];
 
