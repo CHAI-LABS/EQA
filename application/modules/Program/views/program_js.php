@@ -11,6 +11,7 @@ $(document).ready(function(){
 
 
 	$(document).on('change','#round-select',function(){
+		// alert("changed");
 		var r = document.getElementById("round-select");
 		var c = document.getElementById("county-select");
 		var f = document.getElementById("facility-select");
@@ -49,12 +50,12 @@ $(document).ready(function(){
 
 				document.getElementById('facility-select').innerHTML += facOptions;
 		    });
-
 		    changeGraphs(round,county,facility);
 		}
   	});
 
   	$(document).on('change','#facility-select',function(){
+  		// alert("changed");
        	var r = document.getElementById("round-select");
 		var c = document.getElementById("county-select");
 		var f = document.getElementById("facility-select");
@@ -70,9 +71,10 @@ $(document).ready(function(){
 
   	function changeGraphs(round, county, facility){
 
-  		// alert(county);
+  		
   		
 	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	    	// alert("reached1");
 
 	    	$('#graph-1').replaceWith('<canvas id="graph-1"></canvas>');
 
@@ -103,7 +105,8 @@ $(document).ready(function(){
 	    });
 
 	    $.get("<?=@base_url('Program/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        // console.log(ChartData);
+	    	// alert("reached2");
+
 	        $('#graph-2').replaceWith('<canvas id="graph-2"></canvas>');
 
 	        var part = ChartData['datasets']['0']['data']['0'];
@@ -143,7 +146,9 @@ $(document).ready(function(){
 
 
 	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        // console.log(ChartData);
+	    	// alert("reached3");
+	        
+
 	        $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
 
 	    	var roundname1 = ChartData['round'];
@@ -210,7 +215,9 @@ $(document).ready(function(){
 
 
 	    $.get("<?=@base_url('Program/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        // console.log(ChartData);
+	    	// alert("reached4");
+
+
 	        $('#graph-4').replaceWith('<canvas id="graph-4"></canvas>');
 
 	        var roundname2 = ChartData['round'];
@@ -273,7 +280,7 @@ $(document).ready(function(){
 
 
 	    $.get("<?=@base_url('Program/PassFailGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        // console.log(ChartData);
+	    	// alert("reached5");
 
 	        $('#graph-5').replaceWith('<canvas id="graph-5"></canvas>');
 
@@ -305,7 +312,8 @@ $(document).ready(function(){
 
 
 	    $.get("<?=@base_url('Program/ResondentNonGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        // console.log(ChartData);
+	    	// alert("reached6");
+	       	
 
 	        $('#graph-6').replaceWith('<canvas id="graph-6"></canvas>');
 
@@ -337,8 +345,8 @@ $(document).ready(function(){
 
 
 	    $.get("<?=@base_url('Program/OverallOutcomeGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        // console.log(ChartData);
 
+	    	// alert("reached7");
 	        $('#graph-7').replaceWith('<canvas id="graph-7"></canvas>');
 
 	        var roundname3 = ChartData['round'];

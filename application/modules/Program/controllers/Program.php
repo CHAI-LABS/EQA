@@ -31,14 +31,14 @@ class Program extends MY_Controller {
 
         $counties = $this->db->get('county_v')->result();
         $county_list = '<select id="county-select" class="form-control select2-single">
-                        <option selected = "selected" value="0">Select a County</option>';
+                        <option selected = "selected" value="0">All Counties</option>';
         foreach ($counties as $county) {
             $county_list .= '<option value='.$county->id.'>'.$county->county_name.'</option>';
         }
         $county_list .= '</select>';
 
         // $facilities = $this->db->get('facility_v')->result();
-        $facility_list = '<option selected = "selected" value="0">Select a Facility</option>';
+        $facility_list = '<option selected = "selected" value="0">All Facilities</option>';
 
 
         $data = [
@@ -656,12 +656,14 @@ class Program extends MY_Controller {
             }
         }
 
-        $unable = $this->Program_m->getUnableParticipants($round_uuid)->participants;
-        $disqualified = $this->Program_m->getRoundVerdict($round_uuid)->participants;
-        $total_facilities = $this->Program_m->TotalFacilities($county_id)->facilities;
+        $unable = $this->Program_m->getUnableParticipants($round_uuid, $county_id)->participants;
+        $disqualified = $this->Program_m->getRoundVerdict($round_uuid, $county_id)->participants;
+        $total_facilities = $this->Program_m->TotalFacilities($round_uuid, $county_id)->facilities;
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id)->participants;
         $failed = $no_of_participants - $passed;
         $responsive = $no_of_participants - $non_responsive;
+
+        // echo "<pre>";print_r($total_facilities);echo "</pre>";die();
 
         $datasets7 = [
             'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
