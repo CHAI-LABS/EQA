@@ -360,7 +360,7 @@ $(document).ready(function(){
 	            options: {
 	                title:{
 	                    display:false,
-	                    text:"County Outcome"
+	                    text:ChartData['x_axis_name'] + " Outcome"
 	                },
 	                legend: {
 	                	// backgroundColor: "rgba(255,99,132,0.2)",
@@ -382,7 +382,7 @@ $(document).ready(function(){
 	                        stacked: true,
 	                        scaleLabel: {
 	                        	display: true,
-					            labelString: 'Counties'
+					            labelString: ChartData['x_axis_name']
 					        },
 					        ticks: {
 					            stepSize: 1,

@@ -125,16 +125,37 @@ class Program_m extends CI_Model {
     }
 
 
-    public function ParticipatingParticipants($round_uuid, $county_id = null){
-        $county = '';
+    public function getFacilities($county_id){
+
+        $this->db->select("*");
+        $this->db->from("facility_v fv");
+        // $this->db->join("facility_v fv", "fv.county_id = cv.id");
+        $this->db->where("fv.county_id", $county_id);
+        $this->db->group_by("fv.facility_name");
+        $this->db->order_by("fv.facility_name");
+
+        $query = $this->db->get();
+        
+        return $query->result();
+    }
+
+
+    public function ParticipatingParticipants($round_uuid, $county_id = null, $facility_id = null){
+        $facility = $county = '';
+
         if($county_id){
-        	$county = " AND county_id = ".$county_id ;
+        	$county = " AND county_id = ".$county_id." " ;
+        }
+
+        if($facility_id){
+            $facility = " AND facility_id = ".$facility_id." " ;
         }
 
         $sql = "SELECT COUNT(participant_id) AS participants 
         FROM pt_ready_participants 
         WHERE pt_round_uuid = '".$round_uuid."' 
         $county
+        $facility
         AND verdict = 1; ";
 
         $query = $this->db->query($sql);
@@ -201,7 +222,7 @@ class Program_m extends CI_Model {
     }
 
 
-    public function getReadyParticipants($round_id,$county_id,$facility_id){
+    public function getReadyParticipants($round_id, $county_id = null, $facility_id = null){
 
         $this->db->select("participant_id");
         $this->db->from("pt_participant_review_v");

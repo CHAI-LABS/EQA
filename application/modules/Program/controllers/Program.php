@@ -249,89 +249,169 @@ class Program extends MY_Controller {
             'highlightStroke' => $highlightStroke[$counter]
         ];
 
-        $counties = $this->Program_m->getCounties();
+        if($county_id == 0){
+            $counties = $this->Program_m->getCounties();
 
-        foreach ($counties as $county) {
-            $no_of_participants = $passed = $failed = 0;
+            foreach ($counties as $county) {
+                $no_of_participants = $passed = $failed = 0;
 
-            $labels[] = $county->county_name;
+                $labels[] = $county->county_name;
 
-            $round = $this->db->get_where('pt_round_v', ['id' =>  $round_id])->row();
-            $round_uuid = $round->uuid;
-            $round_name = $round->pt_round_no;
-            $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid,$county->county_id)->participants;
+                $round = $this->db->get_where('pt_round_v', ['id' =>  $round_id])->row();
+                $round_uuid = $round->uuid;
+                $round_name = $round->pt_round_no;
+                $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid,$county->county_id)->participants;
 
-            if($no_of_participants == 0){
-                $failed = $passed = 0;
-                $pass_rate = 0;
+                if($no_of_participants == 0){
+                    $failed = $passed = 0;
+                    $pass_rate = 0;
 
-            }else{
-                $equipments = $this->Program_m->Equipments();
+                }else{
+                    $equipments = $this->Program_m->Equipments();
 
-                foreach ($equipments as $key => $equipment) {
-                    $partcount = 0;
+                    foreach ($equipments as $key => $equipment) {
+                        $partcount = 0;
 
-                    $equipment_id = $equipment->id;
+                        $equipment_id = $equipment->id;
 
-                    $participants = $this->Program_m->getReadyParticipants($round_id, $county->county_id, $county->facility_id);
-                    foreach ($participants as $participant) {
-                        $partcount ++;
-                        $novalue = $sampcount = $acceptable = $unacceptable = 0;
+                        $participants = $this->Program_m->getReadyParticipants($round_id, $county->county_id, $county->facility_id);
 
-                        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
-                        foreach ($samples as $sample) {
-                            $sampcount++;
-                            $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                            if($cd4_values){
 
-                                $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                                $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                            }else{
-                                $upper_limit = 0;
-                                $lower_limit = 0;
-                            } 
+                        
+                        foreach ($participants as $participant) {
+                            $partcount ++;
+                            $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-                            $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+                            $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+                            foreach ($samples as $sample) {
+                                $sampcount++;
+                                $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                            if($part_cd4){
-                                
-                                if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                                    $acceptable++;    
-                                } else{
-                                    $unacceptable++;    
+                                if($cd4_values){
+
+                                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                                }else{
+                                    $upper_limit = 0;
+                                    $lower_limit = 0;
+                                } 
+
+                                $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                                if($part_cd4){
+                                    
+                                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                        $acceptable++;    
+                                    } else{
+                                        $unacceptable++;    
+                                    } 
                                 } 
                             } 
+
+                            if($acceptable == $sampcount) {
+                                $passed++;
+                            }
                         } 
-
-                        if($acceptable == $sampcount) {
-                            $passed++;
-                        }
-
                     } 
+
+                    $failed = $no_of_participants - $passed;
+                    $pass_rate = (($passed / $no_of_participants) * 100);
+
                 } 
 
-                
 
-                $failed = $no_of_participants - $passed;
+                $no_participants['data'][] = round($pass_rate, 2);
+                $pass['data'][] = $passed;
+                $fail['data'][] = $failed;
+            }
 
-                $pass_rate = (($passed / $no_of_participants) * 100);
+            $graph_data['x_axis_name'] = "Counties";
+        }else{
+            $facilities = $this->Program_m->getFacilities($county_id);
 
-            } 
+            // echo "<pre>";print_r($facilities);echo "</pre>";die;
+
+            foreach ($facilities as $facility) {
+                $no_of_participants = $passed = $failed = 0;
+
+                $labels[] = $facility->facility_name;
+
+                $round = $this->db->get_where('pt_round_v', ['id' =>  $round_id])->row();
+                $round_uuid = $round->uuid;
+                $round_name = $round->pt_round_no;
+                $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid,$facility->county_id,$facility->facility_id)->participants;
+
+                if($no_of_participants == 0){
+                    $failed = $passed = 0;
+                    $pass_rate = 0;
+
+                }else{
+                    $equipments = $this->Program_m->Equipments();
+
+                    foreach ($equipments as $key => $equipment) {
+                        $partcount = 0;
+
+                        $equipment_id = $equipment->id;
+
+                        $participants = $this->Program_m->getReadyParticipants($round_id, $facility->county_id, $facility->facility_id);
 
 
 
+                        foreach ($participants as $participant) {
+                            $partcount ++;
+                            $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-            $no_participants['data'][] = round($pass_rate, 2);
-            $pass['data'][] = $passed;
-            $fail['data'][] = $failed;
+                            $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+                            foreach ($samples as $sample) {
+                                $sampcount++;
+                                $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+
+                                if($cd4_values){
+
+                                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                                }else{
+                                    $upper_limit = 0;
+                                    $lower_limit = 0;
+                                } 
+
+                                $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                                if($part_cd4){
+                                    
+                                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                        $acceptable++;    
+                                    } else{
+                                        $unacceptable++;    
+                                    } 
+                                } 
+                            } 
+
+                            if($acceptable == $sampcount) {
+                                $passed++;
+                            }
+                        } 
+                    } 
+
+                    $failed = $no_of_participants - $passed;
+                    $pass_rate = (($passed / $no_of_participants) * 100);
+
+                } 
+
+                $no_participants['data'][] = round($pass_rate, 2);
+                $pass['data'][] = $passed;
+                $fail['data'][] = $failed;
+            }
+
+            $graph_data['x_axis_name'] = "Facilities";
+
         }
 
-
+        
         $graph_data['round'] = $round_name;
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$no_participants, $pass, $fail];
-        // echo "<pre>";print_r($nopart);echo "</pre>";die;
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
