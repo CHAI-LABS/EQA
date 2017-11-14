@@ -106,7 +106,7 @@ class Program_m extends CI_Model {
     }
 
 
-    public function TotalFacilities($round_uuid, $county_id = null){
+    public function TotalFacilities($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select('COUNT(DISTINCT(prv.facility_code)) AS facilities');
         $this->db->from('participant_readiness_v prv');
         $this->db->join("facility_v fv", "fv.facility_id = prv.facility_id", "left");
@@ -114,6 +114,10 @@ class Program_m extends CI_Model {
 
         if($county_id){
             $this->db->where('prv.county_id', $county_id);
+        }
+
+        if($facility_id){
+            $this->db->where('prv.facility_id', $facility_id);
         }
         
         $this->db->where('prp.pt_round_uuid', $round_uuid);
@@ -181,19 +185,36 @@ class Program_m extends CI_Model {
         return $query->row();
     }
 
-    public function getRoundVerdict($round_uuid, $county_id = null){
+    public function getRoundVerdict($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select('COUNT(pr.participant_id) AS participants');
         $this->db->from('participant_readiness pr');
         $this->db->join('facility_v fv', 'pr.participant_facility = fv.facility_id');
         $this->db->where('pr.pt_round_no', $round_uuid);
-        $this->db->where('fv.county_id', $county_id);
+
+        if($county_id){
+            $this->db->where('fv.county_id', $county_id);
+        }
+
+        if($facility_id){
+            $this->db->where('fv.facility_id', $facility_id);
+        }
+        
         $this->db->where('pr.verdict', 0);
         $query = $this->db->get();
 
         return $query->row();
     }
 
-    public function getUnableParticipants($round_uuid, $county_id = null){
+    public function getUnableParticipants($round_uuid, $county_id = null, $facility_id = null){
+        $county = $facility = '';
+        
+        if($county_id){
+            $county = " AND fv.county_id = ".$county_id. " ";
+        }
+
+        if($facility_id){
+            $facility = " AND fv.facility_id = ".$facility_id. " ";
+        }
 
         $sql = "SELECT COUNT(prv.p_id) AS participants
                 FROM participant_readiness_v prv
@@ -203,7 +224,8 @@ class Program_m extends CI_Model {
                      FROM participant_readiness pr
                      WHERE prv.uuid = pr.participant_id 
                      AND pr.pt_round_no = '".$round_uuid."')
-                AND fv.county_id = '".$county_id."'
+                $county
+                $facility
                 AND prv.user_type = 'participant'";
 
         $query = $this->db->query($sql);

@@ -82,56 +82,104 @@ class Program extends MY_Controller {
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
 
-        foreach ($equipments as $key => $equipment) {
-            $counter++;
-            
-            $equipment_id = $equipment->id;
+        if($facility_id == 0){
+            foreach ($equipments as $key => $equipment) {
+                $counter++;
+                
+                $equipment_id = $equipment->id;
 
+                foreach ($participants as $participant) {
+                    $partcount ++;
+                    $novalue = $sampcount = $acceptable = $unacceptable = 0;
+
+                    foreach ($samples as $sample) {
+                        $sampcount++;
+
+                        $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+
+                        if($cd4_values){
+
+                            $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                            $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                        }else{
+                            $upper_limit = 0;
+                            $lower_limit = 0;
+                        } 
+
+                        $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                        if($part_cd4){
+                            
+                            if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                $acceptable++;    
+                            } else{
+                                $unacceptable++;    
+                            } 
+
+                            if($part_cd4->cd4_absolute == 0){
+                                $novalue++;
+                            }
+                        } 
+                    } 
+
+
+                    if($acceptable == $sampcount) {
+                        $passed++;
+                    }
+
+                }
+            }
+        }else{
             foreach ($participants as $participant) {
                 $partcount ++;
                 $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-                foreach ($samples as $sample) {
-                    $sampcount++;
+                foreach ($equipments as $key => $equipment) {
+                    $counter++;
+                    
+                    $equipment_id = $equipment->id;
 
-                    $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+                    foreach ($samples as $sample) {
+                        $sampcount++;
 
-                    if($cd4_values){
+                        $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                    }else{
-                        $upper_limit = 0;
-                        $lower_limit = 0;
-                    } 
+                        if($cd4_values){
 
-                    $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
-
-                    if($part_cd4){
-                        
-                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                            $acceptable++;    
-                        } else{
-                            $unacceptable++;    
+                            $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                            $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                        }else{
+                            $upper_limit = 0;
+                            $lower_limit = 0;
                         } 
 
-                        if($part_cd4->cd4_absolute == 0){
-                            $novalue++;
-                        }
+                        $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                        if($part_cd4){
+                            
+                            if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                $acceptable++;    
+                            } else{
+                                $unacceptable++;    
+                            } 
+
+                            if($part_cd4->cd4_absolute == 0){
+                                $novalue++;
+                            }
+                        } 
                     } 
-                } 
 
 
-                if($acceptable == $sampcount) {
-                    $passed++;
+                    if($acceptable == $sampcount) {
+                        $passed++;
+                    }
+
                 }
-
             }
         }
 
         
-
-        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id)->participants;
+        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $failed = $no_of_participants - $passed;
 
         $datasets = [
@@ -832,60 +880,112 @@ class Program extends MY_Controller {
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
 
-        foreach ($equipments as $key => $equipment) {
-            $counter++;
-            
-            $equipment_id = $equipment->id;
+        if($facility_id == 0){
+            foreach ($equipments as $key => $equipment) {
+                $counter++;
+                
+                $equipment_id = $equipment->id;
 
+                foreach ($participants as $participant) {
+                    $partcount ++;
+                    $novalue = $sampcount = $acceptable = $unacceptable = 0;
+
+                    foreach ($samples as $sample) {
+                        $sampcount++;
+
+                        $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+
+                        if($cd4_values){
+
+                            $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                            $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                        }else{
+                            $upper_limit = 0;
+                            $lower_limit = 0;
+                        } 
+
+                        $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                        if($part_cd4){
+                            
+                            if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                $acceptable++;    
+                            } else{
+                                $unacceptable++;    
+                            } 
+
+                            if($part_cd4->cd4_absolute == 0){
+                                $novalue++;
+                            }
+                        } 
+                    } 
+
+                    if($novalue == $sampcount){
+                        $non_responsive++;
+                    }
+
+                    if($acceptable == $sampcount) {
+                        $passed++;
+                    }
+
+                }
+            }
+        }else{
             foreach ($participants as $participant) {
                 $partcount ++;
                 $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-                foreach ($samples as $sample) {
-                    $sampcount++;
+                foreach ($equipments as $key => $equipment) {
+                    $counter++;
+                    
+                    $equipment_id = $equipment->id;
 
-                    $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+                    foreach ($samples as $sample) {
+                        $sampcount++;
 
-                    if($cd4_values){
+                        $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                    }else{
-                        $upper_limit = 0;
-                        $lower_limit = 0;
-                    } 
+                        if($cd4_values){
 
-                    $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
-
-                    if($part_cd4){
-                        
-                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                            $acceptable++;    
-                        } else{
-                            $unacceptable++;    
+                            $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                            $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                        }else{
+                            $upper_limit = 0;
+                            $lower_limit = 0;
                         } 
 
-                        if($part_cd4->cd4_absolute == 0){
-                            $novalue++;
-                        }
+                        $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                        if($part_cd4){
+                            
+                            if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                $acceptable++;    
+                            } else{
+                                $unacceptable++;    
+                            } 
+
+                            if($part_cd4->cd4_absolute == 0){
+                                $novalue++;
+                            }
+                        } 
                     } 
-                } 
 
-                if($novalue == $sampcount){
-                    $non_responsive++;
+                    if($novalue == $sampcount){
+                        $non_responsive++;
+                    }
+
+                    if($acceptable == $sampcount) {
+                        $passed++;
+                    }
+
                 }
-
-                if($acceptable == $sampcount) {
-                    $passed++;
-                }
-
             }
         }
 
-        $unable = $this->Program_m->getUnableParticipants($round_uuid, $county_id)->participants;
-        $disqualified = $this->Program_m->getRoundVerdict($round_uuid, $county_id)->participants;
-        $total_facilities = $this->Program_m->TotalFacilities($round_uuid, $county_id)->facilities;
-        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id)->participants;
+        $unable = $this->Program_m->getUnableParticipants($round_uuid, $county_id, $facility_id)->participants;
+        $disqualified = $this->Program_m->getRoundVerdict($round_uuid, $county_id, $facility_id)->participants;
+        $total_facilities = $this->Program_m->TotalFacilities($round_uuid, $county_id, $facility_id)->facilities;
+        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $failed = $no_of_participants - $passed;
         $responsive = $no_of_participants - $non_responsive;
 
@@ -969,59 +1069,113 @@ class Program extends MY_Controller {
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
 
-        foreach ($equipments as $key => $equipment) {
-            $counter++;
-            
-            $equipment_id = $equipment->id;
+        if($facility_id){
+            foreach ($equipments as $key => $equipment) {
+                $counter++;
+                
+                $equipment_id = $equipment->id;
 
+                foreach ($participants as $participant) {
+                    $partcount ++;
+                    $novalue = $sampcount = $acceptable = $unacceptable = 0;
+
+                    foreach ($samples as $sample) {
+                        $sampcount++;
+
+                        $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+
+                        if($cd4_values){
+
+                            $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                            $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                        }else{
+                            $upper_limit = 0;
+                            $lower_limit = 0;
+                        } 
+
+                        $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                        if($part_cd4){
+                            
+                            if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                $acceptable++;    
+                            } else{
+                                $unacceptable++;    
+                            } 
+
+                            if($part_cd4->cd4_absolute == 0){
+                                $novalue++;
+                            }
+                        } 
+                    } 
+
+                    if($novalue == $sampcount){
+                        $non_responsive++;
+                    }
+
+                    if($acceptable == $sampcount) {
+                        $passed++;
+                    }
+
+                }
+            }
+        }else{
             foreach ($participants as $participant) {
                 $partcount ++;
                 $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-                foreach ($samples as $sample) {
-                    $sampcount++;
+                foreach ($equipments as $key => $equipment) {
+                    $counter++;
+                    
+                    $equipment_id = $equipment->id;
 
-                    $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
+                    foreach ($samples as $sample) {
+                        $sampcount++;
 
-                    if($cd4_values){
+                        $cd4_values = $this->Program_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                    }else{
-                        $upper_limit = 0;
-                        $lower_limit = 0;
-                    } 
+                        if($cd4_values){
 
-                    $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
-
-                    if($part_cd4){
-                        
-                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                            $acceptable++;    
-                        } else{
-                            $unacceptable++;    
+                            $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                            $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                        }else{
+                            $upper_limit = 0;
+                            $lower_limit = 0;
                         } 
 
-                        if($part_cd4->cd4_absolute == 0){
-                            $novalue++;
-                        }
+                        $part_cd4 = $this->Program_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                        if($part_cd4){
+                            
+                            if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                $acceptable++;    
+                            } else{
+                                $unacceptable++;    
+                            } 
+
+                            if($part_cd4->cd4_absolute == 0){
+                                $novalue++;
+                            }
+                        } 
                     } 
-                } 
 
-                if($novalue == $sampcount){
-                    $non_responsive++;
+                    if($novalue == $sampcount){
+                        $non_responsive++;
+                    }
+
+                    if($acceptable == $sampcount) {
+                        $passed++;
+                    }
+
                 }
-
-                if($acceptable == $sampcount) {
-                    $passed++;
-                }
-
             }
-        }
+        }   
 
         
 
-        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id)->participants;
+        
+
+        $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $responsive = $no_of_participants - $non_responsive;
         // $participants = $responsive + $non_responsive;
 
