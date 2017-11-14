@@ -28,6 +28,8 @@ $(document).ready(function(){
   		// alert("changed");
   		$("#facility-select").empty();
 
+  		document.getElementById('facility-select').innerHTML = "<option selected='selected' value=0> All Facilities</option>";
+
        	var r = document.getElementById("round-select");
 		var c = document.getElementById("county-select");
 		var f = document.getElementById("facility-select");

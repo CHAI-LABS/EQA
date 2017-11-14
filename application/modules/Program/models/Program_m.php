@@ -9,7 +9,7 @@ class Program_m extends CI_Model {
     }
 
 
-    public function getEquipmentBreakdown($round_uuid, $county_id = null){
+    public function getEquipmentBreakdown($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select("count(prr.response) AS equipments");
         $this->db->from("pt_readiness_responses_v prr");
         $this->db->join("facility_v fv", "fv.facility_id = prr.participant_facility");
@@ -17,6 +17,10 @@ class Program_m extends CI_Model {
 
         if($county_id){
             $this->db->where("fv.county_id", $county_id);
+        }
+
+        if($facility_id){
+            $this->db->where("fv.facility_id", $facility_id);
         }
         
         $this->db->where("prr.question_id", 2);
@@ -26,7 +30,7 @@ class Program_m extends CI_Model {
         return $query->row();
     }
 
-    public function getReagentStock($round_uuid, $county_id = null){
+    public function getReagentStock($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select("count(prr.response) AS reagents");
         $this->db->from("pt_readiness_responses_v prr");
         $this->db->join("facility_v fv", "fv.facility_id = prr.participant_facility");
@@ -34,6 +38,10 @@ class Program_m extends CI_Model {
 
         if($county_id){
             $this->db->where("fv.county_id", $county_id);
+        }
+
+        if($facility_id){
+            $this->db->where("fv.facility_id", $facility_id);
         }
         
         $this->db->where("prr.question_id", 3);
@@ -43,7 +51,7 @@ class Program_m extends CI_Model {
         return $query->row();
     }
 
-    public function getUnavailableAnalyst($round_uuid, $county_id = null){
+    public function getUnavailableAnalyst($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select("count(prr.response) AS analysts");
         $this->db->from("pt_readiness_responses_v prr");
         $this->db->join("facility_v fv", "fv.facility_id = prr.participant_facility");
@@ -51,6 +59,10 @@ class Program_m extends CI_Model {
 
         if($county_id){
             $this->db->where("fv.county_id", $county_id);
+        }
+
+        if($facility_id){
+            $this->db->where("fv.facility_id", $facility_id);
         }
         
         $this->db->where("prr.question_id", 1);
@@ -60,7 +72,7 @@ class Program_m extends CI_Model {
         return $query->row();
     }
 
-    public function getPendingCapa($round_uuid, $county_id = null){
+    public function getPendingCapa($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select("count(prr.response) AS capas");
         $this->db->from("pt_readiness_responses_v prr");
         $this->db->join("facility_v fv", "fv.facility_id = prr.participant_facility");
@@ -68,6 +80,10 @@ class Program_m extends CI_Model {
 
         if($county_id){
             $this->db->where("fv.county_id", $county_id);
+        }
+
+        if($facility_id){
+            $this->db->where("fv.facility_id", $facility_id);
         }
         
         $this->db->where("prr.question_id", 7);
