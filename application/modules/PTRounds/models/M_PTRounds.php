@@ -51,7 +51,18 @@ class M_PTRounds extends MY_Model{
         return $result;
     }
 
-    function getParticipantRoundReadiness($facility_code, $pt_round_uuid){
+    function getParticipantRoundReadiness($participant_id, $pt_round_uuid){
+        $this->db->select("pr.readiness_id, p.participant_id, p.participant_fname, p.participant_lname, p.participant_email, p.participant_phonenumber, f.facility_code, f.facility_name, f.email, f.telephone, pr.status as readiness_status, pr.verdict as readiness_verdict, pr.comment as readiness_comment");
+        $this->db->from("participant_readiness pr");
+        $this->db->join("participants p", "p.uuid = pr.participant_id");
+        $this->db->join('facility f', 'f.id = p.participant_facility');
+        $this->db->where('p.participant_id', $participant_id);
+        $this->db->where('pr.pt_round_no', $pt_round_uuid);
+
+        return $this->db->get()->row();
+    }
+
+    function getParticipantResponses($facility_code, $pt_round_uuid){
         $this->db->select("pr.readiness_id, p.participant_id, p.participant_fname, p.participant_lname, p.participant_email, p.participant_phonenumber, f.facility_code, f.facility_name, f.email, f.telephone, pr.status as readiness_status, pr.verdict as readiness_verdict, pr.comment as readiness_comment");
         $this->db->from("participant_readiness pr");
         $this->db->join("participants p", "p.uuid = pr.participant_id");
@@ -59,7 +70,9 @@ class M_PTRounds extends MY_Model{
         $this->db->where('f.facility_code', $facility_code);
         $this->db->where('pr.pt_round_no', $pt_round_uuid);
 
-        return $this->db->get()->row();
+        // return $this->db->get()->row();
+
+        return $this->db->get()->result();
     }
 
     function getReadinessResponses($readiness_id){

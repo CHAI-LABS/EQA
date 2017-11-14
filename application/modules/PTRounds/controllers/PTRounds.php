@@ -1274,14 +1274,21 @@ public function createTabs($round_uuid, $participant_uuid){
         return $stats_section;
     }
 
+
     function getFacilitiesTable($pt_uuid, $type=NULL){
         if($this->input->is_ajax_request()){
             $columns = [];
             $limit = $offset = $search_value = NULL;
+            $complete_mark = '';
+            // $columns = [
+            //     0 => "facility_code",
+            //     1 => "facility_name",
+            //     2 => "status"
+            // ];
+
             $columns = [
                 0 => "facility_code",
-                1 => "facility_name",
-                2 => "status"
+                1 => "facility_name"
             ];
 
             $limit = $_REQUEST['length'];
@@ -1293,7 +1300,7 @@ public function createTabs($round_uuid, $participant_uuid){
             if ($facilities) {
                 foreach ($facilities as $facility) {
                     $status_label = $smart_status_label = $complete_mark = $resend_link = "";
-                    $complete_mark = "<a target = '_blank' class='dropdown-item' href = '".base_url('PTRounds/facilityreadiness/'. $pt_uuid . '/' . $facility->facility_code)."'>Mark as Complete</a>";
+                    // $complete_mark = "<a target = '_blank' class='dropdown-item' href = '".base_url('PTRounds/facilityreadiness/'. $pt_uuid . '/' . $facility->facility_code)."'>Mark as Complete</a>";
                     if($facility->status == "No Response"){
                         $status_label = "<span class = 'tag tag-danger'>{$facility->status}</span>";
                     }elseif ($facility->status == "In Review") {
@@ -1317,19 +1324,22 @@ public function createTabs($round_uuid, $participant_uuid){
                         }
                     }else{
                         $smart_status_label = "<span class = 'tag tag-danger'>No Response</span>";
-                        $resend_link = "<a class='dropdown-item' href = '".base_url('PTRounds/sendemails/'. $pt_uuid . '/' . $facility->facility_code)."'>Resend Link to Email</a>";
+                        
                     }
+
+                    $resend_link = "<a class='dropdown-item' href = '".base_url('PTRounds/sendemails/'. $pt_uuid . '/' . $facility->facility_code)."'>Resend Link to Email</a>";
+
                     $data[] = [
                         $facility->facility_code,
                         $facility->facility_name,
-                        $status_label,
-                        "<center>" . $smart_status_label . "</center>",
+                        // $status_label,
+                        // "<center>" . $smart_status_label . "</center>",
                         "<div class = 'dropdown'>
                         <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'false'>
                             Quick Actions
                         </button>
                         <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
-                            <a target = '_blank' class='dropdown-item' href = '".base_url('PTRounds/facilityreadiness/'. $pt_uuid . '/' . $facility->facility_code)."'>View Response</a>
+                            <a class='dropdown-item' href = '".base_url('PTRounds/participantrespondents/'. $pt_uuid . '/' . $facility->facility_code)."'>View Participants</a>
                             {$complete_mark}
                             {$resend_link}
                         </div>
@@ -1347,12 +1357,16 @@ public function createTabs($round_uuid, $participant_uuid){
                 "recordsFiltered"   =>  intval(count($this->M_PTRounds->searchFacilityReadiness($pt_uuid, $search_value, NULL, NULL))),
                 'data'              =>  $data
              ];
+
+             // echo "string";print_r($json_data);echo "string";die();
             return $this->output->set_content_type('application/json')->set_output(json_encode($json_data));
         }
     }
 
-    function facilityreadiness($pt_round_uuid, $facility_code){
-        $result = $this->M_PTRounds->getParticipantRoundReadiness($facility_code, $pt_round_uuid);
+
+    function facilityreadiness($pt_round_uuid, $participant_id){
+        $result = $this->M_PTRounds->getParticipantRoundReadiness($participant_id, $pt_round_uuid);
+        // echo $result;die();
         if($result){
             $data['pt_round'] = $pt_round_uuid;
             $data['result'] = $result;
@@ -1368,8 +1382,111 @@ public function createTabs($round_uuid, $participant_uuid){
                     ->setPageTitle('Facility Readiness')
                     ->readinessTemplate();
         }else{
+            
             show_404();
         }
+    }
+
+
+    function createParticipantResponseTable($facility_code, $pt_round_uuid){
+
+        $template = $this->config->item('default');
+
+        $heading = [
+            "No.",
+            "Participant ID",
+            "Participant Name",
+            "Status",
+            "Smart Status",
+            "Actions"
+        ];
+        $tabledata = [];
+
+        //$equipments = $this->M_Facilities->getequipments();
+        $participants = $this->M_PTRounds->getParticipantResponses($facility_code, $pt_round_uuid);
+
+
+        if($participants){
+            $counter = 0;
+            foreach($participants as $participant){
+                $counter ++;
+                $id = $participant->participant_id;
+                $name = $participant->participant_lname .' ' . $participant->participant_fname;
+
+                if($participant->readiness_status == 1){
+                    $status = "<label class = 'tag tag-success tag-sm'>Complete</label>";
+                    // $change_state = '<a href = ' . base_url("Equipments/changeState/deactivate/$id") . ' class = "btn btn-danger btn-sm"><i class = "icon-refresh"></i>&nbsp;Deactivate </a>';
+                    
+                }else if($participant->readiness_status == 0){
+                    $status = "<label class = 'tag tag-info tag-sm'>In Review</label>";
+                    // $change_state = '<a href = ' . base_url("Equipments/changeState/activate/$id") . ' class = "btn btn-success btn-sm"><i class = "icon-refresh"></i>&nbsp;Activate </a>';
+                }else{
+                    $status = "<label class = 'tag tag-info tag-sm'>No Response</label>";
+                    // $change_state = '<a href = ' . base_url("Equipments/changeState/activate/$id") . ' class = "btn btn-success btn-sm"><i class = "icon-refresh"></i>&nbsp;Activate </a>';
+                }
+
+                if($participant->readiness_verdict == 1){
+                    $smart_status = "<label class = 'tag tag-success tag-sm'>Verdict: Accepted</label>";
+                    // $change_state = '<a href = ' . base_url("Equipments/changeState/deactivate/$id") . ' class = "btn btn-danger btn-sm"><i class = "icon-refresh"></i>&nbsp;Deactivate </a>';
+                    
+                }elseif($participant->readiness_status == 0){
+                    $smart_status = "<label class = 'tag tag-info tag-sm'>Verdict: Rejected</label>";
+                    // $change_state = '<a href = ' . base_url("Equipments/changeState/activate/$id") . ' class = "btn btn-success btn-sm"><i class = "icon-refresh"></i>&nbsp;Activate </a>';
+                }else{
+                    $smart_status = "<label class = 'tag tag-info tag-sm'>No Verdict</label>";
+                    // $change_state = '<a href = ' . base_url("Equipments/changeState/activate/$id") . ' class = "btn btn-success btn-sm"><i class = "icon-refresh"></i>&nbsp;Activate </a>';
+                }
+
+               
+                $resend_link = "<a class='dropdown-item' href = '".base_url('PTRounds/sendemails/'. $pt_round_uuid . '/' . $participant->facility_code .'/'. $participant->participant_id)."'>Resend Link to Email</a>";;
+
+                // $change_state .= ' <a href = ' . base_url("Equipments/equipmentEdit/$id") . ' class = "btn btn-primary btn-sm"><i class = "icon-note"></i>&nbsp;Edit</a>';
+                
+                $tabledata[] = [
+                    $counter,
+                    $id,
+                    $name,
+                    $status,
+                    $smart_status,
+                    "<div class = 'dropdown'>
+                        <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'false'>
+                            Quick Actions
+                        </button>
+                        <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                            <a target = '_blank' class='dropdown-item' href = '".base_url('PTRounds/facilityreadiness/'. $pt_round_uuid . '/' . $participant->participant_id)."'>View Response</a>
+                            {$resend_link}
+                        </div>
+                        </div>"
+                ];
+            }
+        }
+        $this->table->set_heading($heading);
+        $this->table->set_template($template);
+
+        return $this->table->generate($tabledata);
+    }
+
+
+
+    function participantrespondents($pt_round_uuid, $facility_code){
+
+        $data['pt_round'] = $pt_round_uuid;
+        $data['page_title'] = 'Responded Participants';
+        $data['back_name'] = 'Back to PT Round Facilities';
+        $data['back_link'] = base_url("PTRounds/create/facilities/$pt_round_uuid");
+        $data['table_view'] = $this->createParticipantResponseTable($facility_code, $pt_round_uuid);
+
+        $this->assets
+                    ->addCss('dashboard/js/libs/icheck/skins/flat/blue.css')
+                    ->addCss('dashboard/js/libs/icheck/skins/flat/green.css')
+                    ->addCss('dashboard/js/libs/icheck/skins/flat/red.css')
+                    ->addJs('dashboard/js/libs/icheck/icheck.min.js')
+                    ->setJavascript('PTRounds/readiness_js');
+        $this->template
+                ->setPartial('PTRounds/table_view', $data)
+                ->setPageTitle('Responded Participants')
+                ->adminTemplate();
+        
     }
 
     function generateResponseQuestionnaire($readiness_id){
@@ -1403,7 +1520,7 @@ public function createTabs($round_uuid, $participant_uuid){
         $readiness = $this->db->get_where('participant_readiness', ['readiness_id' => $readiness_id])->row();
         if ($readiness) {
             $participant = $this->db->get_where('participants', ['uuid' => $readiness->participant_id])->row();
-            $facility = $this->db->get_where('facility', ['id'  =>  $participant->participant_facility])->row();
+            // $facility = $this->db->get_where('facility', ['id'  =>  $participant->participant_facility])->row();
             $verdict = $this->input->post('verdict');
             $status = ($this->input->post('status') == 'on') ? 1 : 0;
             $comment = $this->input->post('readiness_comment');
@@ -1421,19 +1538,22 @@ public function createTabs($round_uuid, $participant_uuid){
             }else{
                 $this->session->set_flashdata('error', 'There was an issue updating your assessment outcome');
             }
-            redirect('PTRounds/facilityreadiness/' . $readiness->pt_round_no . '/' . $facility->facility_code);
+            redirect('PTRounds/facilityreadiness/' . $readiness->pt_round_no . '/' . $participant->participant_id);
         }else{
             $this->session->set_flashdata('error', 'There was an issue updating your assessment outcome');
             redirect('Dashboard','refresh');
         }
     }
 
-    function sendemails($pt_round_uuid, $facility_code = NULL){
+    function sendemails($pt_round_uuid, $facility_code = NULL, $participant_id = NULL){
         $pt_round = $this->db->get_where('pt_round', ['uuid'   =>  $pt_round_uuid])->row();
         $this->load->library('Mailer');
         if ($pt_round) {
             $recepients = [];
+
+            
             if($facility_code == NULL){
+                // echo "<pre>";print_r("no facility");echo "</pre>";die();
                 $facilities = $this->M_PTRounds->searchFacilityReadiness($pt_round_uuid);
                 $recepients_array = [];
                 foreach ($facilities as $facility) {
@@ -1453,15 +1573,30 @@ public function createTabs($round_uuid, $participant_uuid){
                     $recepients = $recepients_array;
                 }
             }else{
-                $facility = $this->db->get_where('facility', ['facility_code'   =>  $facility_code])->row();
-                $participants = $this->db->get_where('participants', ['participant_facility' =>  $facility->id])->result();
-                if($participants){
-                    foreach ($participants as $participant) {
-                        $recepients[$participant->participant_email]  =  $participant->participant_fname . ' ' . $participant->participant_lname;
+
+                if($participant_id){
+                    // echo "<pre>";print_r("participant");echo "</pre>";die();
+                    $participants = $this->db->get_where('participants', ['participant_id' =>  $participant_id])->result();
+
+                    if($participants){
+                        foreach ($participants as $participant) {
+                           $recepients_array[$participant->participant_email]  =  $participant->participant_fname . ' ' . $participant->participant_lname;
+                        }
+                    }elseif ($facility->email != "NULL" && $facility->email != "(NULL)" && $facility->email != "") {
+                        // $recepients_array[$facility->email]  =  $facility->facility_name;
                     }
-                }elseif ($facility->email != "NULL" && $facility->email != "(NULL)" && $facility->email != "") {
-                    // $recepients[$facility->email]  =  $facility->facility_name;
-                }
+                }else{
+                    // echo "<pre>";print_r("facility");echo "</pre>";die();
+                    $facility = $this->db->get_where('facility', ['facility_code'   =>  $facility_code])->row();
+                    $participants = $this->db->get_where('participants', ['participant_facility' =>  $facility->id])->result();
+                    if($participants){
+                        foreach ($participants as $participant) {
+                            $recepients[$participant->participant_email]  =  $participant->participant_fname . ' ' . $participant->participant_lname;
+                        }
+                    }elseif ($facility->email != "NULL" && $facility->email != "(NULL)" && $facility->email != "") {
+                        // $recepients[$facility->email]  =  $facility->facility_name;
+                    }
+                }  
             }
 
             $data = [

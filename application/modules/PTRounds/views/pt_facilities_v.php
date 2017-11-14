@@ -32,8 +32,8 @@
 	<thead>
 		<th>MFL Code</th>
 		<th>Facility Name</th>
-		<th>Status</th>
-		<th>Smart Status</th>
+		<!-- <th>Status</th>
+		<th>Smart Status</th> -->
 		<th>Actions</th>
 	</thead>
 </table>
