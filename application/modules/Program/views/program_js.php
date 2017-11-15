@@ -326,7 +326,7 @@ $(document).ready(function(){
 
 
 
-	    
+
 
 
 
@@ -356,7 +356,21 @@ $(document).ready(function(){
 	                        stacked: true,
 	                    }],
 	                    yAxes: [{
-	                        stacked: true
+		    				stacked: true,
+	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+	                        display: true,
+	                        position: "left",
+	                        id: "y-axis-1",
+	                    }, {
+	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+	                        display: true,
+	                        position: "right",
+	                        id: "y-axis-2",
+
+	                        // grid line settings
+	                        gridLines: {
+	                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+	                        },
 	                    }]
 	                }
 	            }
@@ -416,6 +430,16 @@ $(document).ready(function(){
 	                        	display: true,
 					            labelString: 'Number #'
 					        }
+	                    }, {
+	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+	                        display: true,
+	                        position: "right",
+	                        id: "y-axis-2",
+
+	                        // grid line settings
+	                        gridLines: {
+	                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+	                        },
 	                    }]
 	                },
 	            }

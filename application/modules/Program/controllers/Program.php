@@ -280,6 +280,7 @@ class Program extends MY_Controller {
             'borderColor' => $borderColor[$counter],
             'highlightFill' => $highlightFill[$counter],
             'highlightStroke' => $highlightStroke[$counter],
+            'yAxisID' => 'y-axis-2',
             'type' => 'line'
         ];
 
@@ -747,6 +748,7 @@ class Program extends MY_Controller {
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
                     'highlightStroke' => $highlightStroke[$counter],
+                    'yAxisID' => 'y-axis-2',
                     'type' => 'line'
                 ];
 
