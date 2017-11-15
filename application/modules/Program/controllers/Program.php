@@ -245,7 +245,7 @@ class Program extends MY_Controller {
             'data' => [$analyst_unavailable]
         ];
         $datasets4 = [
-            'label'         =>  'Pending Capa',
+            'label'         =>  'Pending CAPA',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
             'borderColor' => 'rgba(231,76,60,0.8)',
             'highlightFill' => 'rgba(231,76,60,0.75)',

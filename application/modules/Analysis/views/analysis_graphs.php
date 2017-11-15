@@ -37,7 +37,7 @@
 
 			                    <div class="card">
 			                        <div class="card-header">
-			                            PARTICIPATION STATISTICS
+			                            Participation Statistics
 			                            <div class="card-actions">
 			                                <!-- <a href="http://www.chartjs.org/">
 			                                    <small class="text-muted">docs</small>
@@ -81,7 +81,7 @@
 
 			                    <div class="card">
 			                        <div class="card-header">
-			                            DISQUALIFIED PARTICIPANTS
+			                            Disqualified Participants
 			                            <div class="card-actions">
 			                                <!-- <a href="http://www.chartjs.org/">
 			                                    <small class="text-muted">docs</small>
@@ -130,7 +130,7 @@
 			       
 			                    <div class="card">
 			                        <div class="card-header">
-			                        	OVERALL HISTORICAL PERFORMANCE
+			                        	Overall Historical Performance
 			                            <div class="card-actions">
 			                                <!-- <a href="http://www.chartjs.org/">
 			                                    <small class="text-muted">docs</small>

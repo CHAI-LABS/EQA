@@ -376,6 +376,9 @@ class Analysis extends DashboardController {
     {        
         // echo'<pre>';print_r($cdtype);echo'</pre>';die();
 
+        $round_name = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->pt_round_no;
+        $equipment_name = $this->db->get_where('equipments_v', ['id' => $equipment_id])->row()->equipment_name;
+
         $template = $this->config->item('default');
         $column_data = $row_data = array();
 
@@ -2068,10 +2071,19 @@ class Analysis extends DashboardController {
 
             $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
 
+            
             if($facilityid){
                 $facility_id = $facilityid->facility_id;
 
-                $facility_name = $this->db->get_where('facility_v', ['facility_id' =>  $facility_id])->row()->facility_name;
+                $facil = $this->db->get_where('facility_v', ['facility_id' =>  $facility_id])->row();
+
+                if($facil){
+                    $facility_name = $facil->facility_name;
+                }else{
+                    $facility_name = "No Facility";
+                }
+
+                // echo "<pre>";print_r($facility_name);echo "</pre>";die();
             }else{
                 $facility_name = "No Facility";
             }
@@ -2149,7 +2161,7 @@ class Analysis extends DashboardController {
             }
 
             $username = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row()->participant_id;
-            // echo "<pre>";print_r($part_cd4);echo "</pre>";die();
+
             $part_details = $this->db->get_where('users_v', ['username' =>  $username])->row();
             
             $name = $part_details->firstname . ' ' . $part_details->lastname;
@@ -2246,7 +2258,7 @@ class Analysis extends DashboardController {
                 $counter = 0;
 
                 $no_participants = [
-                    'label'         =>  'NO. OF PARTICIPANTS',
+                    'label'         =>  'No. of Participants',
                     'backgroundColor' => $backgroundColor[$counter],
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
@@ -2256,7 +2268,7 @@ class Analysis extends DashboardController {
                 $counter++;
 
                 $pass = [
-                    'label'         =>  'PASS',
+                    'label'         =>  'Pass',
                     'backgroundColor' => $backgroundColor[$counter],
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
@@ -2266,7 +2278,7 @@ class Analysis extends DashboardController {
                 $counter++;
 
                 $fail = [
-                    'label'         =>  'FAIL',
+                    'label'         =>  'Fail',
                     'backgroundColor' => $backgroundColor[$counter],
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
@@ -2364,7 +2376,7 @@ class Analysis extends DashboardController {
         // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
         $datasets1 = [
-            'label'         =>  'FACSCALIBUR',
+            'label'         =>  'Facscalibur',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
@@ -2372,7 +2384,7 @@ class Analysis extends DashboardController {
             'data' => [$facscalibur]
         ];
         $datasets2 = [
-            'label'         =>  'FACSPRESTO',
+            'label'         =>  'Facspresto',
             'backgroundColor' => 'rgba(52,152,219,0.5)',
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
@@ -2380,7 +2392,7 @@ class Analysis extends DashboardController {
             'data' => [$facspresto]
         ];
         $datasets3 = [
-            'label'         =>  'FACSCOUNT',
+            'label'         =>  'Facscount',
             'backgroundColor' => 'rgba(46,204,113,0.5)',
             'borderColor' => 'rgba(46,204,113,0.8)',
             'highlightFill' => 'rgba(46,204,113,0.75)',
@@ -2388,7 +2400,7 @@ class Analysis extends DashboardController {
             'data' => [$facscount]
         ];
         $datasets4 = [
-            'label'         =>  'ALERE PIMA',
+            'label'         =>  'Alere Pima',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
             'borderColor' => 'rgba(231,76,60,0.8)',
             'highlightFill' => 'rgba(231,76,60,0.75)',
@@ -2396,7 +2408,7 @@ class Analysis extends DashboardController {
             'data' => [$alere_pima]
         ];
         $datasets5 = [
-            'label'         =>  'PARTEC CYFLOW',
+            'label'         =>  'Partec Cyflow',
             'backgroundColor' => 'rgba(127,140,141,0.5)',
             'borderColor' => 'rgba(127,140,141,0.8)',
             'highlightFill' => 'rgba(127,140,141,0.75)',
@@ -2404,7 +2416,7 @@ class Analysis extends DashboardController {
             'data' => [$partec_cyflow]
         ];
         $datasets6 = [
-            'label'         =>  'GUAVA EASYCYTE',
+            'label'         =>  'Guava Easycyte',
             'backgroundColor' => 'rgba(241,196,15,0.5)',
             'borderColor' => 'rgba(241,196,15,0.8)',
             'highlightFill' => 'rgba(241,196,15,0.75)',
@@ -2412,7 +2424,7 @@ class Analysis extends DashboardController {
             'data' => [$guava_easycyte]
         ];
         $datasets7 = [
-            'label'         =>  'OTHER',
+            'label'         =>  'Other',
             'backgroundColor' => 'rgba(52,73,94,0.5)',
             'borderColor' => 'rgba(52,73,94,0.8)',
             'highlightFill' => 'rgba(52,73,94,0.75)',
@@ -2441,7 +2453,7 @@ class Analysis extends DashboardController {
         // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
         $datasets1 = [
-            'label'         =>  'EQUIPMENT BREAKDOWN',
+            'label'         =>  'Equipment Breakdown',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
@@ -2449,7 +2461,7 @@ class Analysis extends DashboardController {
             'data' => [$equipment_breakdown]
         ];
         $datasets2 = [
-            'label'         =>  'EQUIPMENT READ ERROR',
+            'label'         =>  'Equipment Read Error',
             'backgroundColor' => 'rgba(52,152,219,0.5)',
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
@@ -2457,7 +2469,7 @@ class Analysis extends DashboardController {
             'data' => [$equipment_readerror]
         ];
         $datasets3 = [
-            'label'         =>  'REAGENT STOCK-OUT',
+            'label'         =>  'Reagent Stock-Out',
             'backgroundColor' => 'rgba(46,204,113,0.5)',
             'borderColor' => 'rgba(46,204,113,0.8)',
             'highlightFill' => 'rgba(46,204,113,0.75)',
@@ -2465,7 +2477,7 @@ class Analysis extends DashboardController {
             'data' => [$reagent_stock_out]
         ];
         $datasets4 = [
-            'label'         =>  'PANEL INTEGRITY',
+            'label'         =>  'Panel Integrity',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
             'borderColor' => 'rgba(231,76,60,0.8)',
             'highlightFill' => 'rgba(231,76,60,0.75)',
@@ -2473,7 +2485,7 @@ class Analysis extends DashboardController {
             'data' => [$panel_integrity]
         ];
         $datasets5 = [
-            'label'         =>  'FAILED LOG-IN',
+            'label'         =>  'Falied Log-in',
             'backgroundColor' => 'rgba(127,140,141,0.5)',
             'borderColor' => 'rgba(127,140,141,0.8)',
             'highlightFill' => 'rgba(127,140,141,0.75)',
@@ -2481,7 +2493,7 @@ class Analysis extends DashboardController {
             'data' => [$failed_login]
         ];
         $datasets6 = [
-            'label'         =>  'NO JUSTIFICATION',
+            'label'         =>  'No Justification',
             'backgroundColor' => 'rgba(241,196,15,0.5)',
             'borderColor' => 'rgba(241,196,15,0.8)',
             'highlightFill' => 'rgba(241,196,15,0.75)',
@@ -2510,7 +2522,7 @@ class Analysis extends DashboardController {
         // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
         $datasets1 = [
-            'label'         =>  'EQUIPMENT BREAKDOWN',
+            'label'         =>  'Equipment Breakdown',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
@@ -2518,7 +2530,7 @@ class Analysis extends DashboardController {
             'data' => [$equipment_breakdown]
         ];
         $datasets2 = [
-            'label'         =>  'REAGENT STOCK-OUT',
+            'label'         =>  'Reagent Stock-Out',
             'backgroundColor' => 'rgba(52,152,219,0.5)',
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
@@ -2526,7 +2538,7 @@ class Analysis extends DashboardController {
             'data' => [$reagent_stock_out]
         ];
         $datasets3 = [
-            'label'         =>  'ANALYST UNAVAILABLE',
+            'label'         =>  'Analyst Unavailable',
             'backgroundColor' => 'rgba(46,204,113,0.5)',
             'borderColor' => 'rgba(46,204,113,0.8)',
             'highlightFill' => 'rgba(46,204,113,0.75)',
@@ -2534,7 +2546,7 @@ class Analysis extends DashboardController {
             'data' => [$analyst_unavailable]
         ];
         $datasets4 = [
-            'label'         =>  'PENDING CAPA',
+            'label'         =>  'Pending CAPA',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
             'borderColor' => 'rgba(231,76,60,0.8)',
             'highlightFill' => 'rgba(231,76,60,0.75)',
@@ -2617,7 +2629,7 @@ class Analysis extends DashboardController {
         $failed = $no_of_participants - $passed;
 
         $datasets1 = [
-            'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
+            'label'         =>  'Total No. of Facilities Enrolled',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
@@ -2625,7 +2637,7 @@ class Analysis extends DashboardController {
             'data' => [$total_facilities]
         ];
         $datasets2 = [
-            'label'         =>  'N0. OF PARTICIPANTS (CURRENT ROUND)',
+            'label'         =>  'No. of Participants (Current Round)',
             'backgroundColor' => 'rgba(52,152,219,0.5)',
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
@@ -2633,7 +2645,7 @@ class Analysis extends DashboardController {
             'data' => [$no_of_participants]
         ];
         $datasets3 = [
-            'label'         =>  'PASSED',
+            'label'         =>  'Passed',
             'backgroundColor' => 'rgba(46,204,113,0.5)',
             'borderColor' => 'rgba(46,204,113,0.8)',
             'highlightFill' => 'rgba(46,204,113,0.75)',
@@ -2641,7 +2653,7 @@ class Analysis extends DashboardController {
             'data' => [$passed]
         ];
         $datasets4 = [
-            'label'         =>  'FAILED',
+            'label'         =>  'Failed',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
             'borderColor' => 'rgba(231,76,60,0.8)',
             'highlightFill' => 'rgba(231,76,60,0.75)',
@@ -2649,7 +2661,7 @@ class Analysis extends DashboardController {
             'data' => [$failed]
         ];
         $datasets5 = [
-            'label'         =>  'NON-RESPONSIVE',
+            'label'         =>  'Non-Responsive',
             'backgroundColor' => 'rgba(127,140,141,0.5)',
             'borderColor' => 'rgba(127,140,141,0.8)',
             'highlightFill' => 'rgba(127,140,141,0.75)',
@@ -2657,7 +2669,7 @@ class Analysis extends DashboardController {
             'data' => [$non_responsive]
         ];
         $datasets6 = [
-            'label'         =>  'UNABLE TO REPORT',
+            'label'         =>  'Unable to Report',
             'backgroundColor' => 'rgba(241,196,15,0.5)',
             'borderColor' => 'rgba(241,196,15,0.8)',
             'highlightFill' => 'rgba(241,196,15,0.75)',
@@ -2665,7 +2677,7 @@ class Analysis extends DashboardController {
             'data' => [$unable]
         ];
         $datasets7 = [
-            'label'         =>  'DISQUALIFIED',
+            'label'         =>  'Disqualified',
             'backgroundColor' => 'rgba(52,73,94,0.5)',
             'borderColor' => 'rgba(52,73,94,0.8)',
             'highlightFill' => 'rgba(52,73,94,0.75)',
