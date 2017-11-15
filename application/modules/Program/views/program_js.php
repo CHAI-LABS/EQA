@@ -73,8 +73,6 @@ $(document).ready(function(){
 
   	function changeGraphs(round, county, facility){
 
-  		
-  		
 	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	    	// alert("reached1");
 
@@ -111,9 +109,9 @@ $(document).ready(function(){
 
 	        $('#graph-2').replaceWith('<canvas id="graph-2"></canvas>');
 
-	        var part = ChartData['datasets']['0']['data']['0'];
-	        var pass = ChartData['datasets']['0']['data']['1'];
-	        var fail = ChartData['datasets']['0']['data']['2'];
+	        var part = ChartData['no_participants'];
+	        var pass = ChartData['datasets']['0']['data']['0'];
+	        var fail = ChartData['datasets']['0']['data']['1'];
 
 
 	    	document.getElementById('part').innerHTML = part;
@@ -305,12 +303,32 @@ $(document).ready(function(){
 	                        stacked: true,
 	                    }],
 	                    yAxes: [{
-	                        stacked: true
+		    				stacked: true,
+	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+	                        display: true,
+	                        position: "left",
+	                        id: "y-axis-1",
+	                    }, {
+	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+	                        display: true,
+	                        position: "right",
+	                        id: "y-axis-2",
+
+	                        // grid line settings
+	                        gridLines: {
+	                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+	                        },
 	                    }]
 	                }
 	            }
 	        });
 	    });
+
+
+
+	    
+
+
 
 
 	    $.get("<?=@base_url('Program/ResondentNonGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){

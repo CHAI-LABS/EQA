@@ -182,14 +182,20 @@ class Program extends MY_Controller {
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $failed = $no_of_participants - $passed;
 
+        // $datasets = [
+        //     'label'         =>  ['NO OF PARTICIPANTS','PASSED','FAILED'],
+        //     'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
+        //     'data' => [$no_of_participants, $passed, $failed]
+        // ];
         $datasets = [
-            'label'         =>  ['NO OF PARTICIPANTS','PASSED','FAILED'],
-            'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-            'data' => [$no_of_participants, $passed, $failed]
+            'label'         =>  ['Passed','Failed'],
+            'backgroundColor' => ['rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
+            'data' => [$passed, $failed]
         ];
-        $labels = ['NO OF PARTICIPANTS','PASSED','FAILED'];
+        $labels = ['Passed','Failed'];
 
         $graph_data['labels'] = $labels;
+        $graph_data['no_participants'] = $no_of_participants;
         $graph_data['datasets'] = [$datasets];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
@@ -211,7 +217,7 @@ class Program extends MY_Controller {
         // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
         $datasets1 = [
-            'label'         =>  'EQUIPMENT BREAKDOWN',
+            'label'         =>  'Equipment Breakdown',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
@@ -219,7 +225,7 @@ class Program extends MY_Controller {
             'data' => [$equipment_breakdown]
         ];
         $datasets2 = [
-            'label'         =>  'REAGENT STOCK-OUT',
+            'label'         =>  'Reagent Stock-Out',
             'backgroundColor' => 'rgba(52,152,219,0.5)',
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
@@ -227,7 +233,7 @@ class Program extends MY_Controller {
             'data' => [$reagent_stock_out]
         ];
         $datasets3 = [
-            'label'         =>  'ANALYST UNAVAILABLE',
+            'label'         =>  'Analyst Unavailable',
             'backgroundColor' => 'rgba(46,204,113,0.5)',
             'borderColor' => 'rgba(46,204,113,0.8)',
             'highlightFill' => 'rgba(46,204,113,0.75)',
@@ -235,7 +241,7 @@ class Program extends MY_Controller {
             'data' => [$analyst_unavailable]
         ];
         $datasets4 = [
-            'label'         =>  'PENDING CAPA',
+            'label'         =>  'Pending Capa',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
             'borderColor' => 'rgba(231,76,60,0.8)',
             'highlightFill' => 'rgba(231,76,60,0.75)',
@@ -280,7 +286,7 @@ class Program extends MY_Controller {
         $counter++;
 
         $pass = [
-            'label'         =>  'PASS',
+            'label'         =>  'Pass',
             'backgroundColor' => $backgroundColor[$counter],
             'borderColor' => $borderColor[$counter],
             'highlightFill' => $highlightFill[$counter],
@@ -290,7 +296,7 @@ class Program extends MY_Controller {
         $counter++;
 
         $fail = [
-            'label'         =>  'FAIL',
+            'label'         =>  'Fail',
             'backgroundColor' => $backgroundColor[$counter],
             'borderColor' => $borderColor[$counter],
             'highlightFill' => $highlightFill[$counter],
@@ -554,17 +560,18 @@ class Program extends MY_Controller {
                 $counter = 0;
 
                 $no_participants = [
-                    'label'         =>  'PASS RATE (%)',
+                    'label'         =>  'Pass Rate (%)',
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
                     'highlightStroke' => $highlightStroke[$counter],
+                    'yAxisID' => 'y-axis-2',
                     'type' => 'line'
                 ];
 
                 $counter++;
 
                 $pass = [
-                    'label'         =>  'PASS',
+                    'label'         =>  'Pass',
                     'backgroundColor' => $backgroundColor[$counter],
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
@@ -574,7 +581,7 @@ class Program extends MY_Controller {
                 $counter++;
 
                 $fail = [
-                    'label'         =>  'FAIL',
+                    'label'         =>  'Fail',
                     'backgroundColor' => $backgroundColor[$counter],
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
@@ -692,12 +699,15 @@ class Program extends MY_Controller {
                 $pass_rate = (($passed / $no_of_participants) * 100);
 
                 $no_participants['data'][] = round($pass_rate, 2);
+                
                 $pass['data'][] = $passed;
                 $fail['data'][] = $failed;
 
                 
             }
         }
+
+        // $no_participants['yAxisID'] = 'y-axis-2';
 
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$no_participants, $pass, $fail];
@@ -733,7 +743,7 @@ class Program extends MY_Controller {
                 $counter = 0;
 
                 $no_participants = [
-                    'label'         =>  'RESPONDENT RATE (%)',
+                    'label'         =>  'Responsiveness Rate (%)',
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
                     'highlightStroke' => $highlightStroke[$counter],
@@ -743,7 +753,7 @@ class Program extends MY_Controller {
                 $counter++;
 
                 $responsive = [
-                    'label'         =>  'RESPONSIVE',
+                    'label'         =>  'Responsive',
                     'backgroundColor' => $backgroundColor[$counter],
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
@@ -753,7 +763,7 @@ class Program extends MY_Controller {
                 $counter++;
 
                 $non_responsive = [
-                    'label'         =>  'NON RESPONSIVE',
+                    'label'         =>  'Non-Responsive',
                     'backgroundColor' => $backgroundColor[$counter],
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
@@ -992,7 +1002,7 @@ class Program extends MY_Controller {
         // echo "<pre>";print_r($total_facilities);echo "</pre>";die();
 
         $datasets7 = [
-            'label'         =>  'TOTAL N0. OF FACILITIES ENROLLED',
+            'label'         =>  'Total No. of Facilities Enrolled',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
@@ -1000,7 +1010,7 @@ class Program extends MY_Controller {
             'data' => [$total_facilities]
         ];
         $datasets1 = [
-            'label'         =>  'N0. OF PARTICIPANTS (CURRENT ROUND)',
+            'label'         =>  'No. of Participants (Current Round)',
             'backgroundColor' => 'rgba(52,152,219,0.5)',
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
@@ -1008,7 +1018,7 @@ class Program extends MY_Controller {
             'data' => [$no_of_participants]
         ];
         $datasets2 = [
-            'label'         =>  'PASSED',
+            'label'         =>  'Passed',
             'backgroundColor' => 'rgba(46,204,113,0.5)',
             'borderColor' => 'rgba(46,204,113,0.8)',
             'highlightFill' => 'rgba(46,204,113,0.75)',
@@ -1017,7 +1027,7 @@ class Program extends MY_Controller {
         ];
         
         $datasets3 = [
-            'label'         =>  'NON-RESPONSIVE',
+            'label'         =>  'Non-Responsive',
             'backgroundColor' => 'rgba(127,140,141,0.5)',
             'borderColor' => 'rgba(127,140,141,0.8)',
             'highlightFill' => 'rgba(127,140,141,0.75)',
@@ -1025,7 +1035,7 @@ class Program extends MY_Controller {
             'data' => [$non_responsive]
         ];
         $datasets4 = [
-            'label'         =>  'UNABLE TO REPORT',
+            'label'         =>  'Unable to Report',
             'backgroundColor' => 'rgba(241,196,15,0.5)',
             'borderColor' => 'rgba(241,196,15,0.8)',
             'highlightFill' => 'rgba(241,196,15,0.75)',
@@ -1033,7 +1043,7 @@ class Program extends MY_Controller {
             'data' => [$unable]
         ];
         $datasets5 = [
-            'label'         =>  'FAILED',
+            'label'         =>  'Failed',
             'backgroundColor' => 'rgba(52,73,94,0.5)',
             'borderColor' => 'rgba(52,73,94,0.8)',
             'highlightFill' => 'rgba(52,73,94,0.75)',
@@ -1041,7 +1051,7 @@ class Program extends MY_Controller {
             'data' => [$failed]
         ];
         $datasets6 = [
-            'label'         =>  'DISQUALIFIED',
+            'label'         =>  'Disqualified',
             'backgroundColor' => 'rgba(231,76,60,0.5)',
             'borderColor' => 'rgba(231,76,60,0.8)',
             'highlightFill' => 'rgba(231,76,60,0.75)',
@@ -1069,7 +1079,7 @@ class Program extends MY_Controller {
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
 
-        if($facility_id){
+        if($facility_id == 0){
             foreach ($equipments as $key => $equipment) {
                 $counter++;
                 
@@ -1171,20 +1181,21 @@ class Program extends MY_Controller {
             }
         }   
 
-        
-
-        
-
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $responsive = $no_of_participants - $non_responsive;
-        // $participants = $responsive + $non_responsive;
+        // echo "<pre>";print_r($non_responsive);echo "</pre>";die();
 
+        // $datasets = [
+        //     'label'         =>  ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'],
+        //     'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
+        //     'data' => [$no_of_participants, $responsive, $non_responsive]
+        // ];
         $datasets = [
-            'label'         =>  ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'],
-            'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-            'data' => [$no_of_participants, $responsive, $non_responsive]
+            'label'         =>  ['Responsive','Non-Responsive'],
+            'backgroundColor' => ['rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
+            'data' => [$responsive, $non_responsive]
         ];
-        $labels = ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'];
+        $labels = ['Responsive','Non-Responsive'];
 
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$datasets];

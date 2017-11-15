@@ -73,7 +73,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        SUMMARY: PARTICIPANTS
+                                        National Summary: Participants
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -93,7 +93,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        SUMMARY OUTCOMES: PASS VS FAILED
+                                        National Summary Outcomes
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -120,7 +120,7 @@
 
                                 <div class="card" style="width:100%";>
                                     <div class="card-header">
-                                        SUMMARY OUTCOME: <strong id="roundname1">Loading...</strong>
+                                        National Summary Outcome: <strong id="roundname1">Loading...</strong>
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -143,7 +143,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    DISQUALIFIED PARTICIPANTS: <strong id="roundname2">Loading...</strong>
+                                    National Summary: Disqualified Participants <strong id="roundname2">Loading...</strong>
                                     <div class="card-actions">
                                     </div>
                                 </div>
@@ -169,7 +169,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        PARTICIPANT PASS / FAIL TREND
+                                        National Participants Outcomes Trends
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -182,7 +182,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        PARTICIPANT RESPONDENT / NON-RESPONDENT TREND
+                                        National Participant Responsiveness Trends
                                         <div class="card-actions">
                                         </div>
                                     </div>
