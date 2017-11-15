@@ -28,7 +28,10 @@ class PTRound extends MY_Controller {
     }
 
     function createPTRoundTable(){
+        $this->db->where_not_in('type','future');
         $rounds = $this->db->get('pt_round_v')->result();
+        // echo "<pre>";print_r($rounds);echo "</pre>";die();
+
         $view = $ongoing = $prev = $fut = '';
         $round_array = [];
         if ($rounds) {
@@ -64,7 +67,7 @@ class PTRound extends MY_Controller {
 
                                 $view = "<a class = 'btn btn-success btn-sm' href = '".base_url('Participant/PTRound/Round/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;View</a>&nbsp;";
 
-                                if($ongoing_check->type == 'previous'){
+                                if($round->type == 'previous'){
                                     $view .= "<a class = 'btn btn-info btn-sm' href = '".base_url('Participant/PTRound/Results/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Results</a>";
                                 }
              
