@@ -1,4 +1,4 @@
-<div class = "card-block">
+<!-- <div class = "card-block">
     <?php if($this->session->flashdata('success')){ ?>
         <div class = 'alert alert-success'>
             <?= @$this->session->flashdata('success'); ?>
@@ -8,35 +8,37 @@
             <?= @$this->session->flashdata('error'); ?>
         </div>
     <?php } ?>
-</div>
+</div> -->
 
 
-<div class = "row">
+<!-- <div class = "row">
     <div class="col-md-12">
-        <div class = "card">
-            <div class="card-header col-4">
+        <div class = "card"> -->
+
+
+            <!-- <div class="header col-4">
                 <i class = "icon-chart"></i>
                 &nbsp;
 
                     Criteria Selection
-            </div>
+            </div> -->
 
-            <div class = "card-block">
-                <div class = "card-block col-md-3">
+            <div class = "block">
+                <div class = "block col-md-3">
                     <fieldset class="form-group">
                         <label>Round</label>
                         <?= @$round_option; ?>
                     </fieldset>
                 </div>
 
-                <div class = "card-block col-md-3">
+                <div class = "block col-md-3">
                     <fieldset class="form-group">
                         <label>County</label>
                         <?= @$county_option; ?>
                     </fieldset>
                 </div>
 
-                <div class = "card-block col-md-3">
+                <div class = "block col-md-3">
                     <fieldset class="form-group">
                         <label>Facility</label>
                         <select id="facility-select" class="form-control select2-single">
@@ -45,10 +47,10 @@
                     </fieldset>
                 </div>
             </div>
-
+<!-- 
         </div>
     </div>
-</div>
+</div> -->
 
 
 
@@ -73,7 +75,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        National Summary: Participants
+                                        <strong class="criteria">National</strong> Summary: Participants
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -93,7 +95,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        National Summary Outcomes
+                                        <strong class="criteria">National</strong> Summary Outcomes
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -120,7 +122,8 @@
 
                                 <div class="card" style="width:100%";>
                                     <div class="card-header">
-                                        National Summary Outcome: <strong id="roundname1">Loading...</strong>
+                                        <strong class="criteria">National</strong> Summary Outcome
+                                        <!-- : <strong id="roundname1">Loading...</strong> -->
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -143,15 +146,16 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    National Summary: Disqualified Participants <strong id="roundname2">Loading...</strong>
+                                    <strong class="criteria">National</strong> Summary: Disqualified Participants 
+                                    <!-- <strong id="roundname2">Loading...</strong> -->
                                     <div class="card-actions">
                                     </div>
                                 </div>
                                 <div class="card-block">
-                                    EQUIPMENT BREAKDOWN :<strong id="equip"> 0 </strong><br/>
-                                    REAGENT STOCK-OUT :<strong id="reag"> 0 </strong><br/>
-                                    ANALYST UNAVAILABLE :<strong id="anal"> 0 </strong><br/>
-                                    PENDING CAPA :<strong id="pend"> 0 </strong>
+                                    Equipment Breakdown :<strong id="equip"> 0 </strong><br/>
+                                    Reagent Stock-Out :<strong id="reag"> 0 </strong><br/>
+                                    Analyst Unavailable :<strong id="anal"> 0 </strong><br/>
+                                    Pending Capa :<strong id="pend"> 0 </strong>
                                     <br/><br/>
                                     <div class="chart-wrapper">
                                         <canvas id="graph-4"></canvas>
@@ -169,7 +173,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        National Participants Outcomes Trends
+                                        <strong class="criteria">National</strong> Participants Outcomes Trends
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -182,7 +186,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        National Participant Responsiveness Trends
+                                        <strong class="criteria">National</strong> Participant Responsiveness Trends
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -203,7 +207,8 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    COUNTY OUTCOMES: <strong id="roundname3">Loading...</strong>
+                                    COUNTY OUTCOMES
+                                    <!-- : <strong id="roundname3">Loading...</strong> -->
                                     <div class="card-actions">
                                     </div>
                                 </div>

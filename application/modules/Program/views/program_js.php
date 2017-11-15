@@ -28,7 +28,7 @@ $(document).ready(function(){
   		// alert("changed");
   		$("#facility-select").empty();
 
-  		document.getElementById('facility-select').innerHTML = "<option selected='selected' value=0> All Facilities</option>";
+  		document.getElementById('facility-select').innerHTML = "<option selected='selected' value = '0' > All Facilities</option>";
 
        	var r = document.getElementById("round-select");
 		var c = document.getElementById("county-select");
@@ -38,22 +38,8 @@ $(document).ready(function(){
 		var round = r.options[r.selectedIndex].value;
 		var county = c.options[c.selectedIndex].value;
 		var facility = 0;
-
-		if(county == 0){
-			changeGraphs(round,0,0);
-		}else{
 			
-			$.get("<?=@base_url('Program/getFacilities/');?>" + county, function(counties){
-	        	var facOptions = '';
-
-	         	counties.forEach(function(county) {
-				    facOptions += "<option value="+ county.facility_id +">" + county.facility_name + "</option>";
-				});
-
-				document.getElementById('facility-select').innerHTML += facOptions;
-		    });
 		    changeGraphs(round,county,facility);
-		}
   	});
 
   	$(document).on('change','#facility-select',function(){
@@ -73,6 +59,32 @@ $(document).ready(function(){
 
   	function changeGraphs(round, county, facility){
 
+  		$.get("<?=@base_url('Program/getFacilities/');?>" + county, function(facilities){
+        	var facOptions = '';
+
+         	facilities.forEach(function(facil) {
+			    facOptions += "<option value="+ facil.facility_id +">" + facil.facility_name + "</option>";
+			});
+
+			document.getElementById('facility-select').innerHTML += facOptions;
+	    });
+
+  		var divs = document.getElementsByClassName('criteria');
+
+  		if(county == 0 && facility == 0){
+  			for (var i = 0; i < divs.length; i++) {
+				    divs[i].innerHTML = "National";
+				}
+  		}else{
+  			$.get("<?=@base_url('Program/getName/');?>" + county + '/' + facility, function(criteria){
+	        	
+				for (var i = 0; i < divs.length; i++) {
+				    divs[i].innerHTML = criteria;
+				}
+		    });
+  		}
+
+  		
 	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	    	// alert("reached1");
 
@@ -161,7 +173,7 @@ $(document).ready(function(){
 
 
 	    	document.getElementById('enrolled').innerHTML = enrolled;
-	    	document.getElementById('roundname1').innerHTML = roundname1;
+	    	// document.getElementById('roundname1').innerHTML = roundname1;
 	    	document.getElementById('partno').innerHTML = partno;
 	    	document.getElementById('disqualified').innerHTML = disqualified;
 	    	document.getElementById('unable').innerHTML = unable;
@@ -227,7 +239,7 @@ $(document).ready(function(){
 	        var pend = ChartData['datasets']['3']['data']['0'];
 
 
-	    	document.getElementById('roundname2').innerHTML = roundname2;
+	    	// document.getElementById('roundname2').innerHTML = roundname2;
 	    	document.getElementById('equip').innerHTML = equip;
 	    	document.getElementById('reag').innerHTML = reag;
 	    	document.getElementById('anal').innerHTML = anal;
@@ -385,7 +397,7 @@ $(document).ready(function(){
 
 	        var roundname3 = ChartData['round'];
 
-	        document.getElementById('roundname3').innerHTML = roundname3;
+	        // document.getElementById('roundname3').innerHTML = roundname3;
 
 	        var ctx5 = document.getElementById('graph-7');
 	        var chart = new Chart(ctx5, {

@@ -66,10 +66,14 @@ class Program extends MY_Controller {
     }
 
 
-    public function getFacilities($county_id){
-        $counties = $this->db->get_where('facility_v', ['county_id' => $county_id])->result();
-
-        return $this->output->set_content_type('application/json')->set_output(json_encode($counties));
+    public function getFacilities($county_id = null){
+        if($county_id == 0){
+            $facilities = $this->db->get('facility_v')->result();
+        }else{
+            $facilities = $this->db->get_where('facility_v', ['county_id' => $county_id])->result();
+        }
+        
+        return $this->output->set_content_type('application/json')->set_output(json_encode($facilities));
     }
 
 
@@ -1203,6 +1207,24 @@ class Program extends MY_Controller {
         $graph_data['datasets'] = [$datasets];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    }
+
+
+    public function getName($county_id, $facility_id){
+        $data = "National";
+
+        if($facility_id){
+            $name = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->facility_name;
+            $data = $name . ' County';
+        }elseif($county_id){
+            $name = $this->db->get_where('county_v', ['id' => $county_id])->row()->county_name;
+            $data = $name . ' Facility';
+        }else{
+            $data = "National";
+        }
+
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($data));
     }
 
 
