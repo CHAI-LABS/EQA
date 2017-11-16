@@ -186,13 +186,50 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        <strong class="criteria">National</strong> Participant Responsiveness Trends
+                                        <strong class="criteria">National</strong> Participants Outcomes Trends (%)
                                         <div class="card-actions">
                                         </div>
                                     </div>
                                     <div class="card-block">
                                         <div class="chart-wrapper">
                                             <canvas id="graph-6"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-12 container-fluid">
+                        <div class="animated fadeIn">
+                            <div class="card-columns col-2">
+
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <strong class="criteria">National</strong> Participant Responsiveness Trends
+                                        <div class="card-actions">
+                                        </div>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="chart-wrapper">
+                                            <canvas id="graph-7"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <strong class="criteria">National</strong> Participant Responsiveness Trends (%)
+                                        <div class="card-actions">
+                                        </div>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="chart-wrapper">
+                                            <canvas id="graph-8"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -214,7 +251,7 @@
                                 </div>
                                 <div class="card-block">
                                     <div class="chart-wrapper">
-                                        <canvas id="graph-7"></canvas>
+                                        <canvas id="graph-9"></canvas>
                                     </div>
                                 </div>
                             </div>

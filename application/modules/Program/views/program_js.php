@@ -338,14 +338,8 @@ $(document).ready(function(){
 
 
 
-
-
-
-
-
-	    $.get("<?=@base_url('Program/ResondentNonGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	    	// alert("reached6");
-	       	
+	    $.get("<?=@base_url('Program/PassFailRateGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	    	// alert("reached5");
 
 	        $('#graph-6').replaceWith('<canvas id="graph-6"></canvas>');
 
@@ -356,7 +350,7 @@ $(document).ready(function(){
 	            options: {
 	                title:{
 	                    display:false,
-	                    text:"Participant Enrolled vs Responded Trends"
+	                    text:"Participant Outcome Trends (%)"
 	                },
 	                tooltips: {
 	                    mode: 'index',
@@ -373,16 +367,80 @@ $(document).ready(function(){
 	                        display: true,
 	                        position: "left",
 	                        id: "y-axis-1",
-	                    }, {
+	                    }]
+	                }
+	            }
+	        });
+	    });
+
+
+
+
+	    $.get("<?=@base_url('Program/ResondentNonGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	    	// alert("reached6");
+
+	        $('#graph-7').replaceWith('<canvas id="graph-7"></canvas>');
+
+	        var ctx5 = document.getElementById('graph-7');
+	        var chart = new Chart(ctx5, {
+	            type: 'bar',
+	            data: ChartData,
+	            options: {
+	                title:{
+	                    display:false,
+	                    text:"Participant Responsiveness Trends"
+	                },
+	                tooltips: {
+	                    mode: 'index',
+	                    intersect: false
+	                },
+	                responsive: true,
+	                scales: {
+	                    xAxes: [{
+	                        stacked: true,
+	                    }],
+	                    yAxes: [{
+		    				stacked: true,
 	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 	                        display: true,
-	                        position: "right",
-	                        id: "y-axis-2",
+	                        position: "left",
+	                        id: "y-axis-1",
+	                    }]
+	                }
+	            }
+	        });
+	    });
 
-	                        // grid line settings
-	                        gridLines: {
-	                            drawOnChartArea: false, // only want the grid lines for one axis to show up
-	                        },
+
+	    $.get("<?=@base_url('Program/ResondentNonRateGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	    	// alert("reached6");
+
+	        $('#graph-8').replaceWith('<canvas id="graph-8"></canvas>');
+
+	        var ctx5 = document.getElementById('graph-8');
+	        var chart = new Chart(ctx5, {
+	            type: 'bar',
+	            data: ChartData,
+	            options: {
+	                title:{
+	                    display:false,
+	                    text:"Participant Responsiveness Trends (%)"
+	                },
+	                tooltips: {
+	                    mode: 'index',
+	                    intersect: false
+	                },
+	                responsive: true,
+	                scales: {
+	                    xAxes: [{
+	                        stacked: true,
+	                    }],
+	                    yAxes: [{
+		    				stacked: true,
+	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+	                        display: true,
+	                        position: "left",
+	                        id: "y-axis-1",
 	                    }]
 	                }
 	            }
@@ -393,13 +451,13 @@ $(document).ready(function(){
 	    $.get("<?=@base_url('Program/OverallOutcomeGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 
 	    	// alert("reached7");
-	        $('#graph-7').replaceWith('<canvas id="graph-7"></canvas>');
+	        $('#graph-9').replaceWith('<canvas id="graph-9"></canvas>');
 
 	        var roundname3 = ChartData['round'];
 
 	        // document.getElementById('roundname3').innerHTML = roundname3;
 
-	        var ctx5 = document.getElementById('graph-7');
+	        var ctx5 = document.getElementById('graph-9');
 	        var chart = new Chart(ctx5, {
 	            type: 'bar',
 	            data: ChartData,
