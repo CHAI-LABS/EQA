@@ -9,8 +9,9 @@ class Analysis extends DashboardController {
 		$this->load->library('table');
         $this->load->config('table');
         $this->load->module('Export');
+        $this->load->module('Program');
 		$this->load->model('Analysis_m');
-        $this->load->model('Program/Program_m');
+        $this->load->model('Program_m');
 
 	}
 	
