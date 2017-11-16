@@ -1,411 +1,518 @@
 <script>
-    $(document).ready(function(){
-        
-    'use strict';
+$(document).ready(function(){
 
-    var round = $('#round').attr('data-type');
+    var round = $('#round').attr('data-type'); 
+    var county = 0;
+    var facility = 0;
+
+    changeGraphs(round,county,facility);
+
+    $('#round-select, #county-select, #facility-select').select2();
+
+    $(document).on('change','#round-select',function(){
+        // alert("changed");
+        var r = document.getElementById("round-select");
+        var c = document.getElementById("county-select");
+        var f = document.getElementById("facility-select");
+
+        var round = r.options[r.selectedIndex].value;
+        var county = c.options[c.selectedIndex].value;
+        var facility = f.options[f.selectedIndex].value;
+
+        changeGraphs(round,county,facility);
+    });
+
+    $(document).on('change','#county-select',function(){
+        // alert("changed");
+        $("#facility-select").empty();
+
+        document.getElementById('facility-select').innerHTML = "<option selected='selected' value = '0' > All Facilities</option>";
+
+        var r = document.getElementById("round-select");
+        var c = document.getElementById("county-select");
+        var f = document.getElementById("facility-select");
 
 
-    // $.get("<?=@base_url('Analysis/graphExample/');?>", function(barChartData){
+        var round = r.options[r.selectedIndex].value;
+        var county = c.options[c.selectedIndex].value;
+        var facility = f.options[f.selectedIndex].value;;
+            
+            changeGraphs(round,county,facility);
+    });
 
-    //     // console.log(barChartData);
-    //     var ctx = document.getElementById('test');
-    //     var chart = new Chart(ctx, {
-    //         type: 'bar',
-    //         data: barChartData,
-    //         options: {
-    //             legend: {
-    //                 display: true,
-    //                 labels: {
-    //                     fontColor: 'rgb(0, 0, 0)'
-    //                 }
-    //             },
-    //             scales: {
-    //                 yAxes: [{
-    //                     ticks: {
-    //                         beginAtZero:false
-    //                     }
-    //                 }]
-    //             },
-    //             responsive: true
-    //         }
-    //     });
-    // });
+    $(document).on('change','#facility-select',function(){
+        // alert("changed");
+        var r = document.getElementById("round-select");
+        var c = document.getElementById("county-select");
+        var f = document.getElementById("facility-select");
 
 
-    $.get("<?=@base_url('Analysis/ParticipationGraph/');?>" + round, function(barChartData){
-        // console.log(barChartData);
-        
-        var ctx = document.getElementById('participation');
-        var chart = new Chart(ctx, {
-            type: 'bar',
-            data: barChartData,
-            options: {
-                legend: {
-                    display: true,
-                    labels: {
-                        fontColor: 'rgb(0, 0, 0)'
-                    }
-                },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:false
-                        }
-                    }]
-                },
-                responsive: true
-            }
-        });
+        var round = r.options[r.selectedIndex].value;
+        var county = c.options[c.selectedIndex].value;
+        var facility = f.options[f.selectedIndex].value;
+
+       changeGraphs(round,county,facility);
     });
 
 
-    $.get("<?=@base_url('Analysis/DisqualificationGraph/');?>" + round, function(barChartData){
-        // console.log(barChartData);
-        
-        var ctx = document.getElementById('disqualified');
-        var chart = new Chart(ctx, {
-            type: 'bar',
-            data: barChartData,
-            options: {
-                legend: {
-                    display: true,
-                    labels: {
-                        fontColor: 'rgb(0, 0, 0)'
-                    }
-                },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:false
-                        }
-                    }]
-                },
-                responsive: true
-            }
+    function changeGraphs(round, county, facility){
+
+        $.get("<?=@base_url('Analysis/getFacilities/');?>" + county, function(facilities){
+            var facOptions = '';
+
+            facilities.forEach(function(facil) {
+                facOptions += "<option value="+ facil.facility_id +">" + facil.facility_name + "</option>";
+            });
+
+            document.getElementById('facility-select').innerHTML += facOptions;
         });
-    });
 
+        var divs = document.getElementsByClassName('criteria');
 
-    // $.get("<?=@base_url('Analysis/JustificationGraph/');?>" + round, function(barChartData){
-    //     console.log(barChartData);
+        if(county == 0 && facility == 0){
+            for (var i = 0; i < divs.length; i++) {
+                    divs[i].innerHTML = "National";
+                }
+        }else{
+            $.get("<?=@base_url('Analysis/getName/');?>" + county + '/' + facility, function(criteria){
+                
+                for (var i = 0; i < divs.length; i++) {
+                    divs[i].innerHTML = criteria;
+                }
+            });
+        }
+
         
-    //     var ctx = document.getElementById('justification');
-    //     var chart = new Chart(ctx, {
-    //         type: 'bar',
-    //         data: barChartData,
-    //         options: {
-    //             legend: {
-    //                 display: true,
-    //                 labels: {
-    //                     fontColor: 'rgb(0, 0, 0)'
-    //                 }
-    //             },
-    //             scales: {
-    //                 yAxes: [{
-    //                     ticks: {
-    //                         beginAtZero:false
-    //                     }
-    //                 }]
-    //             },
-    //             responsive: true
-    //         }
-    //     });
-    // });
+        $.get("<?=@base_url('Analysis/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached1");
 
+            $('#graph-1').replaceWith('<canvas id="graph-1"></canvas>');
 
-    // $.get("<?=@base_url('Analysis/RemedialGraph/');?>" + round, function(barChartData){
-    //     console.log(barChartData);
-        
-    //     var ctx = document.getElementById('remedial');
-    //     var chart = new Chart(ctx, {
-    //         type: 'bar',
-    //         data: barChartData,
-    //         options: {
-    //             legend: {
-    //                 display: true,
-    //                 labels: {
-    //                     fontColor: 'rgb(0, 0, 0)'
-    //                 }
-    //             },
-    //             scales: {
-    //                 yAxes: [{
-    //                     ticks: {
-    //                         beginAtZero:false
-    //                     }
-    //                 }]
-    //             },
-    //             responsive: true
-    //         }
-    //     });
-    // });
-
-
-    $.get("<?=@base_url('Analysis/HistoricalGraph/');?>" + round, function(barChartData){
-        // console.log(barChartData);
-        
-        var ctx = document.getElementById('historical');
-        var chart = new Chart(ctx, {
-            type: 'bar',
-            data: barChartData,
-            options: {
-                legend: {
-                    display: true,
-                    labels: {
-                        fontColor: 'rgb(0, 0, 0)'
+            var ctx1 = document.getElementById('graph-1');
+            var chart = new Chart(ctx1, {
+                    type: 'pie',
+                    data: ChartData,
+                    options: {
+                        datasets: [{
+                            dataLabels: { 
+                                display: true,       
+                                colors: ['#fff', '#ccc', '#000'], 
+                                minRadius: 30,
+                                align: 'start',
+                                anchor: 'start'
+                            }
+                        }],
+                        cutoutPercentage: 0,
+                        responsive: true,
+                            pieceLabel: {
+                                render: 'percentage',
+                                fontColor: ['black', 'black', 'black'],
+                                precision: 2,
+                                position: 'outside'
+                              }
                     }
-                },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:false
-                        }
-                    }]
-                },
-                responsive: true
-            }
+            });
         });
-    });
+
+        $.get("<?=@base_url('Analysis/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached2");
+
+            $('#graph-2').replaceWith('<canvas id="graph-2"></canvas>');
+
+            var part = ChartData['no_participants'];
+            var pass = ChartData['datasets']['0']['data']['0'];
+            var fail = ChartData['datasets']['0']['data']['1'];
+
+
+            document.getElementById('part').innerHTML = part;
+            document.getElementById('pass').innerHTML = pass;
+            document.getElementById('fail').innerHTML = fail;
+
+            var ctx2 = document.getElementById('graph-2');
+            var chart = new Chart(ctx2, {
+                    type: 'pie',
+                    data: ChartData,
+                    options: {
+                        datasets: [{
+                            dataLabels: { 
+                                display: true,         
+                                colors: ['#fff', '#ccc', '#000'], 
+                                minRadius: 30,
+                                align: 'start',
+                                anchor: 'start'
+                            }
+                        }],
+                        cutoutPercentage: 0,
+                        responsive: true,
+                            pieceLabel: {
+                                render: 'percentage',
+                                fontColor: ['black', 'black', 'black'],
+                                precision: 2,
+                                position: 'outside'
+                              }
+                    }
+            });
+        });
+
+
+        $.get("<?=@base_url('Analysis/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached3");
+            
+            $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
+
+            var roundname1 = ChartData['round'];
+            var enrolled = ChartData['datasets']['0']['data']['0'];
+            var partno = ChartData['datasets']['1']['data']['0'];
+            var nonresp = ChartData['datasets']['2']['data']['0'];
+            var unable = ChartData['datasets']['3']['data']['0'];
+            var disqualified = ChartData['datasets']['4']['data']['0'];
+            var resp = ChartData['responsive'];
+
+
+            document.getElementById('enrolled').innerHTML = enrolled;
+            // document.getElementById('roundname1').innerHTML = roundname1;
+            document.getElementById('partno').innerHTML = partno;
+            document.getElementById('disqualified').innerHTML = disqualified;
+            document.getElementById('unable').innerHTML = unable;
+            document.getElementById('nonresp').innerHTML = nonresp;
+            document.getElementById('resp').innerHTML = resp;
+
+            var ctx3 = document.getElementById('graph-3');
+            var chart = new Chart(ctx3, {
+                type: 'bar',
+                data: ChartData,
+                options: {
+                    legend: {
+                        backgroundColor: "rgba(255,99,132,0.2)",
+                        
+                        display: true,
+                        position: 'right',
+                        fullWidth: true,
+                        labels: {
+                            fontColor: 'rgb(0, 0, 0)'
+                        }
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:false
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    datasets: [{
+                        dataLabels: { 
+                            display: true,          //  disabled by default
+                            colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
+                            minRadius: 30, //  minimum radius for display labels (on pie charts)
+                            align: 'start',
+                            anchor: 'start'
+                        },
+                        borderColor: "rgba(255,99,132,1)",
+                        borderWidth: 2,
+                        hoverBackgroundColor: "rgba(255,99,132,0.4)",
+                        hoverBorderColor: "rgba(255,99,132,1)",
+                    }],
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
+
+
+        $.get("<?=@base_url('Analysis/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached4");
+
+
+            $('#graph-4').replaceWith('<canvas id="graph-4"></canvas>');
+
+            var roundname2 = ChartData['round'];
+            var equip = ChartData['datasets']['0']['data']['0'];
+            var reag = ChartData['datasets']['1']['data']['0'];
+            var anal = ChartData['datasets']['2']['data']['0'];
+            var pend = ChartData['datasets']['3']['data']['0'];
+
+
+            // document.getElementById('roundname2').innerHTML = roundname2;
+            document.getElementById('equip').innerHTML = equip;
+            document.getElementById('reag').innerHTML = reag;
+            document.getElementById('anal').innerHTML = anal;
+            document.getElementById('pend').innerHTML = pend;
+
+            var ctx4 = document.getElementById('graph-4');
+            var chart = new Chart(ctx4, {
+                type: 'bar',
+                data: ChartData,
+                options: {
+                    legend: {
+                        backgroundColor: "rgba(255,99,132,0.2)",
+                        
+                        display: true,
+                        position: 'right',
+                        fullWidth: true,
+                        labels: {
+                            fontColor: 'rgb(0, 0, 0)'
+                        }
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:false
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    datasets: [{
+                        dataLabels: { 
+                            display: true,          //  disabled by default
+                            colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
+                            minRadius: 30, //  minimum radius for display labels (on pie charts)
+                            align: 'start',
+                            anchor: 'start'
+                        },
+                        borderColor: "rgba(255,99,132,1)",
+                        borderWidth: 2,
+                        hoverBackgroundColor: "rgba(255,99,132,0.4)",
+                        hoverBorderColor: "rgba(255,99,132,1)",
+                    }],
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
+
+
+        $.get("<?=@base_url('Analysis/PassFailGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached5");
+
+            $('#graph-5').replaceWith('<canvas id="graph-5"></canvas>');
+
+            var ctx5 = document.getElementById('graph-5');
+            var chart = new Chart(ctx5, {
+                type: 'bar',
+                data: ChartData,
+                options: {
+                    title:{
+                        display:false,
+                        text:"Participant Outcome Trends"
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            position: "left",
+                            id: "y-axis-1",
+                        }, {
+                            type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            position: "right",
+                            id: "y-axis-2",
+
+                            // grid line settings
+                            gridLines: {
+                                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                            },
+                        }]
+                    }
+                }
+            });
+        });
+
+
+
+        $.get("<?=@base_url('Analysis/PassFailRateGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached5");
+
+            $('#graph-6').replaceWith('<canvas id="graph-6"></canvas>');
+
+            var ctx5 = document.getElementById('graph-6');
+            var chart = new Chart(ctx5, {
+                type: 'bar',
+                data: ChartData,
+                options: {
+                    title:{
+                        display:false,
+                        text:"Participant Outcome Trends (%)"
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            type: "linear",
+                            display: true,
+                            position: "left",
+                            id: "y-axis-1",
+                        }]
+                    }
+                }
+            });
+        });
 
 
 
 
-    //Bar Graph Below
+        $.get("<?=@base_url('Analysis/ResondentNonGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached6");
+
+            $('#graph-7').replaceWith('<canvas id="graph-7"></canvas>');
+
+            var ctx5 = document.getElementById('graph-7');
+            var chart = new Chart(ctx5, {
+                type: 'bar',
+                data: ChartData,
+                options: {
+                    title:{
+                        display:false,
+                        text:"Participant Responsiveness Trends"
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            position: "left",
+                            id: "y-axis-1",
+                        }]
+                    }
+                }
+            });
+        });
 
 
-    // var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
-    // var barChartData = {
-    //     labels : ['January','February','March','April','May','June','July'],
-    //     datasets : [
-    //         {
-    //             backgroundColor : 'rgba(220,220,220,0.5)',
-    //             borderColor : 'rgba(220,220,220,0.8)',
-    //             highlightFill: 'rgba(220,220,220,0.75)',
-    //             highlightStroke: 'rgba(220,220,220,1)',
-    //             data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-    //         },
-    //         {
-    //             backgroundColor : 'rgba(151,187,205,0.5)',
-    //             borderColor : 'rgba(151,187,205,0.8)',
-    //             highlightFill : 'rgba(151,187,205,0.75)',
-    //             highlightStroke : 'rgba(151,187,205,1)',
-    //             data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-    //         }
-    //     ]
-    // }
-    // var ctx = document.getElementById('canvas-2');
-    // var chart = new Chart(ctx, {
-    //     type: 'bar',
-    //     data: barChartData,
-    //     options: {
-    //         responsive: true
-    //     }
-    // });
+        $.get("<?=@base_url('Analysis/ResondentNonRateGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+            // alert("reached6");
 
-    //Bar Graph Above
+            $('#graph-8').replaceWith('<canvas id="graph-8"></canvas>');
 
-
-
-    // Line Graph Below
-
-    // var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
-    // var lineChartData = {
-    //     labels : ['January','February','March','April','May','June','July'],
-    //     datasets : [
-    //         {
-    //             label: 'My First dataset',
-    //             backgroundColor : 'rgba(220,220,220,0.2)',
-    //             borderColor : 'rgba(220,220,220,1)',
-    //             pointBackgroundColor : 'rgba(220,220,220,1)',
-    //             pointBorderColor : '#fff',
-    //             data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-    //         },
-    //         {
-    //             label: 'My Second dataset',
-    //             backgroundColor : 'rgba(151,187,205,0.2)',
-    //             borderColor : 'rgba(151,187,205,1)',
-    //             pointBackgroundColor : 'rgba(151,187,205,1)',
-    //             pointBorderColor : '#fff',
-    //             data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-    //         }
-    //     ]
-    // }
-
-    // var ctx = document.getElementById('canvas-1');
-    // var chart = new Chart(ctx, {
-    //     type: 'line',
-    //     data: lineChartData,
-    //     options: {
-    //         responsive: true
-    //     }
-    // });
+            var ctx5 = document.getElementById('graph-8');
+            var chart = new Chart(ctx5, {
+                type: 'bar',
+                data: ChartData,
+                options: {
+                    title:{
+                        display:false,
+                        text:"Participant Responsiveness Trends (%)"
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            position: "left",
+                            id: "y-axis-1",
+                        }]
+                    }
+                }
+            });
+        });
 
 
+        $.get("<?=@base_url('Analysis/OverallOutcomeGraph/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 
-    //Line Graph Above
+            // alert("reached7");
+            $('#graph-9').replaceWith('<canvas id="graph-9"></canvas>');
 
+            var roundname3 = ChartData['round'];
 
+            var ctx5 = document.getElementById('graph-9');
+            var chart = new Chart(ctx5, {
+                type: 'bar',
+                data: ChartData,
+                options: {
+                    title:{
+                        display:false,
+                        text:ChartData['x_axis_name'] + " Outcome"
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        fullWidth: true,
+                        labels: {
+                            fontColor: 'rgb(0, 0, 0)'
+                        }
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: ChartData['x_axis_name']
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                min: 0,
+                                autoSkip: false
+                            }
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Number #'
+                            }
+                        }, {
+                            type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            position: "right",
+                            id: "y-axis-2",
 
-    // Donut Graph Below
-
-
-    // var doughnutData = {
-    //     labels: [
-    //         'Red',
-    //         'Green',
-    //         'Yellow'
-    //     ],
-    //     datasets: [{
-    //         data: [300, 50, 100],
-    //         backgroundColor: [
-    //             '#FF6384',
-    //             '#36A2EB',
-    //             '#FFCE56'
-    //         ],
-    //         hoverBackgroundColor: [
-    //             '#FF6384',
-    //             '#36A2EB',
-    //             '#FFCE56'
-    //         ]
-    //     }]
-    // };
-    // var ctx = document.getElementById('canvas-3');
-    // var chart = new Chart(ctx, {
-    //     type: 'doughnut',
-    //     data: doughnutData,
-    //     options: {
-    //         responsive: true
-    //     }
-    // });
-
-
-
-    //Donut Graph Above
-
-
-    // Radar Graph Below
-
-
-    // var radarChartData = {
-    //     labels: ['Eating', 'Drinking', 'Sleeping', 'Designing', 'Coding', 'Cycling', 'Running'],
-    //     datasets: [
-    //         {
-    //             label: 'My First dataset',
-    //             backgroundColor: 'rgba(220,220,220,0.2)',
-    //             borderColor: 'rgba(220,220,220,1)',
-    //             pointBackgroundColor: 'rgba(220,220,220,1)',
-    //             pointBorderColor: '#fff',
-    //             pointHighlightFill: '#fff',
-    //             pointHighlightStroke: 'rgba(220,220,220,1)',
-    //             data: [65,59,90,81,56,55,40]
-    //         },
-    //         {
-    //             label: 'My Second dataset',
-    //             backgroundColor: 'rgba(151,187,205,0.2)',
-    //             borderColor: 'rgba(151,187,205,1)',
-    //             pointBackgroundColor: 'rgba(151,187,205,1)',
-    //             pointBorderColor: '#fff',
-    //             pointHighlightFill: '#fff',
-    //             pointHighlightStroke: 'rgba(151,187,205,1)',
-    //             data: [28,48,40,19,96,27,100]
-    //         }
-    //     ]
-    // };
-    // var ctx = document.getElementById('canvas-4');
-    // var chart = new Chart(ctx, {
-    //     type: 'radar',
-    //     data: radarChartData,
-    //     options: {
-    //         responsive: true
-    //     }
-    // });
-
-
-    //Radar Graph Above
+                            // grid line settings
+                            gridLines: {
+                                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                            },
+                        }]
+                    },
+                }
+            });
+        });
 
 
 
-    //Pie Graph Below
+    }
 
-
-    // var pieData = {
-    //     labels: [
-    //         'Red',
-    //         'Green',
-    //         'Yellow'
-    //     ],
-    //     datasets: [{
-    //         data: [300, 50, 100],
-    //         backgroundColor: [
-    //             '#FF6384',
-    //             '#36A2EB',
-    //             '#FFCE56'
-    //         ],
-    //         hoverBackgroundColor: [
-    //             '#FF6384',
-    //             '#36A2EB',
-    //             '#FFCE56'
-    //         ]
-    //     }]
-    // };
-    // var ctx = document.getElementById('canvas-5');
-    // var chart = new Chart(ctx, {
-    //     type: 'pie',
-    //     data: pieData,
-    //     options: {
-    //         responsive: true
-    //     }
-    // });
-
-
-    //Pie Graph Above
-
-
-
-    // Polar Graph Below
-
-
-    // var polarData = {
-    //     datasets: [{
-    //         data: [
-    //             11,
-    //             16,
-    //             7,
-    //             3,
-    //             14
-    //         ],
-    //         backgroundColor: [
-    //             '#FF6384',
-    //             '#4BC0C0',
-    //             '#FFCE56',
-    //             '#E7E9ED',
-    //             '#36A2EB'
-    //         ],
-    //         label: 'My dataset' // for legend
-    //     }],
-    //     labels: [
-    //         'Red',
-    //         'Green',
-    //         'Yellow',
-    //         'Grey',
-    //         'Blue'
-    //     ]
-    // };
-    // var ctx = document.getElementById('canvas-6');
-    // var chart = new Chart(ctx, {
-    //     type: 'polarArea',
-    //     data: polarData,
-    //     options: {
-    //         responsive: true
-    //     }
-    // });
-
-
-
-    // Polar Graph Above
-
-
-
-
+                   
 });    
 </script>

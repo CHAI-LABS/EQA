@@ -42,6 +42,7 @@ class Program extends MY_Controller {
 
 
         $data = [
+            'back_link' => '',
             'page_title' => "Program Graphs",
             'round_option' => $round_list,
             'county_option' => $county_list,
@@ -210,6 +211,9 @@ class Program extends MY_Controller {
         $labels = $graph_data = $datasets = $data = array();
         $equipment_breakdown = $reagent_stock_out = $analyst_unavailable = $pending_capa = 0;
 
+
+        // echo "<pre>";print_r("reached");echo "</pre>";die();
+
         $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
         $round_uuid = $round->uuid;
         $round_name = $round->pt_round_no;
@@ -218,7 +222,6 @@ class Program extends MY_Controller {
         // $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid, $county_id, $facility_id)->analysts;
         $pending_capa = $this->Program_m->getPendingCapa($round_uuid, $county_id, $facility_id)->capas;
 
-        // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
         $datasets1 = [
             'label'         =>  'Equipment Breakdown',
@@ -1470,7 +1473,6 @@ class Program extends MY_Controller {
 
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $responsive = $no_of_participants - $non_responsive;
-        // echo "<pre>";print_r($non_responsive);echo "</pre>";die();
 
         // $datasets = [
         //     'label'         =>  ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'],
@@ -1486,6 +1488,7 @@ class Program extends MY_Controller {
 
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$datasets];
+        // echo "<pre>";print_r($no_of_participants);echo "</pre>";die();
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

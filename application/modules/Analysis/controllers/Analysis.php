@@ -10,6 +10,7 @@ class Analysis extends DashboardController {
         $this->load->config('table');
         $this->load->module('Export');
 		$this->load->model('Analysis_m');
+        $this->load->model('Program/Program_m');
 
 	}
 	
@@ -705,77 +706,66 @@ class Analysis extends DashboardController {
     public function Graphs($round_uuid){
         $data = [];
         $title = "Graph Analysis";
+        $counter = 0;
+
         // echo "<pre>";print_r($round_uuid);echo "</pre>";die();
 
-        
-            $data = [
-                'round' => $round_uuid,
-                'round_name' => $this->db->get_where('pt_round_v', ['uuid'   => $round_uuid])->row()->pt_round_no
-            ];
+        // $this->db->where('type', 'previous');
+        $this->db->order_by('id', 'ASC');
+        $rounds = $this->db->get('pt_round_v')->result();
+
+
+        $round_list = '<select id="round-select" class="form-control select2-single">';
+        foreach ($rounds as $round) {
+            $counter++;
+            if($counter == 1){
+                $round_list .= '<option selected = "selected" value='.$round->id.'>'.$round->pt_round_no.'</option>';
+                $round_id = $round->id;
+                $round_name = $round->pt_round_no;
+            }else{
+                $round_list .= '<option value='.$round->id.'>'.$round->pt_round_no.'</option>';
+            }
+        }
+        $round_list .= '</select>';
+
+
+        $counties = $this->db->get('county_v')->result();
+        $county_list = '<select id="county-select" class="form-control select2-single">
+                        <option selected = "selected" value="0">All Counties</option>';
+        foreach ($counties as $county) {
+            $county_list .= '<option value='.$county->id.'>'.$county->county_name.'</option>';
+        }
+        $county_list .= '</select>';
+
+        // $facilities = $this->db->get('facility_v')->result();
+        $facility_list = '<option selected = "selected" value="0">All Facilities</option>';
+
+
+        $data = [
+            'page_title' => "Analysis Graphs",
+            'round_option' => $round_list,
+            'county_option' => $county_list,
+            'facility_option' => $facility_list,
+            'back_link' => '<div class = "pull-right"> <a href="'.base_url('Analysis/').'"><button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to PT Analysis</button></a><br /><br /></div>',
+            'round' => $round_id,
+            'round_name' => $round_name
+        ];
             
         $this->assets->addCss('css/main.css');
         $this->assets
-                ->addJs('js/Chart.min.js')
-                ->addJs('js/chartsjs-plugin-data-labels.js')
-                ->addJs('js/Chart.PieceLabel.js')
-                ->addJs("js/Chart.min.js")
-                ->addJs('js/chartsjs-plugin-data-labels.js')
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
-                        ->addJs('dashboard/js/libs/moment.min.js');
-        $this->assets->setJavascript('Analysis/chart_js');
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js')
+                ->addJs('js/Chart.min.js')
+                ->addJs('js/chartsjs-plugin-data-labels.js')
+                ->addJs('js/Chart.PieceLabel.js');
+        $this->assets->setJavascript('Program/program_js');
         $this->template
                 ->setPageTitle($title)
-                ->setPartial('Analysis/analysis_graphs', $data)
+                ->setPartial('Program/program_view', $data)
                 ->adminTemplate();
     }
-
-
-    //  public function graphExample(){
-    //     $labels = $graph_data = $datasets = $data = array();
-
-    //     // $colors = [
-    //     //     'rgba(220,220,220,0.5)', 'rgba(151,187,205,0.5)'
-    //     // ];
-
-    //     $sql = "SELECT ps.sample_name, avg(per.cd3_absolute) as cd3, avg(per.cd4_absolute) as cd4 FROM pt_equipment_results per JOIN pt_samples ps ON ps.id = per.sample_id GROUP BY per.sample_id;";
-
-    //     $results = $this->db->query($sql)->result();
-    //     $cd3datasets = [
-    //         'label'         =>  'CD3',
-    //         'backgroundColor' => 'rgba(220,220,220,0.5)',
-    //         'borderColor' => 'rgba(220,220,220,0.8)',
-    //         'highlightFill' => 'rgba(220,220,220,0.75)',
-    //         'highlightStroke' => 'rgba(220,220,220,1)'
-    //     ];
-    //     $cd4datasets = [
-    //         'label'         =>  'CD4',
-    //         'backgroundColor' => 'rgba(151,187,205,0.5)',
-    //         'borderColor' => 'rgba(151,187,205,0.8)',
-    //         'highlightFill' => 'rgba(151,187,205,0.75)',
-    //         'highlightStroke' => 'rgba(151,187,205,1)'
-    //     ];
-    //     // echo "<pre>";print_r($results);die;
-    //     if($results){
-    //         $counter = 0;
-    //         foreach ($results as $key => $value) {
-    //             $data = [];
-    //             // echo "<pre>";print_r($value);echo "</pre>";die();
-    //             $cd3datasets['data'][] = $value->cd3;
-    //             $cd4datasets['data'][] = $value->cd4;
-
-    //             $labels[] = $value->sample_name;
-    //             $tabledata[] = [];
-    //             $counter++;
-    //         }
-    //     }
-
-    //     $graph_data['labels'] = $labels;
-    //     $graph_data['datasets'] = [$cd3datasets, $cd4datasets];
-
-    //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
-    // }
-
 
 
 	public function createNHRLTable($form, $round_id, $equipment_id){
@@ -2233,465 +2223,465 @@ class Analysis extends DashboardController {
     }
 
 
-    public function HistoricalGraph(){
-        $labels = $graph_data = $datasets = $data = array();
-        $participants = $pass = $fail = 0;
-        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
+    // public function HistoricalGraph(){
+    //     $labels = $graph_data = $datasets = $data = array();
+    //     $participants = $pass = $fail = 0;
+    //     $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
 
-        $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
-        ];
+    //     $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
+    //     ];
 
-        $borderColor = ['rgba(52,152,219,0.8)','rgba(46,204,113,0.8)','rgba(211,84,0,0.8)','rgba(231,76,60,0.8)','rgba(127,140,141,0.8)','rgba(241,196,15,0.8)','rgba(52,73,94,0.8)'
-        ];
+    //     $borderColor = ['rgba(52,152,219,0.8)','rgba(46,204,113,0.8)','rgba(211,84,0,0.8)','rgba(231,76,60,0.8)','rgba(127,140,141,0.8)','rgba(241,196,15,0.8)','rgba(52,73,94,0.8)'
+    //     ];
 
-        $highlightFill = ['rgba(52,152,219,0.75)','rgba(46,204,113,0.75)','rgba(211,84,0,0.75)','rgba(231,76,60,0.75)','rgba(127,140,141,0.75)','rgba(241,196,15,0.75)','rgba(52,73,94,0.75)'
-        ];
+    //     $highlightFill = ['rgba(52,152,219,0.75)','rgba(46,204,113,0.75)','rgba(211,84,0,0.75)','rgba(231,76,60,0.75)','rgba(127,140,141,0.75)','rgba(241,196,15,0.75)','rgba(52,73,94,0.75)'
+    //     ];
 
-        $highlightStroke = ['rgba(52,152,219,1)','rgba(46,204,113,1)','rgba(211,84,0,1)','rgba(231,76,60,1)','rgba(127,140,141,1)','rgba(241,196,15,1)','rgba(52,73,94,1)'
-        ];
+    //     $highlightStroke = ['rgba(52,152,219,1)','rgba(46,204,113,1)','rgba(211,84,0,1)','rgba(231,76,60,1)','rgba(127,140,141,1)','rgba(241,196,15,1)','rgba(52,73,94,1)'
+    //     ];
 
-        $rounds = $this->Analysis_m->getLatestRounds();
+    //     $rounds = $this->Analysis_m->getLatestRounds();
 
-        if($rounds){
-            foreach ($rounds as $round) {
-                $data = [];
-                $counter = 0;
+    //     if($rounds){
+    //         foreach ($rounds as $round) {
+    //             $data = [];
+    //             $counter = 0;
 
-                $no_participants = [
-                    'label'         =>  'No. of Participants',
-                    'backgroundColor' => $backgroundColor[$counter],
-                    'borderColor' => $borderColor[$counter],
-                    'highlightFill' => $highlightFill[$counter],
-                    'highlightStroke' => $highlightStroke[$counter]
-                ];
+    //             $no_participants = [
+    //                 'label'         =>  'No. of Participants',
+    //                 'backgroundColor' => $backgroundColor[$counter],
+    //                 'borderColor' => $borderColor[$counter],
+    //                 'highlightFill' => $highlightFill[$counter],
+    //                 'highlightStroke' => $highlightStroke[$counter]
+    //             ];
 
-                $counter++;
+    //             $counter++;
 
-                $pass = [
-                    'label'         =>  'Pass',
-                    'backgroundColor' => $backgroundColor[$counter],
-                    'borderColor' => $borderColor[$counter],
-                    'highlightFill' => $highlightFill[$counter],
-                    'highlightStroke' => $highlightStroke[$counter]
-                ];
+    //             $pass = [
+    //                 'label'         =>  'Pass',
+    //                 'backgroundColor' => $backgroundColor[$counter],
+    //                 'borderColor' => $borderColor[$counter],
+    //                 'highlightFill' => $highlightFill[$counter],
+    //                 'highlightStroke' => $highlightStroke[$counter]
+    //             ];
 
-                $counter++;
+    //             $counter++;
 
-                $fail = [
-                    'label'         =>  'Fail',
-                    'backgroundColor' => $backgroundColor[$counter],
-                    'borderColor' => $borderColor[$counter],
-                    'highlightFill' => $highlightFill[$counter],
-                    'highlightStroke' => $highlightStroke[$counter]
-                ];
+    //             $fail = [
+    //                 'label'         =>  'Fail',
+    //                 'backgroundColor' => $backgroundColor[$counter],
+    //                 'borderColor' => $borderColor[$counter],
+    //                 'highlightFill' => $highlightFill[$counter],
+    //                 'highlightStroke' => $highlightStroke[$counter]
+    //             ];
 
 
-                $round_id = $this->db->get_where('pt_round', ['uuid' => $round->uuid])->row()->id;
-                $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
-                $participants = $this->Analysis_m->getReadyParticipants($round_id);
-                $equipments = $this->Analysis_m->Equipments();
+    //             $round_id = $this->db->get_where('pt_round', ['uuid' => $round->uuid])->row()->id;
+    //             $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+    //             $participants = $this->Analysis_m->getReadyParticipants($round_id);
+    //             $equipments = $this->Analysis_m->Equipments();
 
-                foreach ($equipments as $key => $equipment) {
+    //             foreach ($equipments as $key => $equipment) {
                     
                     
-                    $equipment_id = $equipment->id;
+    //                 $equipment_id = $equipment->id;
 
-                    foreach ($participants as $participant) {
-                        $partcount ++;
-                        $novalue = $sampcount = $acceptable = $unacceptable = 0;
+    //                 foreach ($participants as $participant) {
+    //                     $partcount ++;
+    //                     $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-                        foreach ($samples as $sample) {
-                            $sampcount++;
+    //                     foreach ($samples as $sample) {
+    //                         $sampcount++;
 
-                            $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
+    //                         $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                            if($cd4_values){
+    //                         if($cd4_values){
 
-                                $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                                $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                            }else{
-                                $upper_limit = 0;
-                                $lower_limit = 0;
-                            } 
+    //                             $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+    //                             $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+    //                         }else{
+    //                             $upper_limit = 0;
+    //                             $lower_limit = 0;
+    //                         } 
 
-                            $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+    //                         $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
 
-                            if($part_cd4){
+    //                         if($part_cd4){
                                 
-                                if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                                    $acceptable++;    
-                                } else{
-                                    $unacceptable++;    
-                                } 
+    //                             if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+    //                                 $acceptable++;    
+    //                             } else{
+    //                                 $unacceptable++;    
+    //                             } 
 
-                                if($part_cd4->cd4_absolute == 0){
-                                    $novalue++;
-                                }
-                            } 
-                        } 
+    //                             if($part_cd4->cd4_absolute == 0){
+    //                                 $novalue++;
+    //                             }
+    //                         } 
+    //                     } 
 
-                        if($novalue == $sampcount){
-                            $non_responsive++;
-                        }
+    //                     if($novalue == $sampcount){
+    //                         $non_responsive++;
+    //                     }
 
-                        if($acceptable == $sampcount) {
-                            $passed++;
-                        }
+    //                     if($acceptable == $sampcount) {
+    //                         $passed++;
+    //                     }
 
-                    }
-                }
-
-                
-                $labels[] = $round->pt_round_no;
-
-                $no_of_participants = $this->Analysis_m->ParticipatingParticipants($round->uuid)->participants;
-                $failed = $no_of_participants - $passed;
-
-                $no_participants['data'][] = $no_of_participants;
-                $pass['data'][] = $passed;
-                $fail['data'][] = $failed;
+    //                 }
+    //             }
 
                 
-            }
-        }
+    //             $labels[] = $round->pt_round_no;
 
-        $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$no_participants, $pass, $fail];
+    //             $no_of_participants = $this->Analysis_m->ParticipatingParticipants($round->uuid)->participants;
+    //             $failed = $no_of_participants - $passed;
 
-        // echo "<pre>";print_r($graph_data);die;
+    //             $no_participants['data'][] = $no_of_participants;
+    //             $pass['data'][] = $passed;
+    //             $fail['data'][] = $failed;
 
-        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
-    }
+                
+    //         }
+    //     }
 
+    //     $graph_data['labels'] = $labels;
+    //     $graph_data['datasets'] = [$no_participants, $pass, $fail];
 
-    public function RemedialGraph($round_uuid){
-        $labels = $graph_data = $datasets = $data = array();
-        $facscalibur = $facspresto = $facscount = $alere_pima = $partec_cyflow = $guava_easycyte = $other = 0;
+    //     // echo "<pre>";print_r($graph_data);die;
 
-        // $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
-        // $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
-        // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
-        // $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
-
-        // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
-
-        $datasets1 = [
-            'label'         =>  'Facscalibur',
-            'backgroundColor' => 'rgba(211,84,0,0.5)',
-            'borderColor' => 'rgba(211,84,0,0.8)',
-            'highlightFill' => 'rgba(211,84,0,0.75)',
-            'highlightStroke' => 'rgba(211,84,0,1)',
-            'data' => [$facscalibur]
-        ];
-        $datasets2 = [
-            'label'         =>  'Facspresto',
-            'backgroundColor' => 'rgba(52,152,219,0.5)',
-            'borderColor' => 'rgba(52,152,219,0.8)',
-            'highlightFill' => 'rgba(52,152,219,0.75)',
-            'highlightStroke' => 'rgba(52,152,219,1)',
-            'data' => [$facspresto]
-        ];
-        $datasets3 = [
-            'label'         =>  'Facscount',
-            'backgroundColor' => 'rgba(46,204,113,0.5)',
-            'borderColor' => 'rgba(46,204,113,0.8)',
-            'highlightFill' => 'rgba(46,204,113,0.75)',
-            'highlightStroke' => 'rgba(46,204,113,1)',
-            'data' => [$facscount]
-        ];
-        $datasets4 = [
-            'label'         =>  'Alere Pima',
-            'backgroundColor' => 'rgba(231,76,60,0.5)',
-            'borderColor' => 'rgba(231,76,60,0.8)',
-            'highlightFill' => 'rgba(231,76,60,0.75)',
-            'highlightStroke' => 'rgba(231,76,60,1)',
-            'data' => [$alere_pima]
-        ];
-        $datasets5 = [
-            'label'         =>  'Partec Cyflow',
-            'backgroundColor' => 'rgba(127,140,141,0.5)',
-            'borderColor' => 'rgba(127,140,141,0.8)',
-            'highlightFill' => 'rgba(127,140,141,0.75)',
-            'highlightStroke' => 'rgba(127,140,141,1)',
-            'data' => [$partec_cyflow]
-        ];
-        $datasets6 = [
-            'label'         =>  'Guava Easycyte',
-            'backgroundColor' => 'rgba(241,196,15,0.5)',
-            'borderColor' => 'rgba(241,196,15,0.8)',
-            'highlightFill' => 'rgba(241,196,15,0.75)',
-            'highlightStroke' => 'rgba(241,196,15,1)',
-            'data' => [$guava_easycyte]
-        ];
-        $datasets7 = [
-            'label'         =>  'Other',
-            'backgroundColor' => 'rgba(52,73,94,0.5)',
-            'borderColor' => 'rgba(52,73,94,0.8)',
-            'highlightFill' => 'rgba(52,73,94,0.75)',
-            'highlightStroke' => 'rgba(52,73,94,1)',
-            'data' => [$other]
-        ];
-
-        
-
-        $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4, $datasets5, $datasets6, $datasets7];
-
-        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
-    }
+    //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    // }
 
 
-    public function JustificationGraph($round_uuid){
-        $labels = $graph_data = $datasets = $data = array();
-        $equipment_breakdown = $equipment_readerror = $reagent_stock_out = $panel_integrity = $failed_login = $no_justification = 0;
+    // public function RemedialGraph($round_uuid){
+    //     $labels = $graph_data = $datasets = $data = array();
+    //     $facscalibur = $facspresto = $facscount = $alere_pima = $partec_cyflow = $guava_easycyte = $other = 0;
 
-        // $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
-        // $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
-        // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
-        // $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
+    //     // $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
+    //     // $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
+    //     // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
+    //     // $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
 
-        // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
+    //     // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
-        $datasets1 = [
-            'label'         =>  'Equipment Breakdown',
-            'backgroundColor' => 'rgba(211,84,0,0.5)',
-            'borderColor' => 'rgba(211,84,0,0.8)',
-            'highlightFill' => 'rgba(211,84,0,0.75)',
-            'highlightStroke' => 'rgba(211,84,0,1)',
-            'data' => [$equipment_breakdown]
-        ];
-        $datasets2 = [
-            'label'         =>  'Equipment Read Error',
-            'backgroundColor' => 'rgba(52,152,219,0.5)',
-            'borderColor' => 'rgba(52,152,219,0.8)',
-            'highlightFill' => 'rgba(52,152,219,0.75)',
-            'highlightStroke' => 'rgba(52,152,219,1)',
-            'data' => [$equipment_readerror]
-        ];
-        $datasets3 = [
-            'label'         =>  'Reagent Stock-Out',
-            'backgroundColor' => 'rgba(46,204,113,0.5)',
-            'borderColor' => 'rgba(46,204,113,0.8)',
-            'highlightFill' => 'rgba(46,204,113,0.75)',
-            'highlightStroke' => 'rgba(46,204,113,1)',
-            'data' => [$reagent_stock_out]
-        ];
-        $datasets4 = [
-            'label'         =>  'Panel Integrity',
-            'backgroundColor' => 'rgba(231,76,60,0.5)',
-            'borderColor' => 'rgba(231,76,60,0.8)',
-            'highlightFill' => 'rgba(231,76,60,0.75)',
-            'highlightStroke' => 'rgba(231,76,60,1)',
-            'data' => [$panel_integrity]
-        ];
-        $datasets5 = [
-            'label'         =>  'Falied Log-in',
-            'backgroundColor' => 'rgba(127,140,141,0.5)',
-            'borderColor' => 'rgba(127,140,141,0.8)',
-            'highlightFill' => 'rgba(127,140,141,0.75)',
-            'highlightStroke' => 'rgba(127,140,141,1)',
-            'data' => [$failed_login]
-        ];
-        $datasets6 = [
-            'label'         =>  'No Justification',
-            'backgroundColor' => 'rgba(241,196,15,0.5)',
-            'borderColor' => 'rgba(241,196,15,0.8)',
-            'highlightFill' => 'rgba(241,196,15,0.75)',
-            'highlightStroke' => 'rgba(241,196,15,1)',
-            'data' => [$no_justification]
-        ];
+    //     $datasets1 = [
+    //         'label'         =>  'Facscalibur',
+    //         'backgroundColor' => 'rgba(211,84,0,0.5)',
+    //         'borderColor' => 'rgba(211,84,0,0.8)',
+    //         'highlightFill' => 'rgba(211,84,0,0.75)',
+    //         'highlightStroke' => 'rgba(211,84,0,1)',
+    //         'data' => [$facscalibur]
+    //     ];
+    //     $datasets2 = [
+    //         'label'         =>  'Facspresto',
+    //         'backgroundColor' => 'rgba(52,152,219,0.5)',
+    //         'borderColor' => 'rgba(52,152,219,0.8)',
+    //         'highlightFill' => 'rgba(52,152,219,0.75)',
+    //         'highlightStroke' => 'rgba(52,152,219,1)',
+    //         'data' => [$facspresto]
+    //     ];
+    //     $datasets3 = [
+    //         'label'         =>  'Facscount',
+    //         'backgroundColor' => 'rgba(46,204,113,0.5)',
+    //         'borderColor' => 'rgba(46,204,113,0.8)',
+    //         'highlightFill' => 'rgba(46,204,113,0.75)',
+    //         'highlightStroke' => 'rgba(46,204,113,1)',
+    //         'data' => [$facscount]
+    //     ];
+    //     $datasets4 = [
+    //         'label'         =>  'Alere Pima',
+    //         'backgroundColor' => 'rgba(231,76,60,0.5)',
+    //         'borderColor' => 'rgba(231,76,60,0.8)',
+    //         'highlightFill' => 'rgba(231,76,60,0.75)',
+    //         'highlightStroke' => 'rgba(231,76,60,1)',
+    //         'data' => [$alere_pima]
+    //     ];
+    //     $datasets5 = [
+    //         'label'         =>  'Partec Cyflow',
+    //         'backgroundColor' => 'rgba(127,140,141,0.5)',
+    //         'borderColor' => 'rgba(127,140,141,0.8)',
+    //         'highlightFill' => 'rgba(127,140,141,0.75)',
+    //         'highlightStroke' => 'rgba(127,140,141,1)',
+    //         'data' => [$partec_cyflow]
+    //     ];
+    //     $datasets6 = [
+    //         'label'         =>  'Guava Easycyte',
+    //         'backgroundColor' => 'rgba(241,196,15,0.5)',
+    //         'borderColor' => 'rgba(241,196,15,0.8)',
+    //         'highlightFill' => 'rgba(241,196,15,0.75)',
+    //         'highlightStroke' => 'rgba(241,196,15,1)',
+    //         'data' => [$guava_easycyte]
+    //     ];
+    //     $datasets7 = [
+    //         'label'         =>  'Other',
+    //         'backgroundColor' => 'rgba(52,73,94,0.5)',
+    //         'borderColor' => 'rgba(52,73,94,0.8)',
+    //         'highlightFill' => 'rgba(52,73,94,0.75)',
+    //         'highlightStroke' => 'rgba(52,73,94,1)',
+    //         'data' => [$other]
+    //     ];
 
         
 
-        $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4, $datasets5, $datasets6];
+    //     $graph_data['labels'] = $labels;
+    //     $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4, $datasets5, $datasets6, $datasets7];
 
-        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
-    }
+    //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    // }
 
 
-    public function DisqualificationGraph($round_uuid){
-        $labels = $graph_data = $datasets = $data = array();
-        $equipment_breakdown = $reagent_stock_out = $analyst_unavailable = $pending_capa = 0;
+    // public function JustificationGraph($round_uuid){
+    //     $labels = $graph_data = $datasets = $data = array();
+    //     $equipment_breakdown = $equipment_readerror = $reagent_stock_out = $panel_integrity = $failed_login = $no_justification = 0;
 
-        $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
-        $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
-        // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
-        $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
+    //     // $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
+    //     // $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
+    //     // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
+    //     // $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
 
-        // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
+    //     // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
 
-        $datasets1 = [
-            'label'         =>  'Equipment Breakdown',
-            'backgroundColor' => 'rgba(211,84,0,0.5)',
-            'borderColor' => 'rgba(211,84,0,0.8)',
-            'highlightFill' => 'rgba(211,84,0,0.75)',
-            'highlightStroke' => 'rgba(211,84,0,1)',
-            'data' => [$equipment_breakdown]
-        ];
-        $datasets2 = [
-            'label'         =>  'Reagent Stock-Out',
-            'backgroundColor' => 'rgba(52,152,219,0.5)',
-            'borderColor' => 'rgba(52,152,219,0.8)',
-            'highlightFill' => 'rgba(52,152,219,0.75)',
-            'highlightStroke' => 'rgba(52,152,219,1)',
-            'data' => [$reagent_stock_out]
-        ];
-        $datasets3 = [
-            'label'         =>  'Analyst Unavailable',
-            'backgroundColor' => 'rgba(46,204,113,0.5)',
-            'borderColor' => 'rgba(46,204,113,0.8)',
-            'highlightFill' => 'rgba(46,204,113,0.75)',
-            'highlightStroke' => 'rgba(46,204,113,1)',
-            'data' => [$analyst_unavailable]
-        ];
-        $datasets4 = [
-            'label'         =>  'Pending CAPA',
-            'backgroundColor' => 'rgba(231,76,60,0.5)',
-            'borderColor' => 'rgba(231,76,60,0.8)',
-            'highlightFill' => 'rgba(231,76,60,0.75)',
-            'highlightStroke' => 'rgba(231,76,60,1)',
-            'data' => [$pending_capa]
-        ];
+    //     $datasets1 = [
+    //         'label'         =>  'Equipment Breakdown',
+    //         'backgroundColor' => 'rgba(211,84,0,0.5)',
+    //         'borderColor' => 'rgba(211,84,0,0.8)',
+    //         'highlightFill' => 'rgba(211,84,0,0.75)',
+    //         'highlightStroke' => 'rgba(211,84,0,1)',
+    //         'data' => [$equipment_breakdown]
+    //     ];
+    //     $datasets2 = [
+    //         'label'         =>  'Equipment Read Error',
+    //         'backgroundColor' => 'rgba(52,152,219,0.5)',
+    //         'borderColor' => 'rgba(52,152,219,0.8)',
+    //         'highlightFill' => 'rgba(52,152,219,0.75)',
+    //         'highlightStroke' => 'rgba(52,152,219,1)',
+    //         'data' => [$equipment_readerror]
+    //     ];
+    //     $datasets3 = [
+    //         'label'         =>  'Reagent Stock-Out',
+    //         'backgroundColor' => 'rgba(46,204,113,0.5)',
+    //         'borderColor' => 'rgba(46,204,113,0.8)',
+    //         'highlightFill' => 'rgba(46,204,113,0.75)',
+    //         'highlightStroke' => 'rgba(46,204,113,1)',
+    //         'data' => [$reagent_stock_out]
+    //     ];
+    //     $datasets4 = [
+    //         'label'         =>  'Panel Integrity',
+    //         'backgroundColor' => 'rgba(231,76,60,0.5)',
+    //         'borderColor' => 'rgba(231,76,60,0.8)',
+    //         'highlightFill' => 'rgba(231,76,60,0.75)',
+    //         'highlightStroke' => 'rgba(231,76,60,1)',
+    //         'data' => [$panel_integrity]
+    //     ];
+    //     $datasets5 = [
+    //         'label'         =>  'Falied Log-in',
+    //         'backgroundColor' => 'rgba(127,140,141,0.5)',
+    //         'borderColor' => 'rgba(127,140,141,0.8)',
+    //         'highlightFill' => 'rgba(127,140,141,0.75)',
+    //         'highlightStroke' => 'rgba(127,140,141,1)',
+    //         'data' => [$failed_login]
+    //     ];
+    //     $datasets6 = [
+    //         'label'         =>  'No Justification',
+    //         'backgroundColor' => 'rgba(241,196,15,0.5)',
+    //         'borderColor' => 'rgba(241,196,15,0.8)',
+    //         'highlightFill' => 'rgba(241,196,15,0.75)',
+    //         'highlightStroke' => 'rgba(241,196,15,1)',
+    //         'data' => [$no_justification]
+    //     ];
 
         
 
-        $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
+    //     $graph_data['labels'] = $labels;
+    //     $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4, $datasets5, $datasets6];
 
-        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
-    }
+    //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    // }
 
 
-    public function ParticipationGraph($round_uuid){
-        $labels = $graph_data = $datasets = $data = array();
-        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
+    // public function DisqualificationGraph($round_uuid){
+    //     $labels = $graph_data = $datasets = $data = array();
+    //     $equipment_breakdown = $reagent_stock_out = $analyst_unavailable = $pending_capa = 0;
 
-        $round_id = $this->db->get_where('pt_round', ['uuid' => $round_uuid])->row()->id;
-        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
-        $participants = $this->Analysis_m->getReadyParticipants($round_id);
-        $equipments = $this->Analysis_m->Equipments();
+    //     $equipment_breakdown = $this->Analysis_m->getEquipmentBreakdown($round_uuid)->equipments;
+    //     $reagent_stock_out = $this->Analysis_m->getReagentStock($round_uuid)->reagents;
+    //     // $analyst_unavailable = $this->Analysis_m->getUnavailableAnalyst($round_uuid)->analysts;
+    //     $pending_capa = $this->Analysis_m->getPendingCapa($round_uuid)->capas;
 
-        foreach ($equipments as $key => $equipment) {
-            $counter++;
+    //     // echo "<pre>";print_r($pending_capa);echo "</pre>";die();
+
+    //     $datasets1 = [
+    //         'label'         =>  'Equipment Breakdown',
+    //         'backgroundColor' => 'rgba(211,84,0,0.5)',
+    //         'borderColor' => 'rgba(211,84,0,0.8)',
+    //         'highlightFill' => 'rgba(211,84,0,0.75)',
+    //         'highlightStroke' => 'rgba(211,84,0,1)',
+    //         'data' => [$equipment_breakdown]
+    //     ];
+    //     $datasets2 = [
+    //         'label'         =>  'Reagent Stock-Out',
+    //         'backgroundColor' => 'rgba(52,152,219,0.5)',
+    //         'borderColor' => 'rgba(52,152,219,0.8)',
+    //         'highlightFill' => 'rgba(52,152,219,0.75)',
+    //         'highlightStroke' => 'rgba(52,152,219,1)',
+    //         'data' => [$reagent_stock_out]
+    //     ];
+    //     $datasets3 = [
+    //         'label'         =>  'Analyst Unavailable',
+    //         'backgroundColor' => 'rgba(46,204,113,0.5)',
+    //         'borderColor' => 'rgba(46,204,113,0.8)',
+    //         'highlightFill' => 'rgba(46,204,113,0.75)',
+    //         'highlightStroke' => 'rgba(46,204,113,1)',
+    //         'data' => [$analyst_unavailable]
+    //     ];
+    //     $datasets4 = [
+    //         'label'         =>  'Pending CAPA',
+    //         'backgroundColor' => 'rgba(231,76,60,0.5)',
+    //         'borderColor' => 'rgba(231,76,60,0.8)',
+    //         'highlightFill' => 'rgba(231,76,60,0.75)',
+    //         'highlightStroke' => 'rgba(231,76,60,1)',
+    //         'data' => [$pending_capa]
+    //     ];
+
+        
+
+    //     $graph_data['labels'] = $labels;
+    //     $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
+
+    //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    // }
+
+
+    // public function ParticipationGraph($round_uuid){
+    //     $labels = $graph_data = $datasets = $data = array();
+    //     $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
+
+    //     $round_id = $this->db->get_where('pt_round', ['uuid' => $round_uuid])->row()->id;
+    //     $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+    //     $participants = $this->Analysis_m->getReadyParticipants($round_id);
+    //     $equipments = $this->Analysis_m->Equipments();
+
+    //     foreach ($equipments as $key => $equipment) {
+    //         $counter++;
             
-            $equipment_id = $equipment->id;
+    //         $equipment_id = $equipment->id;
 
-            foreach ($participants as $participant) {
-                $partcount ++;
-                $novalue = $sampcount = $acceptable = $unacceptable = 0;
+    //         foreach ($participants as $participant) {
+    //             $partcount ++;
+    //             $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-                foreach ($samples as $sample) {
-                    $sampcount++;
+    //             foreach ($samples as $sample) {
+    //                 $sampcount++;
 
-                    $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
+    //                 $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                    if($cd4_values){
+    //                 if($cd4_values){
 
-                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                    }else{
-                        $upper_limit = 0;
-                        $lower_limit = 0;
-                    } 
+    //                     $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+    //                     $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+    //                 }else{
+    //                     $upper_limit = 0;
+    //                     $lower_limit = 0;
+    //                 } 
 
-                    $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+    //                 $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
 
-                    if($part_cd4){
+    //                 if($part_cd4){
                         
-                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                            $acceptable++;    
-                        } else{
-                            $unacceptable++;    
-                        } 
+    //                     if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+    //                         $acceptable++;    
+    //                     } else{
+    //                         $unacceptable++;    
+    //                     } 
 
-                        if($part_cd4->cd4_absolute == 0){
-                            $novalue++;
-                        }
-                    } 
-                } 
+    //                     if($part_cd4->cd4_absolute == 0){
+    //                         $novalue++;
+    //                     }
+    //                 } 
+    //             } 
 
-                if($novalue == $sampcount){
-                    $non_responsive++;
-                }
+    //             if($novalue == $sampcount){
+    //                 $non_responsive++;
+    //             }
 
-                if($acceptable == $sampcount) {
-                    $passed++;
-                }
+    //             if($acceptable == $sampcount) {
+    //                 $passed++;
+    //             }
 
-            }
-        }
+    //         }
+    //     }
 
-        $unable = $this->Analysis_m->getUnableParticipants($round_uuid)->participants;
-        $disqualified = $this->Analysis_m->getRoundVerdict($round_uuid)->participants;
-        $total_facilities = $this->Analysis_m->TotalFacilities()->facilities;
-        $no_of_participants = $this->Analysis_m->ParticipatingParticipants($round_uuid)->participants;
-        $failed = $no_of_participants - $passed;
+    //     $unable = $this->Analysis_m->getUnableParticipants($round_uuid)->participants;
+    //     $disqualified = $this->Analysis_m->getRoundVerdict($round_uuid)->participants;
+    //     $total_facilities = $this->Analysis_m->TotalFacilities()->facilities;
+    //     $no_of_participants = $this->Analysis_m->ParticipatingParticipants($round_uuid)->participants;
+    //     $failed = $no_of_participants - $passed;
 
-        $datasets1 = [
-            'label'         =>  'Total No. of Facilities Enrolled',
-            'backgroundColor' => 'rgba(211,84,0,0.5)',
-            'borderColor' => 'rgba(211,84,0,0.8)',
-            'highlightFill' => 'rgba(211,84,0,0.75)',
-            'highlightStroke' => 'rgba(211,84,0,1)',
-            'data' => [$total_facilities]
-        ];
-        $datasets2 = [
-            'label'         =>  'No. of Participants (Current Round)',
-            'backgroundColor' => 'rgba(52,152,219,0.5)',
-            'borderColor' => 'rgba(52,152,219,0.8)',
-            'highlightFill' => 'rgba(52,152,219,0.75)',
-            'highlightStroke' => 'rgba(52,152,219,1)',
-            'data' => [$no_of_participants]
-        ];
-        $datasets3 = [
-            'label'         =>  'Passed',
-            'backgroundColor' => 'rgba(46,204,113,0.5)',
-            'borderColor' => 'rgba(46,204,113,0.8)',
-            'highlightFill' => 'rgba(46,204,113,0.75)',
-            'highlightStroke' => 'rgba(46,204,113,1)',
-            'data' => [$passed]
-        ];
-        $datasets4 = [
-            'label'         =>  'Failed',
-            'backgroundColor' => 'rgba(231,76,60,0.5)',
-            'borderColor' => 'rgba(231,76,60,0.8)',
-            'highlightFill' => 'rgba(231,76,60,0.75)',
-            'highlightStroke' => 'rgba(231,76,60,1)',
-            'data' => [$failed]
-        ];
-        $datasets5 = [
-            'label'         =>  'Non-Responsive',
-            'backgroundColor' => 'rgba(127,140,141,0.5)',
-            'borderColor' => 'rgba(127,140,141,0.8)',
-            'highlightFill' => 'rgba(127,140,141,0.75)',
-            'highlightStroke' => 'rgba(127,140,141,1)',
-            'data' => [$non_responsive]
-        ];
-        $datasets6 = [
-            'label'         =>  'Unable to Report',
-            'backgroundColor' => 'rgba(241,196,15,0.5)',
-            'borderColor' => 'rgba(241,196,15,0.8)',
-            'highlightFill' => 'rgba(241,196,15,0.75)',
-            'highlightStroke' => 'rgba(241,196,15,1)',
-            'data' => [$unable]
-        ];
-        $datasets7 = [
-            'label'         =>  'Disqualified',
-            'backgroundColor' => 'rgba(52,73,94,0.5)',
-            'borderColor' => 'rgba(52,73,94,0.8)',
-            'highlightFill' => 'rgba(52,73,94,0.75)',
-            'highlightStroke' => 'rgba(52,73,94,1)',
-            'data' => [$disqualified]
-        ];
+    //     $datasets1 = [
+    //         'label'         =>  'Total No. of Facilities Enrolled',
+    //         'backgroundColor' => 'rgba(211,84,0,0.5)',
+    //         'borderColor' => 'rgba(211,84,0,0.8)',
+    //         'highlightFill' => 'rgba(211,84,0,0.75)',
+    //         'highlightStroke' => 'rgba(211,84,0,1)',
+    //         'data' => [$total_facilities]
+    //     ];
+    //     $datasets2 = [
+    //         'label'         =>  'No. of Participants (Current Round)',
+    //         'backgroundColor' => 'rgba(52,152,219,0.5)',
+    //         'borderColor' => 'rgba(52,152,219,0.8)',
+    //         'highlightFill' => 'rgba(52,152,219,0.75)',
+    //         'highlightStroke' => 'rgba(52,152,219,1)',
+    //         'data' => [$no_of_participants]
+    //     ];
+    //     $datasets3 = [
+    //         'label'         =>  'Passed',
+    //         'backgroundColor' => 'rgba(46,204,113,0.5)',
+    //         'borderColor' => 'rgba(46,204,113,0.8)',
+    //         'highlightFill' => 'rgba(46,204,113,0.75)',
+    //         'highlightStroke' => 'rgba(46,204,113,1)',
+    //         'data' => [$passed]
+    //     ];
+    //     $datasets4 = [
+    //         'label'         =>  'Failed',
+    //         'backgroundColor' => 'rgba(231,76,60,0.5)',
+    //         'borderColor' => 'rgba(231,76,60,0.8)',
+    //         'highlightFill' => 'rgba(231,76,60,0.75)',
+    //         'highlightStroke' => 'rgba(231,76,60,1)',
+    //         'data' => [$failed]
+    //     ];
+    //     $datasets5 = [
+    //         'label'         =>  'Non-Responsive',
+    //         'backgroundColor' => 'rgba(127,140,141,0.5)',
+    //         'borderColor' => 'rgba(127,140,141,0.8)',
+    //         'highlightFill' => 'rgba(127,140,141,0.75)',
+    //         'highlightStroke' => 'rgba(127,140,141,1)',
+    //         'data' => [$non_responsive]
+    //     ];
+    //     $datasets6 = [
+    //         'label'         =>  'Unable to Report',
+    //         'backgroundColor' => 'rgba(241,196,15,0.5)',
+    //         'borderColor' => 'rgba(241,196,15,0.8)',
+    //         'highlightFill' => 'rgba(241,196,15,0.75)',
+    //         'highlightStroke' => 'rgba(241,196,15,1)',
+    //         'data' => [$unable]
+    //     ];
+    //     $datasets7 = [
+    //         'label'         =>  'Disqualified',
+    //         'backgroundColor' => 'rgba(52,73,94,0.5)',
+    //         'borderColor' => 'rgba(52,73,94,0.8)',
+    //         'highlightFill' => 'rgba(52,73,94,0.75)',
+    //         'highlightStroke' => 'rgba(52,73,94,1)',
+    //         'data' => [$disqualified]
+    //     ];
 
-        // echo "<pre>";print_r($unable);echo "</pre>";die();
+    //     // echo "<pre>";print_r($unable);echo "</pre>";die();
 
-        $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets7, $datasets6, $datasets5, $datasets3, $datasets4];
+    //     $graph_data['labels'] = $labels;
+    //     $graph_data['datasets'] = [$datasets1, $datasets2, $datasets7, $datasets6, $datasets5, $datasets3, $datasets4];
 
-        return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
-    }
+    //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
+    // }
 
 
 

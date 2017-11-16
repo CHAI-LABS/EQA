@@ -9,13 +9,11 @@ $(document).ready(function(){
 
 	$('#round-select, #county-select, #facility-select').select2();
 
-
 	$(document).on('change','#round-select',function(){
 		// alert("changed");
 		var r = document.getElementById("round-select");
 		var c = document.getElementById("county-select");
 		var f = document.getElementById("facility-select");
-
 
 		var round = r.options[r.selectedIndex].value;
 		var county = c.options[c.selectedIndex].value;
@@ -37,7 +35,7 @@ $(document).ready(function(){
 
 		var round = r.options[r.selectedIndex].value;
 		var county = c.options[c.selectedIndex].value;
-		var facility = f.options[c.selectedIndex].value;;
+		var facility = f.options[f.selectedIndex].value;;
 			
 		    changeGraphs(round,county,facility);
   	});
@@ -59,6 +57,8 @@ $(document).ready(function(){
 
   	function changeGraphs(round, county, facility){
 
+
+
   		$.get("<?=@base_url('Program/getFacilities/');?>" + county, function(facilities){
         	var facOptions = '';
 
@@ -68,6 +68,7 @@ $(document).ready(function(){
 
 			document.getElementById('facility-select').innerHTML += facOptions;
 	    });
+
 
   		var divs = document.getElementsByClassName('criteria');
 
@@ -84,9 +85,8 @@ $(document).ready(function(){
 		    });
   		}
 
-  		
 	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	    	// alert("reached1");
+	    	// console.log(ChartData);
 
 	    	$('#graph-1').replaceWith('<canvas id="graph-1"></canvas>');
 
@@ -160,7 +160,6 @@ $(document).ready(function(){
 	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	    	// alert("reached3");
 	        
-
 	        $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
 
 	    	var roundname1 = ChartData['round'];
@@ -363,7 +362,7 @@ $(document).ready(function(){
 	                    }],
 	                    yAxes: [{
 		    				stacked: true,
-	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+	                        type: "linear",
 	                        display: true,
 	                        position: "left",
 	                        id: "y-axis-1",
@@ -455,8 +454,6 @@ $(document).ready(function(){
 
 	        var roundname3 = ChartData['round'];
 
-	        // document.getElementById('roundname3').innerHTML = roundname3;
-
 	        var ctx5 = document.getElementById('graph-9');
 	        var chart = new Chart(ctx5, {
 	            type: 'bar',
@@ -467,8 +464,6 @@ $(document).ready(function(){
 	                    text:ChartData['x_axis_name'] + " Outcome"
 	                },
 	                legend: {
-	                	// backgroundColor: "rgba(255,99,132,0.2)",
-					    
 	                    display: true,
 	                    position: 'top',
 	                    fullWidth: true,

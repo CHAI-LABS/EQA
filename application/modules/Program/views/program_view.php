@@ -23,6 +23,8 @@
                     Criteria Selection
             </div> -->
 
+            <?= @$back_link; ?>
+
             <div class = "block">
                 <div class = "block col-md-3">
                     <fieldset class="form-group">
