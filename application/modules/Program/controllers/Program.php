@@ -1502,7 +1502,7 @@ class Program extends MY_Controller {
             $data = $name . ' Facility';
         }elseif($county_id){
             $name = $this->db->get_where('county_v', ['id' => $county_id])->row()->county_name;
-            $data = $name . ' County';
+            $data = $name . ' County Facilities Outcomes';
         }else{
             $data = "National";
         }
