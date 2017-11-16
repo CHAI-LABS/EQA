@@ -378,7 +378,6 @@ class Program extends MY_Controller {
 
                 } 
 
-
                 $no_participants['data'][] = round($pass_rate, 2);
                 $pass['data'][] = $passed;
                 $fail['data'][] = $failed;
@@ -530,7 +529,6 @@ class Program extends MY_Controller {
                 $graph_data['x_axis_name'] = "Participants";
             }
         }
-
         
         $graph_data['round'] = $round_name;
         $graph_data['labels'] = $labels;

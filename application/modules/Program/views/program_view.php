@@ -244,7 +244,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    COUNTY OUTCOMES
+                                    <strong class="criteria">National</strong> Outcomes
                                     <!-- : <strong id="roundname3">Loading...</strong> -->
                                     <div class="card-actions">
                                     </div>
