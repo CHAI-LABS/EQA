@@ -187,11 +187,6 @@ class Program extends MY_Controller {
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $failed = $no_of_participants - $passed;
 
-        // $datasets = [
-        //     'label'         =>  ['NO OF PARTICIPANTS','PASSED','FAILED'],
-        //     'backgroundColor' => ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-        //     'data' => [$no_of_participants, $passed, $failed]
-        // ];
         $datasets = [
             'label'         =>  ['Passed','Failed'],
             'backgroundColor' => ['rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],

@@ -35,7 +35,7 @@ $(document).ready(function(){
 
 		var round = r.options[r.selectedIndex].value;
 		var county = c.options[c.selectedIndex].value;
-		var facility = f.options[f.selectedIndex].value;;
+		var facility = f.options[f.selectedIndex].value;
 			
 		    changeGraphs(round,county,facility);
   	});

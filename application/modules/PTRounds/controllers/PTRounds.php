@@ -458,6 +458,14 @@ class PTRounds extends DashboardController{
     function ReadyParticipants($round_uuid){
         $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
 
+        $qa = $this->M_PTRounds->getQAUnresponsiveCount($round_uuid);
+
+        if($qa){
+            $qa_count = $qa->qa_count;
+        }else{
+            $qa_count = 0;
+        }
+
         $data = [];
         $title = "Ready Participants";
 
@@ -466,7 +474,7 @@ class PTRounds extends DashboardController{
             'back_link'     =>  base_url("PTRounds/"),
             'back_name'     =>  "Back to Rounds",
             'qa_unresponsive'     =>  base_url("PTRounds/QAUnresponsive/$round_uuid"),
-            'qa_unresponsive_count' => $this->M_PTRounds->getQAUnresponsiveCount($round_uuid)->qa_count
+            'qa_unresponsive_count' => $qa_count
         ];
 
         // echo '<pre>';print_r($this->M_PTRounds->getQAUnresponsiveCount($round_uuid)->qa_count);echo "</pre>";die();
@@ -561,15 +569,23 @@ class PTRounds extends DashboardController{
                 $qa_unresponsive = $this->db->get_where('participant_readiness_v',['facility_id'=> $facility->facility_id, 'user_type' => 'qareviewer', 'status' => 1, 'approved' => 1])->row();
 
                 // echo '<pre>';print_r($facilities);echo "</pre>";die();
-                    
-
+                if($qa_unresponsive){
                     $tabledata[] = [
                         $counter,
                         $qa_unresponsive->username,
                         $qa_unresponsive->lastname.' '.$qa_unresponsive->firstname,
                         $qa_unresponsive->phone,
                         $qa_unresponsive->email_address
-                    ];    
+                    ]; 
+                }else{
+                    $tabledata[] = [
+                        $counter,
+                        'No Username',
+                        'No Name',
+                        'No Phone Number',
+                        'No Email Address'
+                    ]; 
+                }
             }
         }else{
             $heading = [
@@ -1039,8 +1055,6 @@ public function createTabs($round_uuid, $participant_uuid){
     }
 
 
-
-
     function createPTRoundTable(){
         $rounds = $this->db->get('pt_round_v')->result();
         $ongoing = $prevfut = '';
@@ -1048,6 +1062,7 @@ public function createTabs($round_uuid, $participant_uuid){
         if ($rounds) {
             foreach ($rounds as $round) {
 
+                // echo "<pre>";print_r($round);die();
                 $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round->uuid)->id;
                 $getRound = $this->M_PTRounds->getDataSubmission($round_id);
 
@@ -1055,6 +1070,12 @@ public function createTabs($round_uuid, $participant_uuid){
                     $submissions = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('PTRounds/PTRounds/ReadyParticipants/' . $round->uuid)."'><i class = 'fa fa-file-text-o'></i>&nbsp;Submissions</a>";
                 }else{
                     $submissions = '';
+                }
+
+                if($round->type == 'ongoing'){
+                    $submit = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('PTRounds/PTRounds/SubmitReport/' . $round->uuid)."'><i class = 'fa fa-file-text-o'></i>&nbsp;Submit Report</a>";
+                }else{
+                    $submit = '';
                 }
 
                 $created = date('dS F, Y', strtotime($round->date_of_entry));
@@ -1072,6 +1093,7 @@ public function createTabs($round_uuid, $participant_uuid){
                                 Quick Actions
                             </button>
                             <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $submit
                                 $view
                                 $panel_tracking
                                 $submissions
@@ -1200,6 +1222,63 @@ public function createTabs($round_uuid, $participant_uuid){
         }
 
         return $calendar_items_span;
+    }
+
+
+    function SubmitReport ($round_uuid){
+        $data = [];
+        $title = "Submit Participant Data";
+
+        // $counter = 0;
+        
+        $this->db->where('uuid', $round_uuid);
+        // $this->db->order_by('id', 'ASC');
+        $rounds = $this->db->get('pt_round_v')->row();
+
+        $round = $rounds->id;
+        // $round_list = '<select id="round-select" class="form-control select2-single">';
+        // foreach ($rounds as $round) {
+        //     $counter++;
+        //     if($counter == 1){
+        //         $round_list .= '<option selected = "selected" value='.$round->id.'>'.$round->pt_round_no.'</option>';
+        //         $round = $round->id;
+        //     }else{
+        //         $round_list .= '<option value='.$round->id.'>'.$round->pt_round_no.'</option>';
+        //     }
+        // }
+        // $round_list .= '</select>';
+
+
+        $counties = $this->db->get('county_v')->result();
+        $county_list = '<select id="county-select" class="form-control select2-single">
+                        <option selected = "selected" value="0">Select the County</option>';
+        foreach ($counties as $county) {
+            $county_list .= '<option value='.$county->id.'>'.$county->county_name.'</option>';
+        }
+        $county_list .= '</select>';
+
+        // $facilities = $this->db->get('facility_v')->result();
+        $facility_list = '<option selected = "selected" value="0">Select the Facility</option>';
+
+        $data = [
+            'round'    =>  $round,
+            'back_link' => '<div class = "pull-right"> <a href="'.base_url('PTRounds/').'"><button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to PT Rounds</button></a><br /><br /></div>',
+            'page_title' => "Submit Participant Data",
+            // 'round_option' => $round_list,
+            'county_option' => $county_list,
+            'facility_option' => $facility_list
+        ];
+
+         $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        $this->assets->setJavascript('PTRounds/submit_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('PTRounds/participant_data_submission', $data)
+                ->adminTemplate();
     }
 
     function getFacilityStatistics($round_uuid){

@@ -1129,6 +1129,25 @@ class PTRound extends MY_Controller {
     }
 
 
+    public function getRound($round_id,$facility_id){
+        $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->uuid;
+        $user = $this->M_Readiness->findUserByLabResult($round_uuid, $facility_id);
+        $participant_id = $user->uuid;
+
+        $equipment_tabs = $this->createTabs($round_uuid,$participant_id);
+
+        $data = [
+                'pt_round_to' => $pt_round_to,
+                'pt_uuid'    =>  $round_uuid,
+                'participant'    =>  $participant_id,
+                'equipment_tabs'    =>  $equipment_tabs,
+                'data_submission' => 'data_submission'
+            ];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($data));
+    }
+
+
     
 
     public function Round($round_uuid){
@@ -1137,10 +1156,8 @@ class PTRound extends MY_Controller {
 
         $participant_id = $user->uuid;
 
-        
-
-        //echo "<pre>";print_r($equipments);echo "</pre>";die();
         $equipment_tabs = $this->createTabs($round_uuid,$participant_id);
+        // echo "<pre>";print_r($equipment_tabs);echo "</pre>";die();
         $pt_round_to = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->to;
 
         $data = [
