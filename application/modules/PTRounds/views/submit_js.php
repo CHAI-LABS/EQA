@@ -28,15 +28,7 @@ $(document).ready(function(){
 		var county = c.options[c.selectedIndex].value;
 		var facility = f.options[f.selectedIndex].value;
 
-		$.get("<?=@base_url('Program/getFacilities/');?>" + county, function(facilities){
-        	var facOptions = '';
-
-         	facilities.forEach(function(facil) {
-			    facOptions += "<option value="+ facil.facility_id +">" + facil.facility_name + "</option>";
-			});
-
-			document.getElementById('facility-select').innerHTML += facOptions;
-	    });
+		
 			
 		    changeFacility(round,county,facility);
   	});
@@ -56,7 +48,15 @@ $(document).ready(function(){
 
 
   	function changeFacility(round,county, facility){
-  		
+  		$.get("<?=@base_url('Program/getFacilities/');?>" + county, function(facilities){
+        	var facOptions = '';
+
+         	facilities.forEach(function(facil) {
+			    facOptions += "<option value="+ facil.facility_id +">" + facil.facility_name + "</option>";
+			});
+
+			document.getElementById('facility-select').innerHTML += facOptions;
+	    });
 
     }
 
