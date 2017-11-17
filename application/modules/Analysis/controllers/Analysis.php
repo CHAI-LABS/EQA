@@ -769,6 +769,71 @@ class Analysis extends DashboardController {
     }
 
 
+    public function Dashboard(){
+        $data = [];
+        $title = "Graph Dashboard";
+        $counter = 0;
+
+        // echo "<pre>";print_r($round_uuid);echo "</pre>";die();
+
+        // $this->db->where('type', 'previous');
+        $this->db->order_by('id', 'ASC');
+        $rounds = $this->db->get('pt_round_v')->result();
+
+
+        $round_list = '<select id="round-select" class="form-control select2-single">';
+        foreach ($rounds as $round) {
+            $counter++;
+            if($counter == 1){
+                $round_list .= '<option selected = "selected" value='.$round->id.'>'.$round->pt_round_no.'</option>';
+                $round_id = $round->id;
+                $round_name = $round->pt_round_no;
+            }else{
+                $round_list .= '<option value='.$round->id.'>'.$round->pt_round_no.'</option>';
+            }
+        }
+        $round_list .= '</select>';
+
+
+        $counties = $this->db->get('county_v')->result();
+        $county_list = '<select id="county-select" class="form-control select2-single">
+                        <option selected = "selected" value="0">All Counties</option>';
+        foreach ($counties as $county) {
+            $county_list .= '<option value='.$county->id.'>'.$county->county_name.'</option>';
+        }
+        $county_list .= '</select>';
+
+        // $facilities = $this->db->get('facility_v')->result();
+        $facility_list = '<option selected = "selected" value="0">All Facilities</option>';
+
+
+        $data = [
+            'page_title' => "Analysis Graphs",
+            'round_option' => $round_list,
+            'county_option' => $county_list,
+            'facility_option' => $facility_list,
+            'back_link' => '<div class = "pull-right"> <a href="'.base_url('Dashboard/').'"><button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to Dashboard</button></a><br /><br /></div>',
+            'round' => $round_id,
+            'round_name' => $round_name
+        ];
+            
+        $this->assets->addCss('css/main.css');
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js')
+                ->addJs('js/Chart.min.js')
+                ->addJs('js/chartsjs-plugin-data-labels.js')
+                ->addJs('js/Chart.PieceLabel.js');
+        $this->assets->setJavascript('Program/program_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Program/program_view', $data)
+                ->adminTemplate();
+    }
+
+
 	public function createNHRLTable($form, $round_id, $equipment_id){
 		$template = $this->config->item('default');
 

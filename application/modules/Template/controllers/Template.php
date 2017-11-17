@@ -210,6 +210,12 @@ class Template extends MX_Controller {
 				'link'	=>	'Analysis/',
 				'users'	=>	['admin']
 			],
+			'program'		=>	[
+				'icon'	=>	'icon-graph',
+				'text'	=>	'Dashboard: Graphs',
+				'link'	=>	'Analysis/Dashboard',
+				'users'	=>	['admin']
+			],
 			'participantrounds'	=>	[
 				'icon'	=>	'icon-chemistry',
 				'text'	=>	'PT Rounds',
