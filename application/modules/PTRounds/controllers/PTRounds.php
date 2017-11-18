@@ -1916,7 +1916,7 @@ public function createTabs($round_uuid, $participant_uuid){
 
             </div>
             <div class='card-block'>
-            <form method='POST' class='p-a-4' id='".$equipment->id."' enctype='multipart/form-data'>
+            <form method='POST' class='p-a-4 form' id='".$equipment->id."' enctype='multipart/form-data'>
                 <input type='hidden' class='page-signup-form-control form-control ptround' value='".$round_uuid."'>
                 <div>
                 ";
@@ -2092,8 +2092,8 @@ public function createTabs($round_uuid, $participant_uuid){
 
 
                     $equipment_tabs .= "<tr>
-                                        <td >Participant ID</td>
-                                        <td colspan='6'><input type='text' class='page-signup-form-control form-control' $disabled placeholder='Enter Participant ID to be Lab Result' value = '' name = 'participant_id'></td>
+                                        <th style='text-align: center;' >Participant ID</th>
+                                        <td colspan='6'><input type='text' required='required' class='page-signup-form-control form-control' $disabled placeholder='Enter Participant ID to be Lab Result' name = 'participant_id'></td>
                                         </tr>";
 
 
@@ -2150,17 +2150,19 @@ public function createTabs($round_uuid, $participant_uuid){
 
     public function dataSubmission($equipmentid,$round){
         if($this->input->post()){
-            $user = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));
+            $participant_id = $this->input->post('participant_id');
+
+            $user = $this->M_Readiness->findUserByIdentifier('username', $participant_id);
 
             $no_reagents = count($this->input->post('reagent_name'));
             $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round)->id;
             $participant_uuid = $user->uuid;
-            $participant_id = $user->p_id;
+            $p_id = $user->p_id;
 
             $samples = $this->M_PTRound->getSamples($round,$participant_uuid);
              
             $counter2 = 0;
-            $submission = $this->M_PTRound->getDataSubmission($round_id,$participant_id,$equipmentid);
+            $submission = $this->M_PTRound->getDataSubmission($round_id,$p_id,$equipmentid);
 
             $lot_number = $this->input->post('lot_number');
             $reagent_name = $this->input->post('reagent_name');
@@ -2195,7 +2197,7 @@ public function createTabs($round_uuid, $participant_uuid){
 
                     $insertsampledata = [
                             'round_id'    =>  $round_id,
-                            'participant_id'    =>  $participant_id,
+                            'participant_id'    =>  $p_id,
                             'equipment_id'    =>  $equipmentid,
                             'status'    =>  0,
                             'verdict'    =>  2,
@@ -2330,4 +2332,9 @@ public function createTabs($round_uuid, $participant_uuid){
           $this->session->set_flashdata('error', "No data was received");
         }
     }
+
+
+
+
+
 }

@@ -9,7 +9,7 @@ $(document).ready(function(){
 	var county = 0;
 	var facility = 0;
 
-	
+
 
 	changeFacility(round,county,facility);
 
@@ -24,8 +24,8 @@ $(document).ready(function(){
 		var c = document.getElementById("county-select");
 		var f = document.getElementById("facility-select");
 
-		var county = c.options[c.selectedIndex].value;
-		var facility = f.options[f.selectedIndex].value;
+		county = c.options[c.selectedIndex].value;
+		facility = f.options[f.selectedIndex].value;
 
 		changeFacility(round,county,facility);
   	});
@@ -33,12 +33,12 @@ $(document).ready(function(){
 
 
   	$(document).on('change','#facility-select',function(){
-  		// alert("changed");
+  		// alert("facility changed");
 		var c = document.getElementById("county-select");
 		var f = document.getElementById("facility-select");
 
-		var county = c.options[c.selectedIndex].value;
-		var facility = f.options[f.selectedIndex].value;
+		county = c.options[c.selectedIndex].value;
+		facility = f.options[f.selectedIndex].value;
 
        changeFacility(round,county,facility);
   	});
@@ -61,36 +61,44 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('PTRounds/getRound/');?>" + round + '/' + facility, function(formdata){
         	// console.log(formdata['equipment_tabs']);
-			$('#content').replaceWith(formdata['equipment_tabs']);
+			// $('#content').replaceWith(formdata['equipment_tabs']);
+			document.getElementById('content').innerHTML += formdata['equipment_tabs'];
+
 	    });
+
+		if($(".form").length){
+			console.log("Loaded");
+		}else{
+			alert("Click OK once forms have loaded");
+		}
+
     }
 
+	var round_uuid = $(".ptround").val();
 
-    
 
-	// var round_uuid = $(".ptround").val();
 
 	$("form").submit(function(e){
-		alert("round_uuid");
+		// alert("submitting");
 		 e.preventDefault();
-	  var form = $(this);
-	  var id = form.attr('id');
-      // alert('id');
-	  var formData = new FormData(this);
+		  var form = $(this);
+		  var id = form.attr('id');
+	      // alert('id');
+		  var formData = new FormData(this);
 
 		dataSubmit(id, formData);
 	 
 	});
 
 	function dataSubmit(equipmentid,formData){
-		 alert(facility);
+		 // alert(facility);
 
 		 if(facility == 0){
 		 	alert("Please select a facility first");
 		 }else{
 		 	$.ajax({
 			   	type: "POST",
-			   	url: "<?= @base_url('Participant/PTRound/dataSubmission/'); ?>"+equipmentid+ '/' +round_uuid,
+			   	url: "<?= @base_url('PTRounds/dataSubmission/'); ?>"+equipmentid+ '/' +round_uuid,
 				data: formData,
 	            processData: false,
 	            contentType: false,
@@ -98,12 +106,12 @@ $(document).ready(function(){
 	            // alert(html);
 			   		if(html){
 
-	                	$("#data-info").html("Successfully saved the data");
+	                	$("#data-info").html(html);
 	                    window.location = "<?= @base_url('PTRounds/SubmitReport/'); ?>"+round_uuid;
 	                }else{
 	                	
 	                	$("#data-info").html("Failed to save the data ...");
-	                	// window.location = "<?= @base_url('PTRounds/SubmitReport/'); ?>"+round_uuid;
+	                	// window.location = "<?= @base_url('PTRounds/PTRounds/SubmitReport/'); ?>"+round_uuid;
 	                }	
 			   },
 	           error: function(){
@@ -139,6 +147,9 @@ $(document).ready(function(){
     function addReagentRow(no_items){
         $('tr.reagent_row').eq(no_items-2).after("<?= @$row_blueprint; ?>");
     }
+
+
+
 
 
 

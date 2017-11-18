@@ -1,11 +1,11 @@
 <?php if($this->session->flashdata('success')){ ?>
-        <div id="data-info" class = 'alert alert-success'>
+        <!-- <div id="data-info" class = 'alert alert-success'>
             <?= @$this->session->flashdata('success'); ?>
-        </div>
+        </div> -->
 <?php }elseif($this->session->flashdata('error')){ ?>
-        <div class = 'alert alert-danger'>
+        <!-- <div class = 'alert alert-danger'>
             <?= @$this->session->flashdata('error'); ?>
-        </div>
+        </div> -->
 <?php } ?>
 
 <div id="round" data-type="<?= @$round; ?>"></div>
