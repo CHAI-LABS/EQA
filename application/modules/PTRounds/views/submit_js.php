@@ -62,7 +62,7 @@ $(document).ready(function(){
 	    $.get("<?=@base_url('PTRounds/getRound/');?>" + round + '/' + facility, function(formdata){
         	// console.log(formdata['equipment_tabs']);
 			// $('#content').replaceWith(formdata['equipment_tabs']);
-			document.getElementById('content').innerHTML += formdata['equipment_tabs'];
+			document.getElementById('content').innerHTML = formdata['equipment_tabs'];
 
 	    });
 
@@ -111,7 +111,7 @@ $(document).ready(function(){
 	                }else{
 	                	
 	                	$("#data-info").html("Failed to save the data ...");
-	                	// window.location = "<?= @base_url('PTRounds/PTRounds/SubmitReport/'); ?>"+round_uuid;
+	                	// window.location = "<?= @base_url('PTRounds/SubmitReport/'); ?>"+round_uuid;
 	                }	
 			   },
 	           error: function(){
