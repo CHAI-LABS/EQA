@@ -1,9 +1,11 @@
 <?php
 
 class PTRounds extends DashboardController{
+    protected $row_blueprint;
     protected $menu, $lab_id_prefix;
     function __construct(){
         parent::__construct();
+
         $this->load->helper('form');
         $this->load->library('table');
         $this->load->config('table');
@@ -12,6 +14,8 @@ class PTRounds extends DashboardController{
         $this->load->model('M_Readiness');
         $this->load->model('M_PTRounds');
         $this->load->model('M_PTRound');
+
+        $this->row_blueprint = "<tr class = 'reagent_row'><td colspan = '2'><label style='text-align: center;'>Reagent Name: </label> <input type = 'text' class = 'page-signup-form-control form-control' name = 'reagent_name[]' value = '|reagent_name|' required |disabled|/> </td><td colspan = '3'><label style='text-align: center;'>Lot Number: </label><input type = 'text' class = 'page-signup-form-control form-control' name = 'lot_number[]' value = '|lot_number|' required |disabled|/></td><td colspan = '3'><label style='text-align: center;'>Expiry Date: (YYYY-MM-DD)</label><input type = 'text' class = 'page-signup-form-control form-control' name = 'expiry_date[]' value = '|expiry_date|' required |disabled|/> </td></tr>";
 
         $this->menu = [
             'information'   =>  [
@@ -707,8 +711,8 @@ public function createTabs($round_uuid, $participant_uuid){
         $datas=[];
         $tab = 0;
         $zero = '0';
-        
-        $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid);
+
+        $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid);        
         $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
         $user = $this->M_Readiness->findUserByIdentifier('uuid', $participant_uuid);
         $participant_id = $user->p_id;
@@ -1225,62 +1229,6 @@ public function createTabs($round_uuid, $participant_uuid){
     }
 
 
-    function SubmitReport ($round_uuid){
-        $data = [];
-        $title = "Submit Participant Data";
-
-        // $counter = 0;
-        
-        $this->db->where('uuid', $round_uuid);
-        // $this->db->order_by('id', 'ASC');
-        $rounds = $this->db->get('pt_round_v')->row();
-
-        $round = $rounds->id;
-        // $round_list = '<select id="round-select" class="form-control select2-single">';
-        // foreach ($rounds as $round) {
-        //     $counter++;
-        //     if($counter == 1){
-        //         $round_list .= '<option selected = "selected" value='.$round->id.'>'.$round->pt_round_no.'</option>';
-        //         $round = $round->id;
-        //     }else{
-        //         $round_list .= '<option value='.$round->id.'>'.$round->pt_round_no.'</option>';
-        //     }
-        // }
-        // $round_list .= '</select>';
-
-
-        $counties = $this->db->get('county_v')->result();
-        $county_list = '<select id="county-select" class="form-control select2-single">
-                        <option selected = "selected" value="0">Select the County</option>';
-        foreach ($counties as $county) {
-            $county_list .= '<option value='.$county->id.'>'.$county->county_name.'</option>';
-        }
-        $county_list .= '</select>';
-
-        // $facilities = $this->db->get('facility_v')->result();
-        $facility_list = '<option selected = "selected" value="0">Select the Facility</option>';
-
-        $data = [
-            'round'    =>  $round,
-            'back_link' => '<div class = "pull-right"> <a href="'.base_url('PTRounds/').'"><button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to PT Rounds</button></a><br /><br /></div>',
-            'page_title' => "Submit Participant Data",
-            // 'round_option' => $round_list,
-            'county_option' => $county_list,
-            'facility_option' => $facility_list
-        ];
-
-         $this->assets
-                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
-                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
-                ->addJs('dashboard/js/libs/jquery.validate.js')
-                ->addJs('dashboard/js/libs/select2.min.js');
-        $this->assets->setJavascript('PTRounds/submit_js');
-        $this->template
-                ->setPageTitle($title)
-                ->setPartial('PTRounds/participant_data_submission', $data)
-                ->adminTemplate();
-    }
-
     function getFacilityStatistics($round_uuid){
         $query = $this->db->query("CALL get_pt_facility_statistics('$round_uuid');");
         $result = $query->row();
@@ -1437,7 +1385,7 @@ public function createTabs($round_uuid, $participant_uuid){
                 'data'              =>  $data
              ];
 
-             // echo "string";print_r($json_data);echo "string";die();
+             
             return $this->output->set_content_type('application/json')->set_output(json_encode($json_data));
         }
     }
@@ -1694,6 +1642,692 @@ public function createTabs($round_uuid, $participant_uuid){
             redirect('PTRounds/create/facilities/' . $pt_round_uuid);
         }else{
             show_404();
+        }
+    }
+
+
+    public function generateReagentRow($submission_id = NULL, $equipment_id, $disabled){
+        
+
+        $reagent_row = "";
+
+        if ($submission_id != NULL) {
+            $this->db->where('submission_id', $submission_id);
+            $this->db->where('equipment_id', $equipment_id);
+            $reagents = $this->db->get('pt_data_submission_reagent')->result();
+
+            if($reagents){
+                foreach ($reagents as $reagent) {
+                    $reagent_row .= $this->cleanReagentRowTemplate($disabled, $reagent->reagent_name, $reagent->lot_number, $reagent->expiry_date);
+                }
+            }
+        }
+
+        if ($reagent_row == "") {
+            $reagent_row = $this->cleanReagentRowTemplate($disabled);
+        }
+
+        return $reagent_row;
+    }
+
+    function cleanReagentRowTemplate($disabled, $reagent_name = NULL, $lot_number = NULL, $expiry_date = NULL){
+        $row_blueprint = $this->row_blueprint;
+
+        $search = ['|reagent_name|', '|lot_number|', '|expiry_date|', '|disabled|'];
+        $replace = [$reagent_name, $lot_number, $expiry_date, $disabled];
+
+        $row = str_replace($search, $replace, $row_blueprint);
+
+        return $row;
+    }
+
+
+
+    public function getRound($round_id,$facility_id){
+
+        $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
+
+        $round_uuid = $round->uuid;
+        
+        $user = $this->M_PTRounds->findUserByLabResult($round_uuid, $facility_id);
+        
+        if($user){
+            $participant_uuid = $user->uuid;
+            $participant_id = $user->particiapant_id;
+        }else{
+            $participant_uuid = 0;
+            $participant_id = 0;
+        }        
+        
+        // echo "<pre>";print_r($user);echo "</pre>";die();
+        
+        $equipment_tabs = $this->createSubmitTabs($round_uuid,$participant_uuid);
+
+        $data = [
+                'pt_round_to' => $round->to,
+                'pt_uuid'    =>  $round_uuid,
+                'participant'    =>  $participant_id,
+                'equipment_tabs'    =>  $equipment_tabs
+            ];
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode($data));
+    }
+
+
+    function SubmitReport($round_uuid){
+        $data = [];
+        $title = "Submit Participant Data";
+
+        // $counter = 0;
+        
+        $this->db->where('uuid', $round_uuid);
+        // $this->db->order_by('id', 'ASC');
+        $rounds = $this->db->get('pt_round_v')->row();
+
+        $round = $rounds->id;
+
+        $counties = $this->db->get('county_v')->result();
+        $county_list = '<select id="county-select" class="form-control select2-single">
+                        <option selected = "selected" value="0">Select the County</option>';
+        foreach ($counties as $county) {
+            $county_list .= '<option value='.$county->id.'>'.$county->county_name.'</option>';
+        }
+        $county_list .= '</select>';
+
+        // $facilities = $this->db->get('facility_v')->result();
+        $facility_list = '<option selected = "selected" value="0">Select the Facility</option>';
+
+        $js_data['row_blueprint'] = $this->cleanReagentRowTemplate("");
+        $js_data['round_uuid'] = $round_uuid;
+        $data = [
+            'round'    =>  $round,
+            'back_link' => '<div class = "pull-right"> <a href="'.base_url('PTRounds/').'"><button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to PT Rounds</button></a><br /><br /></div>',
+            'page_title' => "Submit Participant Data",
+            // 'round_option' => $round_list,
+            'county_option' => $county_list,
+            'facility_option' => $facility_list,
+            'pt_round_to' => $rounds->to
+        ];
+
+         $this->assets
+                ->addCss('plugin/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')
+                ->addCss("plugin/sweetalert/sweetalert.css")
+                ->addCss('css/signin.css');  
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/moment.min.js')
+                ->addJs('plugin/bootstrap-datepicker/js/bootstrap-datepicker.min.js')
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js')
+                ->addJs("plugin/sweetalert/sweetalert.min.js");
+        $this->assets->setJavascript('PTRounds/submit_js', $js_data);
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('PTRounds/participant_data_submission', $data)
+                ->adminTemplate();
+    }
+
+
+    public function createSubmitTabs($round_uuid, $participant_uuid){
+        
+        $datas=[];
+        $tab = 0;
+        $zero = '0';
+        
+        if($participant_uuid == 0){
+            $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid,'nopart');
+        }else{
+            $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid);
+        }
+
+
+        $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
+        $user = $this->M_Readiness->findUserByIdentifier('uuid', $participant_uuid);
+
+
+        // echo "<pre>";print_r($samples);echo "</pre>";die();
+
+        if($user){
+            $participant_id = $user->p_id;
+        }else{
+            $participant_id = 0;
+        }
+        
+
+        if($participant_id){
+            $equipments = $this->M_PTRound->Equipments($participant_uuid);
+        }else{
+            $equipments = $this->db->get("equipments_v")->result();
+        }
+
+        
+        // $equipments = $this->M_PTRound->Equipments($participant_uuid);
+        
+        $equipment_tabs = '';
+
+        $equipment_tabs .= "<ul class='nav nav-tabs' role='tablist'>";
+
+        foreach ($equipments as $key => $equipment) {
+            $tab++;
+            $equipment_tabs .= "";
+
+            $equipment_tabs .= "<li class='nav-item'>";
+            if($tab == 1){
+                $equipment_tabs .= "<a class='nav-link active' data-toggle='tab'";
+            }else{
+                $equipment_tabs .= "<a class='nav-link' data-toggle='tab'";
+            }
+
+            $equipmentname = $equipment->equipment_name;
+            $equipmentname = str_replace(' ', '_', $equipmentname);
+            
+            $equipment_tabs .= " href='#".$equipmentname."' role='tab' aria-controls='home'><i class='icon-calculator'></i>&nbsp;";
+            $equipment_tabs .= $equipment->equipment_name;
+            $equipment_tabs .= "&nbsp;";
+            // $equipment_tabs .= "<span class='tag tag-success'>Complete</span>";
+            $equipment_tabs .= "</a>
+                                </li>";
+        }
+
+        $equipment_tabs .= "</ul>
+                            <div class='tab-content'>";
+
+        $counter = 0;
+        $counter3 = 0;
+        $lotcounter = 0;
+
+        foreach ($equipments as $key => $equipment) {
+            $counter++;
+
+            
+
+            $equipmentname = $equipment->equipment_name;
+            $equipmentname = str_replace(' ', '_', $equipmentname);
+
+            if($counter == 1){
+                $equipment_tabs .= "<div class='tab-pane active' id='". $equipmentname ."' role='tabpanel'>";
+            }else{
+                $equipment_tabs .= "<div class='tab-pane' id='". $equipmentname ."' role='tabpanel'>";
+            }
+            
+            $this->db->where('round_uuid',$round_uuid);
+            $this->db->where('participant_id',$participant_id);
+            $this->db->where('equipment_id',$equipment->id);
+
+            $datas = $this->db->get('data_entry_v')->result();
+
+            $this->db->where('round_id',$round_id);
+            $this->db->where('participant_id',$participant_id);
+            $this->db->where('equipment_id',$equipment->id);
+            $new_m_count = $this->db->count_all_results('pt_data_log');
+
+            if($new_m_count){
+               $qa_m_count = $new_m_count; 
+            }else{
+                $qa_m_count = 0;
+            }
+
+            // echo "<pre>";print_r($new_m_count);echo "</pre>";die();
+
+            $equipment_tabs .= "<div class='row'>
+        <div class='col-sm-12'>
+        <div class='card'>
+            <div class='card-header'>
+                
+
+            <div class='form-group row'>
+                <div class='col-md-6'>
+
+                <label class='checkbox-inline'>
+                <strong>RESULTS FOR ". $equipment->equipment_name ."</strong>
+                </label>
+
+                </div>
+                
+                <div class='col-md-6'>
+                    
+            <label class='checkbox-inline' for='check-complete'>";
+
+            if($datas){
+                $getCheck = $this->M_PTRound->getDataSubmission($round_id,$participant_id,$equipment->id)->status;
+                // $submission_id = $this->db->get_where('pt_data_submission', );
+            }else{
+                $getCheck = 0; 
+            }
+            
+
+            // echo "<pre>";print_r("<br/><br/><br/><br/><br/>Lot Number: ".$lotcounter);echo "</pre>";
+            $disabled = "";
+
+            if($getCheck == 1){
+                $disabled = "disabled='' ";
+                $equipment_tabs .= "<p><strong><span class='text-danger'>Further entry disabled. The Submission date has passed or Supervisor of this facility has marked this result as complete</span></strong></p>";
+                // $equipment_tabs .= "<input type='checkbox' data-type = '". $equipment->equipment_name ."' class='check-complete' checked='checked' $disabled name='check-complete' value='". $equipment->id ."'>&nbsp;&nbsp; Mark Equipment as Complete";
+            }else{
+                $disabled = "";
+                // $equipment_tabs .= "<input type='checkbox' class='check-complete' $disabled name='check-complete' value='". $equipment->id ."'>&nbsp;&nbsp; Mark Equipment as Complete";
+            }
+
+            $equipment_tabs .= "</label>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class='card-block'>
+            <form method='POST' class='p-a-4' id='".$equipment->id."' enctype='multipart/form-data'>
+                <input type='hidden' class='page-signup-form-control form-control ptround' value='".$round_uuid."'>
+                <div>
+                ";
+
+                $equipment_tabs .= "
+                </div>
+
+
+                <div class='row'>
+                    <table class='table table-bordered'>
+                        <tr>
+                            <td colspan = '8'>
+                                <button id = 'add-reagent' href = '#' class = 'btn btn-primary btn-sm pull-right' $disabled> <a>Add Reagent</a> </button>
+                            </td>
+                        </tr>";
+
+                
+                $submission_id = ($datas) ? $datas[0]->equip_result_id : NULL;
+                // echo "<pre>";print_r($submission_id);echo "</pre>";die();
+
+
+                $equipment_tabs .= $this->generateReagentRow($submission_id, $equipment->id, $disabled);
+    
+
+                       $equipment_tabs .= "<tr>
+                            <th style='text-align: center; width:20%;' rowspan='3'>
+                                PANEL
+                            </th>
+                            <th style='text-align: center;' colspan='6'>
+                                RESULT
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style='text-align: center;' colspan='2'>
+                                CD3
+                            </th>
+                            <th style='text-align: center;' colspan='2'>
+                                CD4
+                            </th>
+                            <th style='text-align: center;' colspan='2'>
+                                Other (Specify)
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style='text-align: center;'>
+                                Absolute
+                            </th>
+                            <th style='text-align: center;'>
+                                Percent
+                            </th>
+                            <th style='text-align: center;'>
+                                Absolute
+                            </th>
+                            <th style='text-align: center;'>
+                                Percent
+                            </th>
+                            <th style='text-align: center;'>
+                                Absolute
+                            </th>
+                            <th style='text-align: center;'>
+                                Percent
+                            </th>
+                        </tr>";                    
+                    $counter2 = 0;
+
+                    // echo "<pre>";print_r($samples);echo "</pre>";die();
+                    foreach ($samples as $key => $sample) {
+                        
+                        
+
+                        $value = 0;
+                        $equipment_tabs .= "
+                                        <tr>
+                                            <th style='text-align: center;'>";
+                        $equipment_tabs .= $sample->sample_name;
+
+                        $equipment_tabs .= "</th>
+                            <td>
+                                <input type='hidden' name='sample_".$counter2."' value='".$sample->sample_id."' />
+                                <input type='text' data-type='". $equipment->equipment_name ."' class='page-signup-form-control form-control' $disabled placeholder='' value = '";
+                                
+                        //echo "<pre>";print_r($datas[$counter2]->equipment_id);echo "</pre>";die();
+                            if($datas){
+                                if($equipment->id == $datas[$counter2]->equipment_id){
+                                    $value = $datas[$counter2]->cd3_absolute;
+                                }else{
+                                    $value = 0;
+                                }
+                            }else{
+                                $value = 0;
+                            }
+
+                        $equipment_tabs .= $value ."' name = 'cd3_abs_$counter2'>
+                            </td>
+                            <td>
+                                <input type='text' data-type='". $equipment->equipment_name ."' class='page-signup-form-control form-control' $disabled placeholder='' value = '";
+
+                        if($datas){
+                                if($equipment->id == $datas[$counter2]->equipment_id){
+                                    $value = $datas[$counter2]->cd3_percent;
+                                }else{
+                                    $value = 0;
+                                }
+                        }else{
+                            $value = 0;
+                        }
+
+                        $equipment_tabs .= $value."' name = 'cd3_per_$counter2'>
+                            </td>
+                            <td>
+                                <input type='text' data-type='". $equipment->equipment_name ."'  class='page-signup-form-control form-control' $disabled placeholder='' value = '";
+
+                        if($datas){
+                                if($equipment->id == $datas[$counter2]->equipment_id){
+                                    $value = $datas[$counter2]->cd4_absolute;
+                                }else{
+                                    $value = 0;
+                                }
+                        }else{
+                            $value = 0;
+                        }
+
+                        $equipment_tabs .= $value."'  name = 'cd4_abs_$counter2'>
+                            </td>
+                            <td>
+                                <input type='text' data-type='". $equipment->equipment_name ."'  class='page-signup-form-control form-control' $disabled placeholder='' value = '";
+
+                        if($datas){
+                                if($equipment->id == $datas[$counter2]->equipment_id){
+                                    $value = $datas[$counter2]->cd4_percent;
+                                }else{
+                                    $value = 0;
+                                }
+                        }else{
+                            $value = 0;
+                        }
+
+                        $equipment_tabs .= $value."' name = 'cd4_per_$counter2'>
+                            </td>
+                            <td>
+                                <input type='text' data-type='". $equipment->equipment_name ."'  class='page-signup-form-control form-control' $disabled placeholder='' value = '";
+
+                        if($datas){
+                                if($equipment->id == $datas[$counter2]->equipment_id){
+                                    $value = $datas[$counter2]->other_absolute;
+                                }else{
+                                    $value = 0;
+                                }
+                        }else{
+                            $value = 0;
+                        }
+
+                        $equipment_tabs .= $value."' name = 'other_abs_$counter2'>
+                            </td>
+                            <td>
+                                <input type='text' data-type='". $equipment->equipment_name ."'  class='page-signup-form-control form-control' $disabled placeholder='' value = '";
+
+                        if($datas){
+                                if($equipment->id == $datas[$counter2]->equipment_id){
+                                    $value = $datas[$counter2]->other_percent;
+                                }else{
+                                    $value = 0;
+                                }
+                        }else{
+                            $value = 0;
+                        }
+
+                        $equipment_tabs .= $value."' name = 'other_per_$counter2'>
+                            </td>
+                        </tr>";
+                        $counter2++;
+                    }
+
+
+                    $equipment_tabs .= "<tr>
+                                        <td >Participant ID</td>
+                                        <td colspan='6'><input type='text' class='page-signup-form-control form-control' $disabled placeholder='Enter Participant ID to be Lab Result' value = '' name = 'participant_id'></td>
+                                        </tr>";
+
+
+                    $this->db->where('round_id', $round_id);
+                    $this->db->where('participant_id', $participant_id);
+                    $this->db->where('equipment_id', $equipment->id);
+                    $entry = $this->db->get('pt_data_submission')->row();
+                    if($entry){
+                        if($entry->doc_path){
+                            $uploader = "<div class = 'form-control'>
+                                <h5>File uploaded</h5>
+                                <a href = '".base_url($entry->doc_path)."'>Click to Download File</a>
+                            </div>";
+                        }else{
+                            $uploader = "<div class = 'form-group'>
+                                            <label class = 'control-label'>Please upload the data received from the machine</label>
+                                            <input type = 'file' name = 'data_uploaded_form' required = 'true' class = 'form-control'/>
+                                        </div>";
+                        }
+                    }else{
+                        $uploader = "<div class = 'form-group'>
+                                            <label class = 'control-label'>Please upload the data received from the machine</label>
+                                            <input type = 'file' name = 'data_uploaded_form' required = 'true' class = 'form-control'/>
+                                        </div>";
+                    }
+
+
+                    $equipment_tabs .= "</table>
+                                        </div>
+
+                                        {$uploader}
+                                        <button $disabled type='submit' class='btn btn-block btn-lg btn-primary m-t-3 submit'>
+                                            Save
+                                        </button>
+
+                                        </form>
+
+                                        </div>   
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>";
+
+                    $equipment_tabs .= "";
+                    $lotcounter++;
+        }
+
+        $equipment_tabs .= "</div>";
+
+        return $equipment_tabs;
+
+    }
+
+
+    public function dataSubmission($equipmentid,$round){
+        if($this->input->post()){
+            $user = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));
+
+            $no_reagents = count($this->input->post('reagent_name'));
+            $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round)->id;
+            $participant_uuid = $user->uuid;
+            $participant_id = $user->p_id;
+
+            $samples = $this->M_PTRound->getSamples($round,$participant_uuid);
+             
+            $counter2 = 0;
+            $submission = $this->M_PTRound->getDataSubmission($round_id,$participant_id,$equipmentid);
+
+            $lot_number = $this->input->post('lot_number');
+            $reagent_name = $this->input->post('reagent_name');
+            $expiry_date = $this->input->post('expiry_date');
+            // echo "<pre>";print_r($sample);echo "</pre>";die();
+
+            // Uploading file
+            $file_upload_errors = [];
+            $file_path = NULL;
+            
+            if($_FILES){
+                $config['upload_path'] = './uploads/participant_data/';
+                $config['allowed_types'] = 'gif|jpg|png|xlsx|xls|pdf|csv';
+                $config['max_size'] = 10000000;
+                $this->load->library('upload', $config);
+
+                $this->upload->initialize($config); 
+                $docCheck = $this->upload->do_upload('data_uploaded_form');
+ 
+
+
+                if (!$docCheck) {
+                    $file_upload_errors = $this->upload->display_errors();
+                    echo "<pre>";print_r($file_upload_errors);echo "</pre>";die();
+                }else{
+                    $data =$this->upload->data();
+                    $file_path = substr($config['upload_path'], 1) . $data['file_name'];
+                }
+            }
+            if(!$file_upload_errors){
+                if(!($submission)){
+
+                    $insertsampledata = [
+                            'round_id'    =>  $round_id,
+                            'participant_id'    =>  $participant_id,
+                            'equipment_id'    =>  $equipmentid,
+                            'status'    =>  0,
+                            'verdict'    =>  2,
+                            'doc_path'  =>  $file_path
+                        ];
+
+
+
+                    if($this->db->insert('pt_data_submission', $insertsampledata)){
+                        $submission_id = $this->db->insert_id();
+
+                            foreach ($samples as $key => $sample) {
+
+                                $sample_id = $this->input->post('sample_'.$counter2);
+                                $cd3_abs = $this->input->post('cd3_abs_'.$counter2);
+                                $cd3_per = $this->input->post('cd3_per_'.$counter2);
+                                $cd4_abs = $this->input->post('cd4_abs_'.$counter2);
+                                $cd4_per = $this->input->post('cd4_per_'.$counter2);
+                                $other_abs = $this->input->post('other_abs_'.$counter2);
+                                $other_per = $this->input->post('other_per_'.$counter2);
+
+                                $insertequipmentdata = [
+                                'equip_result_id'    =>  $submission_id,
+                                'sample_id'    =>  $sample_id,
+                                'cd3_absolute'    =>  $cd3_abs,
+                                'cd3_percent'    =>  $cd3_per,
+                                'cd4_absolute'    =>  $cd4_abs,
+                                'cd4_percent'    =>  $cd4_per,
+                                'other_absolute'    =>  $other_abs,
+                                'other_percent'    =>  $other_per
+                                ];
+
+                                try {
+                                    if($this->db->insert('pt_equipment_results', $insertequipmentdata)){
+                                        $this->session->set_flashdata('success', "Successfully saved new data");
+                                    }else{
+                                        $this->session->set_flashdata('error', "There was a problem saving the new data. Please try again");
+                                    }
+                                    
+                                } catch (Exception $e) {
+                                    echo $e->getMessage();
+                                }
+                                $counter2 ++;
+                            }
+
+                            $reagent_insert = [];
+
+                            for ($i=0; $i < $no_reagents; $i++) { 
+                                $reagent_insert[] = [
+                                    'submission_id' =>  $submission_id,
+                                    'equipment_id'  =>  $equipmentid,
+                                    'reagent_name'  =>  $this->input->post('reagent_name')[$i],
+                                    'lot_number'    =>  $this->input->post('lot_number')[$i],
+                                    'expiry_date'   =>  date('Y-m-d', strtotime($this->input->post('expiry_date')[$i]))
+                                ];
+                            }
+
+                            $this->db->insert_batch('pt_data_submission_reagent', $reagent_insert);
+
+                    }else{
+                        //echo "submission_error";
+                        $this->session->set_flashdata('error', "A problem was encountered while saving data. Please try again...");
+                    }
+
+                    echo "submission_save";
+                    $this->session->set_flashdata('success', "Successfully saved new data");
+
+                }else{
+                    $reagent_insert = [];
+                    
+                    $submission_id = $submission->id;
+
+                        $this->db->where('equip_result_id', $submission_id);
+                        $this->db->delete('pt_equipment_results');
+                    
+                    foreach ($samples as $key => $sample) {     
+
+                        $sample_id = $this->input->post('sample_'.$counter2);
+                        $cd3_abs = $this->input->post('cd3_abs_'.$counter2);
+                        $cd3_per = $this->input->post('cd3_per_'.$counter2);
+                        $cd4_abs = $this->input->post('cd4_abs_'.$counter2);
+                        $cd4_per = $this->input->post('cd4_per_'.$counter2);
+                        $other_abs = $this->input->post('other_abs_'.$counter2);
+                        $other_per = $this->input->post('other_per_'.$counter2);
+
+                        $insertequipmentdata = [
+                                'equip_result_id'    =>  $submission_id,
+                                'sample_id'    =>  $sample_id,
+                                'cd3_absolute'    =>  $cd3_abs,
+                                'cd3_percent'    =>  $cd3_per,
+                                'cd4_absolute'    =>  $cd4_abs,
+                                'cd4_percent'    =>  $cd4_per,
+                                'other_absolute'    =>  $other_abs,
+                                'other_percent'    =>  $other_per
+                                ];
+
+                        if($this->db->insert('pt_equipment_results', $insertequipmentdata)){
+                            
+                        }
+
+                        $counter2 ++;
+                    }
+
+                    $this->db->where('submission_id', $submission_id);
+                    $this->db->where('equipment_id', $equipmentid);
+                    $this->db->delete('pt_data_submission_reagent');
+
+                    for ($i=0; $i < $no_reagents; $i++) { 
+                        $reagent_insert[] = [
+                            'submission_id' =>  $submission_id,
+                            'equipment_id'  =>  $equipmentid,
+                            'reagent_name'  =>  $this->input->post('reagent_name')[$i],
+                            'lot_number'    =>  $this->input->post('lot_number')[$i],
+                            'expiry_date'   =>  date('Y-m-d', strtotime($this->input->post('expiry_date')[$i]))
+                        ];
+                    }
+
+                    $this->db->insert_batch('pt_data_submission_reagent', $reagent_insert);
+
+
+
+                    $this->session->set_flashdata('success', "Successfully updated data");
+                    echo "submission_update";
+                }
+            }else{
+                echo "error3";
+                $this->session->set_flashdata('error', $file_upload_errors);
+            }
+        }else{
+            //echo "no_post";
+            echo "error4";
+          $this->session->set_flashdata('error', "No data was received");
         }
     }
 }

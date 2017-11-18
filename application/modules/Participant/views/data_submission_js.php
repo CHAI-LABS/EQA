@@ -7,16 +7,7 @@ $(document).ready(function(){
         });
 
 	var round = $(".ptround").val();
-	$("form").submit(function(e){
-		 e.preventDefault();
-	  var form = $(this);
-	  var id = form.attr('id');
-      // alert('id');
-	  var formData = new FormData(this);
-
-		dataSubmit(id, formData);
-	 
-	});
+	
 
     $('#add-reagent').click(function(){
         var items = $('tr.reagent_row').length;
@@ -36,6 +27,18 @@ $(document).ready(function(){
     function addReagentRow(no_items){
         $('tr.reagent_row').eq(no_items-2).after("<?= @$row_blueprint; ?>");
     }
+
+
+    $("form").submit(function(e){
+         e.preventDefault();
+      var form = $(this);
+      var id = form.attr('id');
+      // alert('id');
+      var formData = new FormData(this);
+
+        dataSubmit(id, formData);
+     
+    });
 	
 
 	function dataSubmit(equipmentid,formData){

@@ -18,14 +18,7 @@ class M_Readiness extends CI_Model {
         return $query->row();
     }
 
-    public function findUserByLabResult($round_uuid, $facility_id){
-        $this->db->where('round_uuid', $round_uuid);
-        $this->db->where('facility_id', $facility_id);
-        $this->db->where('lab_result', 1);
-        $query = $this->db->get('pt_ready_participants', 1);
-
-        return $query->row();
-    }
+    
 
     public function findRoundByIdentifier($identifier, $value){
         $this->db->where($identifier, $value);

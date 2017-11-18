@@ -65,18 +65,29 @@ class M_PTRound extends CI_Model {
         return $query->result();
     }
 
-    public function getSamples($round_uuid,$participant_id){
+    public function getSamples($round_uuid,$participant_uuid,$type=null){
 
-    	$this->db->select('ps.id AS sample_id, ps.uuid AS sample_uuid, ps.sample_name AS sample_name');
-    	$this->db->from('pt_panel_tracking ppt');
-    	$this->db->join('pt_batches pb', 'pb.id = ppt.pt_batch_id');
-    	$this->db->join('pt_batch_tube pbt', 'pbt.batch_id = pb.id');
-    	$this->db->join('pt_samples ps', 'ps.id = pbt.sample_id');
-    	$this->db->join('participant_readiness par', 'par.readiness_id = ppt.pt_readiness_id');
-    	$this->db->join('pt_round pr', 'pr.uuid = par.pt_round_no');
+        $round_id = $this->db->get_where('pt_round_v', ['uuid' => $round_uuid])->row()->id;
 
-    	$this->db->where('pr.uuid', $round_uuid);
-    	$this->db->where('par.participant_id', $participant_id);
+        if($type == 'nopart'){
+            $this->db->select('ps.id AS sample_id, ps.uuid AS sample_uuid, ps.sample_name AS sample_name');
+            $this->db->from('pt_samples ps');
+            $this->db->where('ps.pt_round_id', $round_id);
+
+        }else{
+            $this->db->select('ps.id AS sample_id, ps.uuid AS sample_uuid, ps.sample_name AS sample_name');
+            $this->db->from('pt_panel_tracking ppt');
+            $this->db->join('pt_batches pb', 'pb.id = ppt.pt_batch_id');
+            $this->db->join('pt_batch_tube pbt', 'pbt.batch_id = pb.id');
+            $this->db->join('pt_samples ps', 'ps.id = pbt.sample_id');
+            $this->db->join('participant_readiness par', 'par.readiness_id = ppt.pt_readiness_id');
+            $this->db->join('pt_round pr', 'pr.uuid = par.pt_round_no');
+
+            $this->db->where('pr.uuid', $round_uuid);
+            $this->db->where('par.participant_id', $participant_uuid);
+        }
+
+    	
 
     	// $this->db->group_by('ps.id');
 

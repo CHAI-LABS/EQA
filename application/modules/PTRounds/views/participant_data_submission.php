@@ -8,7 +8,7 @@
         </div>
 <?php } ?>
 
-                <div id="round" data-type="<?= @$round; ?>"></div>
+<div id="round" data-type="<?= @$round; ?>"></div>
 
 
 <?= @$back_link; ?>
@@ -37,8 +37,8 @@
                     </fieldset>
                 </div>
             </div>
-
-            <strong><center>METHODOLOGY</center></strong>
+<!-- 
+            <strong><center>METHODOLOGY</center></strong> -->
 
 <?php if($this->session->flashdata('success')){ ?>
         <div id="data-info" class = 'alert alert-success'>

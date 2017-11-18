@@ -139,7 +139,7 @@ class PTRound extends MY_Controller {
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
-                        ->addJs('dashboard/js/libs/moment.min.js');
+                ->addJs('dashboard/js/libs/moment.min.js');
         $this->assets->setJavascript('Participant/results_js');
         $this->template
                 ->setPageTitle($title)
@@ -1127,27 +1127,6 @@ class PTRound extends MY_Controller {
 
         }
     }
-
-
-    public function getRound($round_id,$facility_id){
-        $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->uuid;
-        $user = $this->M_Readiness->findUserByLabResult($round_uuid, $facility_id);
-        $participant_id = $user->uuid;
-
-        $equipment_tabs = $this->createTabs($round_uuid,$participant_id);
-
-        $data = [
-                'pt_round_to' => $pt_round_to,
-                'pt_uuid'    =>  $round_uuid,
-                'participant'    =>  $participant_id,
-                'equipment_tabs'    =>  $equipment_tabs,
-                'data_submission' => 'data_submission'
-            ];
-
-        return $this->output->set_content_type('application/json')->set_output(json_encode($data));
-    }
-
-
     
 
     public function Round($round_uuid){
@@ -1179,7 +1158,7 @@ class PTRound extends MY_Controller {
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
-                        ->addJs('dashboard/js/libs/moment.min.js')
+                ->addJs('dashboard/js/libs/moment.min.js')
                 ->addJs('plugin/bootstrap-datepicker/js/bootstrap-datepicker.min.js')
                 ->addJs('dashboard/js/libs/jquery.validate.js')
                 ->addJs('dashboard/js/libs/select2.min.js')
@@ -1187,7 +1166,7 @@ class PTRound extends MY_Controller {
         $this->assets
                 ->setJavascript('Participant/data_submission_js', $js_data);
         
-        $this->template->setPageTitle('PT Forms')->setPartial('pt_form_v',$data)->adminTemplate();
+        $this->template->setPageTitle('PT Forms')->setPartial('pt_form_v', $data)->adminTemplate();
     }
 
     public function Report($round_uuid){
@@ -1402,13 +1381,28 @@ class PTRound extends MY_Controller {
         $tab = 0;
         $zero = '0';
         
-        $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid);
+        if($participant_uuid == 0){
+            $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid,'nopart');
+        }else{
+            $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid);
+        }
+
+
         $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
         $user = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));
-        $participant_id = $user->p_id;
 
+        if($user){
+            $participant_id = $user->p_id;
+        }else{
+            $participant_id = 0;
+        }
         
-        $equipments = $this->M_PTRound->Equipments($participant_uuid);
+
+        if($participant_id){
+            $equipments = $this->M_PTRound->Equipments($participant_uuid);
+        }else{
+            $equipments = $this->db->get("equipments_v")->result();
+        }
         // echo "<pre>";print_r($equipments);echo "</pre>";die();
         
         $equipment_tabs = '';

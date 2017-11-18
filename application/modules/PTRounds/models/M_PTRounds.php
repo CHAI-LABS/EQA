@@ -23,7 +23,16 @@ class M_PTRounds extends MY_Model{
         }
     }
 
-    
+
+    public function findUserByLabResult($round_uuid, $facility_id){
+        $this->db->where('pt_round_uuid', $round_uuid);
+        $this->db->where('facility_id', $facility_id);
+        $this->db->where('lab_result', 1);
+        $query = $this->db->get('pt_ready_participants', 1);
+
+        return $query->row();
+    }
+        
 
     function findCalendarDetailsByRound($round_id){
         // $sql = "CALL proc_get_calendar_details($round_id)";
