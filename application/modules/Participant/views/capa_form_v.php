@@ -1,8 +1,8 @@
 <div class="row">
 	<div class="col-sm-12">
 
-	<div class = 'alert alert-warning'>
-        <h5>Refreshing the page will cause a loss of some data, and would require another login attempt, through your email</h5>
+	<div class = "pull-right">
+        <a href = "<?= @base_url('Dashboard/'); ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to Dashboard</button></a><br /><br />
     </div>
 
 

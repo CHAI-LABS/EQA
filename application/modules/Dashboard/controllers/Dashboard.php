@@ -277,7 +277,20 @@ class Dashboard extends DashboardController {
 						$dashboard_data->current = "enroute";
 					}elseif($participant_readiness->status_code == 3){
 						if($participant_readiness->receipt == 1){
-							$dashboard_data->current = "pt_round_submission";
+
+							
+
+							$this->db->select('DISTINCT(participant_id)');
+							$this->db->where('round_id', $pt_round->id);
+							$this->db->where('participant_id', $participant_readiness->p_id);
+							$participant_responsive = $this->db->get('pt_participant_review_v')->row();
+
+							if(!($participant_responsive) && ((strtotime($dashboard_data->pt_round->to) > date('Y-m-d')))){
+								$dashboard_data->current = "non_responsive";
+							}else{
+								$dashboard_data->current = "pt_round_submission";
+							}
+
 						}else{
 							$dashboard_data->current = "bad_panel";
 						}

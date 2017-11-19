@@ -14,12 +14,12 @@ class Participant extends MY_Controller {
 
 	}
 
-	public function checkLogin($pt_uuid){
-		// echo "<pre>";print_r($this->session->flashdata());echo "</pre>";
-		if(empty($this->session->flashdata())){
-			redirect('Participant/Participant/authenticate/'.$pt_uuid,'refresh');
-		}
-	}
+	// public function checkLogin($pt_uuid){
+	// 	// echo "<pre>";print_r($this->session->flashdata());echo "</pre>";
+	// 	if(empty($this->session->flashdata())){
+	// 		redirect('Participant/Participant/authenticate/'.$pt_uuid,'refresh');
+	// 	}
+	// }
 
 	public function authenticate($pt_uuid)
 	{	
@@ -98,16 +98,22 @@ class Participant extends MY_Controller {
 
 	public function CapaForm($pt_uuid){
 
-		$sampledata = '';
-		$this->checkLogin($pt_uuid);
 		
-		$user_details = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->flashdata('uuid'));
+		// echo "<pre>";print_r($this->session->userdata());echo "</pre>";die();
+
+
+		$sampledata = '';
+		// $this->checkLogin($pt_uuid);
+		
+		$user_details = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));
 		$round = $this->db->get_where('pt_round_v', ['uuid' => $pt_uuid])->row();
 
-		$participant_data = $this->db->get_where('pt_participant_review_v', ['participant_id' => $user_details->p_id,'round_id' => $round->id])->result();
+		$participant_data = $this->db->get_where('pt_participant_review_v', 
+			['participant_id' => $user_details->p_id,
+			'round_id' => $round->id])->result();
 
 		foreach ($participant_data as $key => $value) {
-			// echo "<pre>";print_r($value);echo "</pre>";die();
+			
 			$sample_name = $this->db->get_where('pt_samples', ['id' => $value->sample_id])->row()->sample_name;
 			$sampledata .= '<strong>Sample Name</strong> : '. $sample_name . '<br/> <strong>Value Entered</strong> : ' . $value->cd4_absolute . '<br/><br/>';
 		}
@@ -137,8 +143,11 @@ class Participant extends MY_Controller {
 		if($this->input->post()){
 
 			$round_uuid = $this->input->post('ptround');
-			$participantuuid  =   $this->session->flashdata('uuid');
-            $facilityid  =   $this->session->flashdata('facilityid');
+			$participantuuid  =   $this->session->userdata('uuid');
+
+			$participant = $this->db->get_where('participant_readiness_v', ['uuid' => $participantuuid])->row();
+
+            $facilityid  =   $participant->facility_id;
 
             $occurrence = $this->input->post('occurrence');
             $cause = $this->input->post('cause');
@@ -199,7 +208,8 @@ class Participant extends MY_Controller {
             }
 
 
-            redirect('/', 'refresh');
+            redirect('Dashboard/', 'refresh');
+            
         }
 	}
 
