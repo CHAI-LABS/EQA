@@ -146,6 +146,12 @@ class Template extends MX_Controller {
 		$menus = [];
 		$menu_list = "";
 		$menus = [
+			'reports' => [
+				'icon'	=>	'fa fa-book',
+				'text'	=>	'Reports',
+				'link'	=>	'Dashboard',
+				'users'	=>	['admin']
+			],
 			'participants' => [
 				'icon'	=>	'icon-people',
 				'text'	=>	'Participants',
