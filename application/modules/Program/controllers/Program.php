@@ -84,6 +84,9 @@ class Program extends MY_Controller {
 
         $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid;
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+        if($facility_id){
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                }
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
 
@@ -181,6 +184,8 @@ class Program extends MY_Controller {
 
                 }
             }
+            // echo "<pre>";print_r($facility_id);echo "</pre>";die();
+            $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
         }
 
         
@@ -459,6 +464,8 @@ class Program extends MY_Controller {
                 $graph_data['x_axis_name'] = "Facilities";
             }else{
                 $no_of_participants = $passed = $failed = 0;
+
+                $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
  
                 $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid,$county_id,$facility_id)->participants;
 
@@ -583,6 +590,9 @@ class Program extends MY_Controller {
 
                 $round_id = $this->db->get_where('pt_round', ['uuid' => $round->uuid])->row()->id;
                 $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+                if($facility_id){
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                }
                 $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
 
                 
@@ -679,6 +689,8 @@ class Program extends MY_Controller {
                             }
                         }
                     }
+
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
                 }
 
                 $labels[] = $round->pt_round_no;
@@ -746,6 +758,11 @@ class Program extends MY_Controller {
 
                 $round_id = $this->db->get_where('pt_round', ['uuid' => $round->uuid])->row()->id;
                 $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+                if($facility_id){
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                }
+
                 $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
 
                 
@@ -842,6 +859,8 @@ class Program extends MY_Controller {
                             }
                         }
                     }
+
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
                 }
 
                 $labels[] = $round->pt_round_no;
@@ -906,6 +925,9 @@ class Program extends MY_Controller {
 
 
                 $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+                if($facility_id){
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                }
                 $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
                 $equipments = $this->Program_m->Equipments();
 
@@ -986,6 +1008,8 @@ class Program extends MY_Controller {
                             }
                         }
                     }
+
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
                 }
 
                  
@@ -1057,6 +1081,9 @@ class Program extends MY_Controller {
 
 
                 $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+                if($facility_id){
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                }
                 $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
                 $equipments = $this->Program_m->Equipments();
 
@@ -1137,6 +1164,8 @@ class Program extends MY_Controller {
                             }
                         }
                     }
+
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
                 }
 
                  
@@ -1172,6 +1201,9 @@ class Program extends MY_Controller {
         $round_uuid = $round->uuid;
         $round_name = $round->pt_round_no;
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+        if($facility_id){
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                }
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
 
@@ -1275,6 +1307,8 @@ class Program extends MY_Controller {
 
                 }
             }
+
+            $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
         }
 
         $unable = $this->Program_m->getUnableParticipants($round_uuid, $county_id, $facility_id)->participants;
@@ -1361,8 +1395,13 @@ class Program extends MY_Controller {
 
         $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid;
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+        if($facility_id){
+                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                }
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
+
+
 
         if($facility_id == 0){
             foreach ($equipments as $key => $equipment) {
@@ -1464,7 +1503,11 @@ class Program extends MY_Controller {
 
                 }
             }
-        }   
+
+            $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+        }  
+
+
 
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $responsive = $no_of_participants - $non_responsive;

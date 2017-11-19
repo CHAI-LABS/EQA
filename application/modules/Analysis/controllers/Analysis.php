@@ -2145,18 +2145,25 @@ class Analysis extends DashboardController {
             }
 
             
-            $batch = $this->db->get_where('pt_ready_participants', ['p_id' => $submission->participant_id, 'pt_round_uuid' => $round_uuid])->row();
+            $batches = $this->db->get_where('pt_ready_participants', ['p_id' => $submission->participant_id, 'pt_round_uuid' => $round_uuid])->row();
+
+            if($batches){
+                $batch = $batches->batch;
+            }else{
+                $batch = '';
+            }
 
             
 
-            array_push($tabledata, $sub_counter, $facility_name, $batch->batch);
+            array_push($tabledata, $sub_counter, $facility_name, $batch);
 
             $html_body .= '<tr>
                             <td class="spacings">'.$sub_counter.'</td>';
             $html_body .= '<td class="spacings">'.$facility_name.'</td>';
-            $html_body .= '<td class="spacings">'.$batch->batch.'</td>';
+            $html_body .= '<td class="spacings">'.$batch.'</td>';
 
             foreach ($samples as $sample) {
+                $comment = '';
                 $samp_counter++;
                 
                 $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();

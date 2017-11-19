@@ -8,7 +8,7 @@
 		Hey there. Please ensure that you fill in your findings for this PT (<?= @$dashboard_data->pt_round->pt_round_no; ?>) before <span style = "color:red;"><?= @date('dS F, Y', strtotime($dashboard_data->pt_round->to)); ?></span>. To fill in the form, please head over to the <a href = "<?= @base_url('Participant/PTRound/Round/' . $dashboard_data->pt_round->uuid); ?>">PT Round Section</a>
 	<?php } ?>
 </div>
-<div class="row">
+<!-- <div class="row">
 	<div class="col-md-8">
 		<div class="card">
 			<div class="card-header">
@@ -69,6 +69,65 @@
 			</div>
 		</div>
 	</div>
-</div>
+</div> -->
 
 <?php } ?>
+
+
+<!-- <div class = "row"> -->
+    <div id="facility" data-type="<?= @$facility_id; ?>"></div>
+
+        
+<div class="col-md-12 container-fluid">
+    <div class="animated fadeIn">
+        <!-- <div class="card-columns col-2"> -->
+
+	        <div class="col-md-12 container-fluid">
+	            <div class="animated fadeIn">
+	                <div class="card" style="width:100%";>
+	                    <div class="card-header">
+	                        <strong class="criteria">Facility</strong> Participants Outcomes Trends
+	                        <!-- : <strong id="roundname3">Loading...</strong> -->
+	                        <div class="card-actions">
+	                        </div>
+	                    </div>
+	                    <div class="card-block">
+	                        <div class="chart-wrapper">
+	                            <canvas style="width:50%;height:50%;" id="graph-1"></canvas>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+
+    	<!-- </div> -->
+	</div>
+</div>
+
+<div class="col-md-12 container-fluid">
+    <div class="animated fadeIn">
+        <!-- <div class="card-columns col-2"> -->
+
+	        <div class="col-md-12 container-fluid">
+	            <div class="animated fadeIn">
+	                <div class="card" style="width:100%";>
+	                    <div class="card-header">
+	                         <strong class="criteria">Facility</strong> Participants Outcomes Trends (%)
+	                        <!-- : <strong id="roundname3">Loading...</strong> -->
+	                        <div class="card-actions">
+	                        </div>
+	                    </div>
+	                    <div class="card-block">
+	                        <div class="chart-wrapper">
+	                            <canvas id="graph-2"></canvas>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	        
+    	<!-- </div> -->
+	</div>
+</div>
+
+
