@@ -228,6 +228,13 @@ class Template extends MX_Controller {
 				'link'	=>	'Participant/PTRound/',
 				'users'	=>	['participant']
 			],
+
+			'calendar'	=>	[
+				'icon'	=>	'icon-calendar',
+				'text'	=>	'Calendar',
+				'link'	=>	'Participant/Calendar/',
+				'users'	=>	['participant']
+			],
 			'qarounds'	=>	[
 				'icon'	=>	'icon-chemistry',
 				'text'	=>	'PT Rounds',
