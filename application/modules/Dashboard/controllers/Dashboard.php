@@ -61,12 +61,17 @@ class Dashboard extends DashboardController {
 			];
 		}elseif($type == "admin"){
 			$view = "admin_dashboard";
+
+			$round = $this->dashboard_m->getCurrentRound();
+
+			// echo "<pre>";print_r($round);echo "</pre>";die();
+
 			$stats = $this->getDashboardStats();
 			$data = [
                 'pending_participants'    =>  $this->dashboard_m->pendingParticipants(),
-                'pending_participants'    =>  $this->dashboard_m->pendingParticipants(),
                 'new_equipments'    =>  $this->dashboard_m->newEquipments(),
-                'stats'						=>	$stats
+                'stats'			=>	$stats,
+                'round_uuid' => $round->uuid
             ];
 		}else if($type == "qareviewer"){
 			$this->db->where('status','active');

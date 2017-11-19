@@ -200,7 +200,14 @@
                 Calendar
             </div>
             <div class="card-body">
-                
+                <div class="card-block">
+                    <div class="col-md-6">
+                        <a href = "<?= @base_url('PTRounds/calendar/'); ?><?= @$round_uuid?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-up"></i> Click to view current PT calendar  </button></a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href = "<?= @base_url('PTRounds/create/calendar/'); ?><?= @$round_uuid?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-down"></i> Click to edit current PT calendar </button></a>
+                    </div>
+                </div>
             </div>
         </divc>
     </div>

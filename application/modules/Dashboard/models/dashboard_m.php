@@ -19,6 +19,18 @@ class Dashboard_m extends CI_Model {
     	return $result;
     }
 
+
+    public function getCurrentRound(){
+        $sql = "SELECT *
+                FROM pt_round_v
+                WHERE status = 'active'
+                AND (type = 'future' OR type = 'ongoing')
+                ORDER BY id DESC
+                LIMIT 1;";
+
+        return $this->db->query($sql)->row();
+    }
+
     public function newEquipments(){
         $this->db->select('equipment_id')->from('participant_equipment')->where('`equipment_id` NOT IN (SELECT id FROM equipment)', NULL, FALSE);
 
