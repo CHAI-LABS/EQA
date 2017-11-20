@@ -37,7 +37,7 @@ class Analysis_m extends CI_Model {
 
 
     public function getParticipatedFacilities($round_id){
-        $this->db->select("DISTINCT(ppr.facility_id),f.facility_code");
+        $this->db->select("DISTINCT(ppr.facility_id),f.facility_code,f.facility_name");
         $this->db->from("pt_participant_review_v ppr");
         $this->db->join("facility_v f", "f.facility_id = ppr.facility_id");
         $this->db->where("ppr.round_id", $round_id);

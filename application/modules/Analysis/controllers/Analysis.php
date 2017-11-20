@@ -494,6 +494,7 @@ class Analysis extends DashboardController {
         foreach ($facilities as $facility) {
 
             $facility_code = $facility->facility_code;
+            $facility_name = $facility->facility_name;
 
             $facility_data = $this->Analysis_m->getResult($round_id,$facility->facility_id);
 
@@ -520,13 +521,13 @@ class Analysis extends DashboardController {
                             $tabledata = [];
 
                             if($a == 0){
-                                array_push($tabledata, $facility_code, '', 'cd3', $equipment_name. ': '.$sample->sample_name);
+                                array_push($tabledata, $facility_code, $facility_name, 'cd3', $equipment_name. ': '.$sample->sample_name);
                             }elseif ($a == 1) {
-                                array_push($tabledata, $facility_code, '', 'cd4', $equipment_name. ': '.$sample->sample_name);
+                                array_push($tabledata, $facility_code, $facility_name, 'cd4', $equipment_name. ': '.$sample->sample_name);
                             }elseif ($a == 2) {
-                                array_push($tabledata, $facility_code, '', 'other', $equipment_name. ': '.$sample->sample_name);
+                                array_push($tabledata, $facility_code, $facility_name, 'other', $equipment_name. ': '.$sample->sample_name);
                             }else{
-                                array_push($tabledata, $facility_code, '', 'problem', $equipment_name. ': '.$sample->sample_name);
+                                array_push($tabledata, $facility_code, $facility_name, 'problem', $equipment_name. ': '.$sample->sample_name);
                             }
 
                             $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
