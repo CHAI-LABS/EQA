@@ -193,6 +193,20 @@
     </div>
 </div> -->
 
+<!-- <div class="row">
+    <div class="col-md-12">
+        <divc class="card">
+            <div class="card-body">
+                <div class="card-block">
+                    <div class="col-md-6">
+                        <a href = "<?= @base_url('PTRounds/Unable/'); ?><?= @$round_uuid?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-right"></i> View Participants Unable to Respond  </button></a>
+                    </div>
+                </div>
+            </div>
+        </divc>
+    </div>
+</div> -->
+
 <div class="row">
     <div class="col-md-12">
         <divc class="card">

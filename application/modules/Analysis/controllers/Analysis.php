@@ -170,7 +170,14 @@ class Analysis extends DashboardController {
                 // echo "<pre>";print_r($capa);echo "</pre>";die();
                 $counter ++;
 
-                $participant_id = $this->db->get_where('participant_readiness_v', ['uuid' => $capa->participant_uuid])->row()->username;
+                $participant_id = $this->db->get_where('participant_readiness_v', ['uuid' => $capa->participant_uuid])->row();
+
+                if($participant_id){
+                    $participant_id = $participant_id->username;
+                }else{
+                   $participant_id = 'No ID Found'; 
+                }
+                
                 
                 if($capa->status == 0){
                     $status = "<label class = 'tag tag-warning tag-sm'>Not Reviewed</label>"; 

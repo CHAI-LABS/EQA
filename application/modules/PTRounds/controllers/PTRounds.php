@@ -1078,6 +1078,7 @@ public function createTabs($round_uuid, $participant_uuid){
 
                 if($round->type == 'ongoing'){
                     $submit = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('PTRounds/PTRounds/SubmitReport/' . $round->uuid)."'><i class = 'fa fa-file-text-o'></i>&nbsp;Submit Report</a>";
+                    $unable = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('PTRounds/Unable/' . $round->uuid)."'><i class = 'fa fa-eye'></i>&nbsp;Unable Participants</a>";
                 }else{
                     $submit = '';
                 }
@@ -1097,6 +1098,7 @@ public function createTabs($round_uuid, $participant_uuid){
                                 Quick Actions
                             </button>
                             <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $unable
                                 $submit
                                 $view
                                 $panel_tracking
@@ -1465,7 +1467,7 @@ public function createTabs($round_uuid, $participant_uuid){
                 }
 
                
-                $resend_link = "<a class='dropdown-item' href = '".base_url('PTRounds/sendemails/'. $pt_round_uuid . '/' . $participant->facility_code .'/'. $participant->participant_id)."'>Resend Link to Email</a>";;
+                $resend_link = "<a class='dropdown-item' href = '".base_url('PTRounds/sendemails/'. $pt_round_uuid . '/' . $participant->facility_code .'/'. $participant->participant_id)."'>Resend Link to Email</a>";
 
                 // $change_state .= ' <a href = ' . base_url("Equipments/equipmentEdit/$id") . ' class = "btn btn-primary btn-sm"><i class = "icon-note"></i>&nbsp;Edit</a>';
                 
@@ -2331,6 +2333,194 @@ public function createTabs($round_uuid, $participant_uuid){
             echo "error4";
           $this->session->set_flashdata('error', "No data was received");
         }
+    }
+
+
+
+    function createUnableParticipantTable($round_uuid){
+
+        $template = $this->config->item('default');
+
+        $heading = [
+            "No.",
+            "Participant ID",
+            "Facility ID",
+            "Status",
+            "Actions"
+        ];
+        $tabledata = [];
+
+        $participants = $this->db->get('unable_response')->result();
+
+
+        if($participants){
+            $counter = 0;
+            foreach($participants as $participant){
+                $counter ++;
+                $part = $this->db->get_where('participant_readiness_v', ['uuid' => $participant->participant_uuid])->row();
+
+                // echo "<pre>";print_r($part);die();
+                $participant_id = $part->username;
+                $facility_code = $this->db->get_where('facility_v', ['facility_id' => $participant->facility_id])->row()->facility_code;
+
+
+                if($participant->viewed == 1){
+                    $status = "<label class = 'tag tag-success tag-sm'>Seen</label>";
+                    
+                }else if($participant->viewed == 0){
+                    $status = "<label class = 'tag tag-info tag-sm'>Not Seen</label>";
+                }
+                
+                $tabledata[] = [
+                    $counter,
+                    $participant_id,
+                    $facility_code,
+                    $status,
+                    "<div class = 'dropdown'>
+                        <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'false'>
+                            Quick Actions
+                        </button>
+                        <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                            <a target = '_blank' class='dropdown-item' href = '".base_url('PTRounds/viewInability/'. $round_uuid . '/' . $participant->participant_uuid)."'>View Reason</a>
+                        </div>
+                        </div>"
+                ];
+            }
+        }else{
+            echo "<pre>";print_r("No participants sent unable requests");echo "</pre>";die();
+        }
+
+        $this->table->set_heading($heading);
+        $this->table->set_template($template);
+
+        return $this->table->generate($tabledata);
+    }
+
+
+    public function viewInability($round_uuid, $participant_uuid){
+        $data = [];
+        $title = "Reason View";
+
+        // echo "<pre>";print_r($rounds);echo "</pre>";die();
+
+        $data = [
+            'page_title'    => 'Reason View',
+            'back_text'     => 'Back to Unable Participants',
+            'back_link'     => base_url('PTRounds/Unable/'.$round_uuid),
+            'capa_view'    =>  $this->createReasonView($participant_uuid, $round_uuid)
+        ];
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        $this->assets->setJavascript('Analysis/analysis_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Analysis/capa_view', $data)
+                ->adminTemplate();
+    }
+
+
+    function createReasonView($participant_uuid, $round_uuid){
+        $capa_view = '';
+
+        // $this->db->where('approved',1);
+        $this->db->where('round_uuid',$round_uuid);
+        $this->db->where('participant_uuid',$participant_uuid);
+
+        $capa = $this->db->get('unable_response')->row();
+
+        $date = date('dS F, Y', strtotime($capa->date_sent));
+
+        $participant_id = $this->db->get_where('participant_readiness_v', ['uuid' => $participant_uuid])->row()->username;
+
+        $facility_code = $this->db->get_where('facility_v', ['facility_id' => $capa->facility_id])->row()->facility_code;
+
+        $equipment_name = $this->db->get_where('equipments_v', ['id' => $capa->equipment_id])->row()->equipment_name;
+
+        // echo "<pre>";print_r($capa);echo "</pre>";die();
+
+        $capa_view .= '<div class = "card">
+                            <div class="card-header">
+                                Occurrence Details
+                            </div>
+
+                            <div class = "card-block">
+                                <div class="col-sm-4"><strong>Participant ID</strong></div>
+                                <div class="col-sm-8">' . $participant_id . '</div>
+                                <br/>&nbsp;<br/>
+                                <div class="col-sm-4"><strong>Facility Code</strong></div>
+                                <div class="col-sm-8">' . $facility_code . '</div>
+                                <br/>&nbsp;<br/>
+                                <div class="col-sm-4"><strong>Equipment</strong></div>
+                                <div class="col-sm-8">' . $equipment_name . '</div>
+                                <br/>&nbsp;<br/>
+                                
+                            </div>
+                        </div>';
+
+        $capa_view .= '<div class = "card">
+                            <div class="card-header">
+                                Reason
+                            </div>
+
+                            <div class = "card-block">
+                                <div class="col-sm-4"><strong>Classification of Reason</strong></div>
+                                <div class="col-sm-8">' . $capa->reason . '</div>
+                                <br/>&nbsp;<br/>
+                                <div class="col-sm-4"><strong>Describe corrective measures taken</strong></div>
+                                <div class="col-sm-8">' . $capa->detail . '</div>
+                            </div>
+                        </div>';
+
+
+        $capa_view .= '<a href="'. base_url('PTRounds/MarkSeen/'.$round_uuid.'/1/' . $capa->id) .'"><button id="submit-capa" type="submit" class="btn btn-block btn-primary">Mark as Seen</button></a>';
+        
+
+        return $capa_view;
+    }
+
+
+    function MarkSeen($round_uuid, $type, $reason_id){
+        $response = [];
+
+            $update_data = [];
+
+            if($type == 1){
+                $update_data = ['viewed'  =>  1];
+            }else{
+                $update_data = ['viewed'  =>  0];
+            }
+
+            $this->db->where('id', $reason_id);
+            if($this->db->update('unable_response', $update_data)){
+                $response = [
+                    'status'    =>  TRUE,
+                    'message'   =>  "Successfully Marked Reason as Seen"
+                ];
+            }else{
+                $response = [
+                    'status'    =>  FALSE,
+                    'message'   =>  "There was a problem marking the Reason"
+                ];
+            }
+        $this->Unable($round_uuid);
+    }
+
+
+    public function Unable($round_uuid){
+        $data = [
+                    'table_view' => $this->createUnableParticipantTable($round_uuid),
+                    'page_title' => 'Unable Participants',
+                    'back_link'     => base_url('PTRounds/'),
+                    'back_name' => 'Back to PT Rounds'
+                ];
+        $this->template
+                    ->setPageTitle('Unable Participants')
+                    ->setPartial('PTRounds/table_view', $data)
+                    ->adminTemplate();
     }
 
 
