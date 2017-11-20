@@ -315,7 +315,7 @@ class Program extends MY_Controller {
         $round_uuid = $round->uuid;
         $round_name = $round->pt_round_no;
 
-        if($county_id == 0){
+        if($county_id == 0 && $facility_id == 0){
             $counties = $this->Program_m->getCounties();
 
             foreach ($counties as $county) {
@@ -531,7 +531,7 @@ class Program extends MY_Controller {
                     $fail['data'][] = $failed;
                 }
 
-                $graph_data['x_axis_name'] = "Participants";
+                $graph_data['x_axis_name'] = "Participant IDs";
             }
         }
         
@@ -1537,10 +1537,10 @@ class Program extends MY_Controller {
 
         if($facility_id){
             $name = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->facility_name;
-            $data = $name . ' Facility';
+            $data = $name . ' Facility ';
         }elseif($county_id){
             $name = $this->db->get_where('county_v', ['id' => $county_id])->row()->county_name;
-            $data = $name . ' County Facilities Outcomes';
+            $data = $name . ' County ';
         }else{
             $data = "National";
         }

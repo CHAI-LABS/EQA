@@ -71,6 +71,7 @@ $(document).ready(function(){
 
 
   		var divs = document.getElementsByClassName('criteria');
+  		var div9 = document.getElementById('criteria2');
 
   		if(county == 0 && facility == 0){
   			for (var i = 0; i < divs.length; i++) {
@@ -81,6 +82,10 @@ $(document).ready(function(){
 	        	
 				for (var i = 0; i < divs.length; i++) {
 				    divs[i].innerHTML = criteria;
+
+				    if(county !== 0 && facility == 0){
+				    	document.getElementById('criteria2').innerHTML = criteria + " Facilities";
+				    }   
 				}
 		    });
   		}
@@ -318,17 +323,7 @@ $(document).ready(function(){
 	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 	                        display: true,
 	                        position: "left",
-	                        id: "y-axis-1",
-	                    }, {
-	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-	                        display: true,
-	                        position: "right",
-	                        id: "y-axis-2",
-
-	                        // grid line settings
-	                        gridLines: {
-	                            drawOnChartArea: false, // only want the grid lines for one axis to show up
-	                        },
+	                        id: "y-axis-1"
 	                    }]
 	                }
 	            }
@@ -365,7 +360,7 @@ $(document).ready(function(){
 	                        type: "linear",
 	                        display: true,
 	                        position: "left",
-	                        id: "y-axis-1",
+	                        id: "y-axis-1"
 	                    }]
 	                }
 	            }

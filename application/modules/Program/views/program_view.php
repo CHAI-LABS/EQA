@@ -77,7 +77,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        <strong class="criteria">National</strong> Summary: Participants
+                                        <strong class="criteria">National</strong> Summary Outcomes: Participants
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -124,7 +124,7 @@
 
                                 <div class="card" style="width:100%";>
                                     <div class="card-header">
-                                        <strong class="criteria">National</strong> Summary Outcome
+                                        <strong class="criteria">National</strong> Summary Outcomes
                                         <!-- : <strong id="roundname1">Loading...</strong> -->
                                         <div class="card-actions">
                                         </div>
@@ -148,7 +148,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    <strong class="criteria">National</strong> Summary: Disqualified Participants 
+                                    <strong class="criteria">National</strong> Summary Outcomes: Disqualified Participants 
                                     <!-- <strong id="roundname2">Loading...</strong> -->
                                     <div class="card-actions">
                                     </div>
@@ -246,7 +246,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    <strong class="criteria">National</strong> Outcomes
+                                    <strong id="criteria2">National</strong> Outcomes
                                     <!-- : <strong id="roundname3">Loading...</strong> -->
                                     <div class="card-actions">
                                     </div>

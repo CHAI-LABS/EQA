@@ -74,10 +74,14 @@ $(document).ready(function(){
                     divs[i].innerHTML = "National";
                 }
         }else{
-            $.get("<?=@base_url('Analysis/getName/');?>" + county + '/' + facility, function(criteria){
+            $.get("<?=@base_url('Program/getName/');?>" + county + '/' + facility, function(criteria){
                 
                 for (var i = 0; i < divs.length; i++) {
                     divs[i].innerHTML = criteria;
+
+                    if(county !== 0 && facility == 0){
+                        document.getElementById('criteria2').innerHTML = criteria + " Facilities";
+                    }   
                 }
             });
         }
