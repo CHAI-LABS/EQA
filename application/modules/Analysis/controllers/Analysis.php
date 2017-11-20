@@ -40,6 +40,91 @@ class Analysis extends DashboardController {
 	}
 
 
+
+    public function Report(){
+        $data = [];
+        $title = "Report";
+
+        $data = [
+            'page_title'    => 'Report List',
+            'back_text'     => 'Back to Dashboard',
+            'back_link'     => base_url('Dashboard/'),
+            'table_view'    =>  $this->createReportTable()
+        ];
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        // $this->assets->setJavascript('Analysis/analysis_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Analysis/analysis_v', $data)
+                ->adminTemplate();
+    }
+
+
+    public function createReportTable(){
+        $template = $this->config->item('default');
+
+        $heading = [
+            "No.",
+            "Round Name",
+            "From",
+            "To",
+            "Status",
+            "Download Report"
+        ];
+        $tabledata = [];
+
+        $this->db->where('status', 'active');
+        $this->db->where('type', 'previous');
+        $this->db->order_by('id', 'DESC');
+        $rounds = $this->db->get('pt_round_v')->result();
+        
+        if($rounds){
+            $counter = 0;
+            foreach($rounds as $round){
+                // echo "<pre>";print_r($capa);echo "</pre>";die();
+                $counter ++;
+
+                $round_name = $round->pt_round_no;
+                $type = $round->type;
+                $from = date('dS F, Y', strtotime($round->from));
+                $to = date('dS F, Y', strtotime($round->to));
+
+                $excel = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('Analysis/generateReport/excel/' . $round->uuid)."'><i class = 'icon-eye'></i>&nbsp;Excel</a>";
+
+                $pdf = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('Analysis/generateReport/pdf/' . $round->uuid)."'><i class = 'icon-eye'></i>&nbsp;PDF</a>";
+
+
+                $dropdown = "<div class = 'dropdown'>
+                            <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
+                                Download As
+                            </button>
+                            <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
+                                $excel
+                            </div>
+                        </div>";
+                
+                $tabledata[] = [
+                    $counter,
+                    $round_name,
+                    $from,
+                    $to,
+                    ucfirst($type),
+                    $dropdown
+                ];
+            }
+        }
+        $this->table->set_heading($heading);
+        $this->table->set_template($template);
+
+        return $this->table->generate($tabledata);
+    }
+
+
     public function Capa()
     {   
         $data = [];
@@ -374,9 +459,225 @@ class Analysis extends DashboardController {
 
 
 
+
+    public function generateReport($type,$round_uuid){
+        $column_data = $row_data = $tablevalues = $tablebody = $table = [];
+        $facility_code = '';
+        $count = $zerocount = $sub_counter = 0;
+        $round = $this->db->get_where('pt_round_v', ['uuid' => $round_uuid])->row();
+        $round_id = $round->id;
+        $round_name = $round->pt_round_no;
+        $heading = [
+            "MFL Code",
+            "Lab",
+            "Analyte",
+            "Sample",
+            "Result (s)",
+            "Result Code",
+            "Grade",
+        ];
+
+        $column_data = array('MFL Code','Lab','Analyte','Sample','Result (s)','Result Code', 'Grade');
+        $tabledata = [];
+
+        $facilities = $this->Analysis_m->getParticipatedFacilities($round_id);
+
+        // echo "<pre>";print_r($round_name);die();
+
+        foreach ($facilities as $facility) {
+
+            $facility_code = $facility->facility_code;
+
+            $facility_data = $this->Analysis_m->getResult($round_id,$facility->facility_id);
+
+            if($facility_data){
+
+                $equipments = $this->Analysis_m->getUsedEquipments($facility->facility_code);
+                
+                foreach ($equipments as $equipment) {
+                    $analyte = 3;
+                    $samp_counter = $acceptable = $unacceptable = 0;
+                    
+
+                    $equipment_id = $equipment->id;
+
+                    $equipment_name = $equipment->equipment_name;
+
+                    for ($a=0; $a < $analyte; $a++) { 
+                        
+
+                        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
+
+                        foreach ($samples as $sample) {
+                            $samp_counter++;
+                            $tabledata = [];
+
+                            if($a == 0){
+                                array_push($tabledata, $facility_code, '', 'cd3', $equipment_name. ': '.$sample->sample_name);
+                            }elseif ($a == 1) {
+                                array_push($tabledata, $facility_code, '', 'cd4', $equipment_name. ': '.$sample->sample_name);
+                            }elseif ($a == 2) {
+                                array_push($tabledata, $facility_code, '', 'other', $equipment_name. ': '.$sample->sample_name);
+                            }else{
+                                array_push($tabledata, $facility_code, '', 'problem', $equipment_name. ': '.$sample->sample_name);
+                            }
+
+                            $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                            if($a == 0){
+                                if($cd4_values){
+                                    $upper_limit = $cd4_values->cd3_absolute_upper_limit;
+                                    $lower_limit = $cd4_values->cd3_absolute_lower_limit;
+                                }else{
+                                    $upper_limit = 0;
+                                    $lower_limit = 0;
+                                }
+                            }elseif ($a == 1) {
+                                if($cd4_values){
+                                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                                }else{
+                                    $upper_limit = 0;
+                                    $lower_limit = 0;
+                                }
+                            }elseif ($a == 2) {
+                                if($cd4_values){
+                                    $upper_limit = $cd4_values->other_absolute_upper_limit;
+                                    $lower_limit = $cd4_values->other_absolute_lower_limit;
+                                }else{
+                                    $upper_limit = 0;
+                                    $lower_limit = 0;
+                                }
+                            }else{
+                                    $upper_limit = 0;
+                                    $lower_limit = 0;
+                            }
+                            
+                            $part_cd4 = $this->Analysis_m->getResult($round_id,$facility->facility_id,$equipment_id,$sample->id);
+
+                            if($part_cd4){
+
+                                if($a == 0){
+                                    // $html_body .= '<td class="spacings">'.$part_cd4->cd3_absolute.'</td>';
+                                    if($part_cd4->cd3_absolute >= $lower_limit && $part_cd4->cd3_absolute <= $upper_limit){
+                                        $acceptable++;
+                                        $comment = "Acceptable";
+
+                                    }else{
+                                        $unacceptable++;
+                                        $comment = "Unacceptable";
+                                    }   
+
+                                    if($part_cd4->cd3_absolute == 0 || $part_cd4->cd3_absolute == null){
+                                        $zerocount++;
+                                    }
+
+                                    array_push($tabledata, $part_cd4->cd3_absolute, '', $comment);
+                                }elseif ($a == 1) {
+
+                                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                        $acceptable++;
+                                        $comment = "Acceptable";
+
+                                    }else{
+                                        $unacceptable++;
+                                        $comment = "Unacceptable";
+                                    }   
+
+                                    if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
+                                        $zerocount++;
+                                    }
+
+
+                                    array_push($tabledata, $part_cd4->cd4_absolute, '', $comment);
+                                }elseif ($a == 2) {
+
+                                        // $html_body .= '<td class="spacings">'.$part_cd4->other_absolute.'</td>';
+
+                                    if($part_cd4->other_absolute >= $lower_limit && $part_cd4->other_absolute <= $upper_limit){
+                                        $acceptable++;
+                                        $comment = "Acceptable";
+
+                                    }else{
+                                        $unacceptable++;
+                                        $comment = "Unacceptable";
+                                    }   
+
+                                    if($part_cd4->other_absolute == 0 || $part_cd4->other_absolute == null){
+                                        $zerocount++;
+                                    }
+
+
+                                    array_push($tabledata, $part_cd4->other_absolute, '', $comment);
+                                }else{
+                                    echo "error here 1";die();
+                                    // array_push($tabledata, 0, '', "Unacceptable");
+
+                                }
+                            }else{
+                                
+                                array_push($tabledata, 0, '', "Unacceptable");
+                            } 
+
+                            switch ($type) {
+                                case 'excel':
+                                    array_push($row_data, $tabledata);
+                                break;
+
+                                // case 'pdf':
+                                 
+                                //     $html_body .= '<td class="spacings">'.$review.'</td>';
+                                //     $html_body .= "</tr></ol>";
+                                // break;
+                                    
+                                
+                                default:
+                                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                                break;
+                            }
+
+                            // $html_body .= '<td class="spacings">'.$comment.'</td>'; 
+                        }
+                    }
+
+                }
+
+            }else{
+                echo "error here";die();
+            }
+
+        }
+
+        $round_name = str_replace('/', '-', $round_name);
+
+
+        if($type == 'excel'){
+
+            $excel_data = array();
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'PT_'.$round_name.'_Results', 'file_name' => 'PT_'.$round_name.'_Results', 'excel_topic' => 'PT_'.$round_name.'_Results');
+
+            
+            $excel_data['column_data'] = $column_data;
+            $excel_data['row_data'] = $row_data;
+
+            $this->export->create_excel($excel_data);
+
+        }
+        // else if($type == 'pdf'){
+
+        //     $html_body .= '</tbody></table>';
+        //     $pdf_data = array("pdf_title" => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_topic' => 'Participants_'.$round_name.'_'.$equipment_name);
+
+        //     $this->export->create_pdf($html_body,$pdf_data);
+
+        // }
+
+    }
+
+
+
     public function createParticipantResultsAbsolute($type, $round_id,$equipment_id,$sample_id,$cdtype)
     {        
-        // echo'<pre>';print_r($cdtype);echo'</pre>';die();
 
         $round_name = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->pt_round_no;
         $equipment_name = $this->db->get_where('equipments_v', ['id' => $equipment_id])->row()->equipment_name;
@@ -2005,7 +2306,7 @@ class Analysis extends DashboardController {
                     
                 
                 default:
-                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                    echo "<pre>";print_r("Something went wrong... Please contact the administrator");echo "</pre>";die();
                 break;
             }
 

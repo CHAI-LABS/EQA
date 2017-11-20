@@ -149,7 +149,7 @@ class Template extends MX_Controller {
 			'reports' => [
 				'icon'	=>	'fa fa-book',
 				'text'	=>	'Reports',
-				'link'	=>	'Dashboard',
+				'link'	=>	'Analysis/Report',
 				'users'	=>	['admin']
 			],
 			'participants' => [

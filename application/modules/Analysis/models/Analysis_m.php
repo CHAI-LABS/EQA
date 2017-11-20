@@ -36,6 +36,49 @@ class Analysis_m extends CI_Model {
     }
 
 
+    public function getParticipatedFacilities($round_id){
+        $this->db->select("DISTINCT(ppr.facility_id),f.facility_code");
+        $this->db->from("pt_participant_review_v ppr");
+        $this->db->join("facility_v f", "f.facility_id = ppr.facility_id");
+        $this->db->where("ppr.round_id", $round_id);
+        $query = $this->db->get();
+        
+        return $query->result();
+    }
+
+    public function getUsedEquipments($facility_code){
+        $this->db->select("e.id, e.equipment_name");
+        $this->db->from("equipments_v e");
+        $this->db->join("facility_equipment_mapping fem", "fem.equipment_id = e.id");
+        $this->db->where("fem.facility_code", $facility_code);
+        $query = $this->db->get();
+        
+        return $query->result();
+    }
+
+
+    public function getResult($round_id,$facility_id,$equipment_id = null,$sample_id = null){
+        $this->db->select("*");
+        $this->db->from("pt_participant_review_v ppr");
+        $this->db->join("pt_ready_participants prp", "prp.p_id = ppr.participant_id");
+        $this->db->where("prp.lab_result", 1);
+        $this->db->where("ppr.round_id", $round_id);
+
+        if($equipment_id){
+            $this->db->where("ppr.equipment_id",$equipment_id);
+        }
+
+        if($sample_id){
+            $this->db->where("ppr.sample_id",$sample_id);
+        }
+
+        $this->db->where("prp.facility_id", $facility_id);
+        $query = $this->db->get();
+        
+        return $query->row();
+    }
+
+
     // public function absoluteValue($round_id,$equipment_id,$sample_id){
 
     //     $this->db->select("cd4_absolute");
