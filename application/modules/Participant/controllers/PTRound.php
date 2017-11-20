@@ -1133,16 +1133,16 @@ class PTRound extends MY_Controller {
         $user = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));
         
 
-        $participant_id = $user->uuid;
-
-        $equipment_tabs = $this->createTabs($round_uuid,$participant_id);
-        // echo "<pre>";print_r($equipment_tabs);echo "</pre>";die();
+        $participant_uuid = $user->uuid;
+        // echo "<pre>";print_r($participant_id);echo "</pre>";die();
+        $equipment_tabs = $this->createTabs($round_uuid,$participant_uuid);
+        
         $pt_round_to = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->to;
 
         $data = [
                 'pt_round_to' => $pt_round_to,
                 'pt_uuid'    =>  $round_uuid,
-                'participant'    =>  $participant_id,
+                'participant'    =>  $participant_uuid,
                 'equipment_tabs'    =>  $equipment_tabs,
                 'data_submission' => 'data_submission'
             ];
@@ -1387,6 +1387,8 @@ class PTRound extends MY_Controller {
             $samples = $this->M_PTRound->getSamples($round_uuid,$participant_uuid);
         }
 
+        // echo "<pre>";print_r($samples);echo "</pre>";die();
+
 
         $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
         $user = $this->M_Readiness->findUserByIdentifier('uuid', $this->session->userdata('uuid'));
@@ -1403,7 +1405,7 @@ class PTRound extends MY_Controller {
         }else{
             $equipments = $this->db->get("equipments_v")->result();
         }
-        // echo "<pre>";print_r($equipments);echo "</pre>";die();
+        
         
         $equipment_tabs = '';
 
@@ -1483,6 +1485,12 @@ class PTRound extends MY_Controller {
                 <label class='checkbox-inline'>
                 <strong>RESULTS FOR ". $equipment->equipment_name ."</strong>
                 </label>
+                <div>
+                    <a class='nav-link nav-link'  href='".base_url('Participant/PTRound/Unable/'.$round_uuid.'/'.$round_id.'/'.$participant_id.'/'.$equipment->id)."' role='button'>
+                        <i class='icon-envelope-letter'></i>
+                        <span class='tag tag-pill tag-danger'>Click here if unable to Report for this Equipment</span>
+                    </a>
+                </div>
 
                 </div>
                 <div class='col-md-6'>
@@ -1505,7 +1513,7 @@ class PTRound extends MY_Controller {
             }
             
 
-            // echo "<pre>";print_r("<br/><br/><br/><br/><br/>Lot Number: ".$lotcounter);echo "</pre>";
+            
             $disabled = "";
 
             if($getCheck == 1){
@@ -1589,6 +1597,7 @@ class PTRound extends MY_Controller {
                             </th>
                         </tr>";                    
                     $counter2 = 0;
+
 
                     // echo "<pre>";print_r($samples);echo "</pre>";die();
                     foreach ($samples as $key => $sample) {
@@ -1782,6 +1791,8 @@ class PTRound extends MY_Controller {
 
         return $row;
     }
+
+
     public function QAMessage($round_uuid,$round_id,$part_id,$equip_id){
         $message_view = '';
 
@@ -1867,6 +1878,88 @@ class PTRound extends MY_Controller {
                 ->setPageTitle($title)
                 ->setPartial('Participant/qa_messages', $data)
                 ->adminTemplate();
+    }
+
+
+
+    public function Unable($round_uuid,$round_id,$part_id,$equip_id){
+        // $message_view = '';
+
+        $round = $this->db->get_where('pt_round_v', ['uuid' => $round_uuid])->row();
+
+        $equipment = $this->db->get_where('equipments_v', ['id' => $equip_id])->row();
+
+
+        // $counter = 1;
+        // foreach ($messages as $key => $message) {
+            
+
+        //     $counter++;
+
+        // }
+
+        $title = "Response Unable";
+
+        $data = [
+            'round_name' => $round->pt_round_no,
+            'equipment_name' => $equipment->equipment_name,
+            'round_id' => $round_id,
+            'round_uuid' => $round_uuid,
+            'equipment_id' => $equip_id,
+            'participant_id' => $part_id
+            ];
+
+        $this->assets
+                ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
+                ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
+                ->addJs('dashboard/js/libs/jquery.validate.js')
+                ->addJs('dashboard/js/libs/select2.min.js');
+        // $this->assets->setJavascript('Participant/notifications_js');
+        $this->template
+                ->setPageTitle($title)
+                ->setPartial('Participant/unable_response', $data)
+                ->adminTemplate();
+    }
+
+
+    public function submitReason(){
+        $response_array = [];
+        if($this->input->post()){
+
+            $round_uuid = $this->input->post('round_uuid');
+            $equipment_id = $this->input->post('equipment_id');
+            $participantuuid  =   $this->session->userdata('uuid');
+
+            $participant = $this->db->get_where('participant_readiness_v', ['uuid' => $participantuuid])->row();
+            $facilityid  =   $participant->facility_id;
+
+            $reason = $this->input->post('reason');
+            $detail = $this->input->post('detail');
+
+            // echo "<pre>";print_r($tests);echo "</pre>";die();
+
+            $insertdata = [
+                'round_uuid'        =>  $round_uuid,
+                'equipment_id'                =>  $equipment_id,
+                'participant_uuid'          =>  $participantuuid,
+                'facility_id'               =>  $facilityid,
+                'reason'             =>  $reason,
+                'detail'  =>  $detail
+            ];
+
+
+            if($this->db->insert('unable_response', $insertdata)){
+                $this->session->set_flashdata('success', "Successfully sent reason for inability to carry out Round");
+                redirect('Participant/PTRound/Round/'.$round_uuid, 'refresh');
+            }else{
+                $this->session->set_flashdata('error', "Unable to send...Please contact the NHRL");
+                redirect('Participant/PTRound/Unable/'.$round_uuid, 'refresh');
+            }
+
+
+            
+            
+        }
     }
 
     

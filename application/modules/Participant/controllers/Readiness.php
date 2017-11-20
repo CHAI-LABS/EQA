@@ -70,7 +70,7 @@ class Readiness extends MY_Controller {
 							'facilityid'		=>	$user->facility_id,
 							'facilitycode'		=>	$user->facility_code,
 							'facilityname'		=>	$user->facility_name,
-							'facilityphone'		=>	$user->telephone,
+							'facilityphone'		=>	$user->facility_telephone,
 							'facilityaltphone'	=>	$user->alt_telephone,
 							'is_logged_in'		=>	true
 						];
