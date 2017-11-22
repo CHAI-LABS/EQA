@@ -1398,6 +1398,9 @@ class PTRound extends MY_Controller {
         }else{
             $participant_id = 0;
         }
+
+
+        // $unable = $this->db->checkInability();
         
 
         if($participant_id){
@@ -1484,15 +1487,39 @@ class PTRound extends MY_Controller {
 
                 <label class='checkbox-inline'>
                 <strong>RESULTS FOR ". $equipment->equipment_name ."</strong>
-                </label>
+                </label>";
+
+
+            $this->db->where('round_uuid', $round_uuid);
+            $this->db->where('participant_uuid', $participant_uuid);
+            $this->db->where('equipment_id',$equipment->id);
+            $inability = $this->db->get('unable_response')->row();
+
+            $reason = "Reason: ".$inability->reason." Detailed Reason: ".$inability->detail. " ";
+            // echo "<pre>";print_r($reason);echo "</pre>";die();
+
+            if($inability){
+                $equipment_tabs .= "
+                <div>
+                    <a data-type='unable' data-value='".$reason."' class='nav-link nav-link unable' role='button'>
+                        <i class='icon-envelope-letter'></i>
+                        <span class='tag tag-pill tag-danger'>Click here if unable to Report for this Equipment</span>
+                    </a>
+                </div>";
+            }else{
+                $equipment_tabs .= "
                 <div>
                     <a class='nav-link nav-link'  href='".base_url('Participant/PTRound/Unable/'.$round_uuid.'/'.$round_id.'/'.$participant_id.'/'.$equipment->id)."' role='button'>
                         <i class='icon-envelope-letter'></i>
                         <span class='tag tag-pill tag-danger'>Click here if unable to Report for this Equipment</span>
                     </a>
-                </div>
+                </div>";
+            }
 
-                </div>
+
+            
+
+            $equipment_tabs .= "</div>
                 <div class='col-md-6'>
                     <a class='nav-link nav-link'  href='".base_url('Participant/PTRound/QAMessage/'.$round_uuid.'/'.$round_id.'/'.$participant_id.'/'.$equipment->id)."' role='button'>
                     Message(s) from QA on ". $equipment->equipment_name ."
@@ -1516,9 +1543,15 @@ class PTRound extends MY_Controller {
             
             $disabled = "";
 
-            if($getCheck == 1){
+            if($getCheck == 1 || $inability){
                 $disabled = "disabled='' ";
-                $equipment_tabs .= "<p><strong><span class='text-danger'>Further entry disabled. The Supervisor has submitted your data for review by the NHRL</span></strong></p>";
+
+                if($getCheck){
+                    $equipment_tabs .= "<p><strong><span class='text-danger'>Further entry disabled. The Supervisor has submitted your data for review by the NHRL</span></strong></p>";
+                }elseif($inability){
+                    $equipment_tabs .= "<p><strong><span class='text-danger'>You checked this equipment as unable to respond</span></strong></p>";
+                }
+                
                 // $equipment_tabs .= "<input type='checkbox' data-type = '". $equipment->equipment_name ."' class='check-complete' checked='checked' $disabled name='check-complete' value='". $equipment->id ."'>&nbsp;&nbsp; Mark Equipment as Complete";
             }else{
                 $disabled = "";

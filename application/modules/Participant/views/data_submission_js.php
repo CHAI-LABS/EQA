@@ -73,29 +73,18 @@ $(document).ready(function(){
 	}
 
 
-   	$(".check-complete").click(function(e) {
+   	$(".unable").click(function(e) {
+        var type = $(this).attr('data-type');
+        var value = $(this).attr('data-value');
 
-        e.preventDefault();
-        var equipmentid = $(this).val();
-
-  		 // alert(equipmentid);
-        swal({
-            title: "Are you sure you want to Mark as Complete ?",
-            text: "Once marked as complete, changes won't be made on this equipment",
-            type: "warning",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true
-        }, function(){
-            $.get('<?= @base_url('Participant/PTRound/EquipmentComplete/'); ?>'+equipmentid+'/'+round, function(data){
-                if(data.response == true){
-                    window.location = "<?= @base_url('Participant/PTRound/Round/'); ?>"+round;
-                    $("#data-info").html("Saving Data ...");
-                }else{
-                    sweetAlert("Oops...", data.message, "error");
-                }
-            });
-        });
+        if(type == 'unable'){
+            // alert(value);
+            swal(
+              'Unable to Respond!',
+              value,
+              'error'
+            )
+        }
     });
 
  //    if(document.getElementById('isAgeSelected').checked) {
