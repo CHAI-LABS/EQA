@@ -1692,18 +1692,27 @@ public function createTabs($round_uuid, $participant_uuid){
         $round_uuid = $round->uuid;
         
         $user = $this->M_PTRounds->findUserByLabResult($round_uuid, $facility_id);
-        
         if($user){
-            $participant_uuid = $user->uuid;
-            $participant_id = $user->particiapant_id;
+            $participant_uuid = $user->participant_uuid;
+            $participant_id = $user->participant_id;
         }else{
             $participant_uuid = 0;
             $participant_id = 0;
-        }        
+        }  
+
+        $facility = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row();
+
         
-        // echo "<pre>";print_r($user);echo "</pre>";die();
+        if($facility){
+            $facility_code = $facility->facility_code;
+        }else{
+            $facility_code = 0;
+        }
         
-        $equipment_tabs = $this->createSubmitTabs($round_uuid,$participant_uuid);
+        $equipment_tabs = $this->createSubmitTabs($round_uuid,$participant_uuid,$facility_code);
+        // echo "<pre>";print_r($equipment_tabs);echo "</pre>";die();
+
+        
 
         $data = [
                 'pt_round_to' => $round->to,
@@ -1771,7 +1780,7 @@ public function createTabs($round_uuid, $participant_uuid){
     }
 
 
-    public function createSubmitTabs($round_uuid, $participant_uuid){
+    public function createSubmitTabs($round_uuid,$participant_uuid,$facility_code){
         
         $datas=[];
         $tab = 0;
@@ -1788,8 +1797,6 @@ public function createTabs($round_uuid, $participant_uuid){
         $user = $this->M_Readiness->findUserByIdentifier('uuid', $participant_uuid);
 
 
-        // echo "<pre>";print_r($samples);echo "</pre>";die();
-
         if($user){
             $participant_id = $user->p_id;
         }else{
@@ -1797,15 +1804,17 @@ public function createTabs($round_uuid, $participant_uuid){
         }
         
 
-        if($participant_id){
-            $equipments = $this->M_PTRound->Equipments($participant_uuid);
+        if($facility_code){
+            $equipments = $this->M_PTRounds->FacilityEquipments($facility_code);
+
         }else{
             $equipments = $this->db->get("equipments_v")->result();
+            
         }
 
-        
-        // $equipments = $this->M_PTRound->Equipments($participant_uuid);
-        
+        // echo "<pre>";print_r($equipments);echo "</pre>";die();
+
+
         $equipment_tabs = '';
 
         $equipment_tabs .= "<ul class='nav nav-tabs' role='tablist'>";

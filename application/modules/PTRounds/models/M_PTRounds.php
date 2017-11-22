@@ -24,6 +24,20 @@ class M_PTRounds extends MY_Model{
     }
 
 
+    public function FacilityEquipments($facility_code){
+        $sql = "
+            SELECT e.id, e.uuid, e.equipment_name FROM facility_equipment_mapping pe
+            JOIN equipment e ON e.id = pe.equipment_id
+            WHERE e.equipment_status = 1
+            AND pe.facility_code = '{$facility_code}'
+        ";
+
+        $query = $this->db->query($sql);
+
+        return $query->result();
+    }
+
+
     public function findUserByLabResult($round_uuid, $facility_id){
         $this->db->where('pt_round_uuid', $round_uuid);
         $this->db->where('facility_id', $facility_id);
