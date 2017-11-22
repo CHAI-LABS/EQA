@@ -3135,7 +3135,7 @@ class Analysis extends DashboardController {
             $registrations = $this->Analysis_m->getRegistrationsNumber($equipment_id);
             $participants = $this->Analysis_m->getReadyParticipants($round_id, $equipment_id);
 
-            
+
             $zerocount = $partcount = $passed = $failed = 0;
 
             foreach ($participants as $participant) {
