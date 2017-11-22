@@ -14,7 +14,8 @@ class Home extends MY_Controller {
         $this->db->from('facility_v');
         $cd4 =  $this->db->count_all_results();
 
-        $rounds = $this->db->count_all('pt_round_v');
+        $this->db->where('type', 'previous');
+        $rounds = $this->db->count_all_results('pt_round_v');
 
         $this->db->where('approved', 1);
         $this->db->where('user_type', "participant");

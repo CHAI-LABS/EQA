@@ -370,12 +370,14 @@
                         <p>Participants</p>
                     </div>
                 </div>
+
                 <!-- <div class="col-xs-12 col-sm-3 col-md-3">
                     <div class="fun-fact-item mb0" data-sr='enter'>
                         <h2 class="counter">128</h2>
                         <p>Awards Win</p>
                     </div>
                 </div> -->
+                
             </div>
         </div>
     </div>

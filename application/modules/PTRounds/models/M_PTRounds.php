@@ -85,7 +85,7 @@ class M_PTRounds extends MY_Model{
         return $this->db->get()->row();
     }
 
-    function getParticipantResponses($facility_code, $pt_round_uuid){
+    function getParticipantResponses($pt_round_uuid, $facility_code){
         $this->db->select("pr.readiness_id, p.participant_id, p.participant_fname, p.participant_lname, p.participant_email, p.participant_phonenumber, f.facility_code, f.facility_name, f.email, f.telephone, pr.status as readiness_status, pr.verdict as readiness_verdict, pr.comment as readiness_comment");
         $this->db->from("participant_readiness pr");
         $this->db->join("participants p", "p.uuid = pr.participant_id");

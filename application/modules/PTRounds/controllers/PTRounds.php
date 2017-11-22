@@ -1417,7 +1417,7 @@ public function createTabs($round_uuid, $participant_uuid){
     }
 
 
-    function createParticipantResponseTable($facility_code, $pt_round_uuid){
+    function createParticipantResponseTable($pt_round_uuid, $facility_code){
 
         $template = $this->config->item('default');
 
@@ -1432,8 +1432,9 @@ public function createTabs($round_uuid, $participant_uuid){
         $tabledata = [];
 
         //$equipments = $this->M_Facilities->getequipments();
-        $participants = $this->M_PTRounds->getParticipantResponses($facility_code, $pt_round_uuid);
-
+        $participants = $this->M_PTRounds->getParticipantResponses($pt_round_uuid, $facility_code);
+        
+                // echo "<pre>";print_r($pt_round_uuid);echo "</pre>";die();
 
         if($participants){
             $counter = 0;
@@ -1488,6 +1489,14 @@ public function createTabs($round_uuid, $participant_uuid){
                         </div>"
                 ];
             }
+        }else{
+            $heading = [
+                "Participants"
+            ];
+
+            $tabledata[] = [
+                "No participants have responded yet"
+            ];
         }
         $this->table->set_heading($heading);
         $this->table->set_template($template);
@@ -1503,7 +1512,7 @@ public function createTabs($round_uuid, $participant_uuid){
         $data['page_title'] = 'Responded Participants';
         $data['back_name'] = 'Back to PT Round Facilities';
         $data['back_link'] = base_url("PTRounds/create/facilities/$pt_round_uuid");
-        $data['table_view'] = $this->createParticipantResponseTable($facility_code, $pt_round_uuid);
+        $data['table_view'] = $this->createParticipantResponseTable($pt_round_uuid,$facility_code);
 
         $this->assets
                     ->addCss('dashboard/js/libs/icheck/skins/flat/blue.css')
@@ -1582,7 +1591,6 @@ public function createTabs($round_uuid, $participant_uuid){
 
             
             if($facility_code == NULL){
-                // echo "<pre>";print_r("no facility");echo "</pre>";die();
                 $facilities = $this->M_PTRounds->searchFacilityReadiness($pt_round_uuid);
                 $recepients_array = [];
                 foreach ($facilities as $facility) {

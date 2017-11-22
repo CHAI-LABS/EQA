@@ -410,7 +410,7 @@ class Analysis extends DashboardController {
         ];
         $tabledata = [];
 
-        
+        $this->db->order_by('id', 'DESC');
         $rounds = $this->db->get('pt_round_v')->result();
         // echo "<pre>";print_r($rounds);echo "</pre>";die();
 
@@ -3057,13 +3057,17 @@ class Analysis extends DashboardController {
     //         'data' => [$disqualified]
     //     ];
 
-    //     // echo "<pre>";print_r($unable);echo "</pre>";die();
+    
 
     //     $graph_data['labels'] = $labels;
     //     $graph_data['datasets'] = [$datasets1, $datasets2, $datasets7, $datasets6, $datasets5, $datasets3, $datasets4];
 
     //     return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     // }
+
+
+
+    
 
 
 
@@ -3132,24 +3136,21 @@ class Analysis extends DashboardController {
             $participants = $this->Analysis_m->getReadyParticipants($round_id, $equipment_id);
 
             
-            $partcount = $passed = $failed = 0;
+            $zerocount = $partcount = $passed = $failed = 0;
 
             foreach ($participants as $participant) {
                 $partcount ++;
-                $sampcount = $acceptable = $unacceptable =0;
-
-
+                $samp_counter = $acceptable = $unacceptable = 0;
 
                 foreach ($samples as $sample) {
-                    $sampcount++;
+                    $samp_counter++;
+                    
+                    $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
 
-                    $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
-
-                    // $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+                    
 
 
                     if($cd4_values){
-
                         $upper_limit = $cd4_values->cd4_absolute_upper_limit;
                         $lower_limit = $cd4_values->cd4_absolute_lower_limit;
                     }else{
@@ -3157,25 +3158,36 @@ class Analysis extends DashboardController {
                         $lower_limit = 0;
                     } 
 
+                    
                     $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
+                   
                     if($part_cd4){
-                        
+
                         if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
                             $acceptable++;
-                            
-                        } else{
-                            $unacceptable++;
-                            
-                        } 
-                    }  
-                } 
 
-                if($acceptable == $sampcount) {
+                        }else{
+                            $unacceptable++;
+                        }   
+
+                        if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
+                            $zerocount++;
+                        }
+                        
+                    }else{
+                        echo "<pre>";print_r("Problem Here");echo "</pre>";die();
+                    }   
+                }
+
+                if($acceptable == $samp_counter) {
                     $passed++;
                 }else{
                     $failed++;
                 }
             }
+
+            // echo "<pre>";print_r($passed);echo "</pre>";die();
 
             $equipment_tabs .= '<div class = "row">
 								    <div class="col-md-12">
