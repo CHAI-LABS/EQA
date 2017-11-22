@@ -460,7 +460,7 @@ class PTRound extends MY_Controller {
         $change_state = '';
 
         $facility_participants = $this->M_PPTRound->getFacilityParticipants($round_uuid,$facility_id);
-        //echo '<pre>';print_r($facility_participants);echo "</pre>";die();
+        // echo '<pre>';print_r($facility_id);echo "</pre>";die();
         $round_id = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->id;
 
         $heading = [
@@ -553,6 +553,13 @@ class PTRound extends MY_Controller {
                     $change_state
                 ];
             }
+        }else{
+            $heading = [
+                        "Participant Data"
+                    ];
+            $tabledata[] = [
+                    "No data submitted for this round"
+                ];
         }
         $this->table->set_heading($heading);
         $this->table->set_template($template);

@@ -2396,7 +2396,12 @@ public function createTabs($round_uuid, $participant_uuid){
                 ];
             }
         }else{
-            echo "<pre>";print_r("No participants sent unable requests");echo "</pre>";die();
+            $heading = [
+                        "Unable Participants"
+                    ];
+            $tabledata[] = [
+                    "No participant is unable to respond"
+                ];
         }
 
         $this->table->set_heading($heading);
