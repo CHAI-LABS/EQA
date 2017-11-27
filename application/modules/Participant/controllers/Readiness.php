@@ -215,6 +215,7 @@ class Readiness extends MY_Controller {
             $question4_1 = $this->input->post('question_4_1');
             $question4_2 = $this->input->post('question_4_2');
             $question5 = $this->input->post('question_5');
+            $question6 = $this->input->post('question_6');
             $useruuid  =   $this->session->flashdata('uuid');
             $facilityid  =   $this->session->flashdata('facilityid');
             
@@ -225,7 +226,8 @@ class Readiness extends MY_Controller {
             	'3'		=>	$question3,
                 '5'     =>  $question4_1,
                 '6'    	=>  $question4_2,
-                '7'    	=>  $question5
+                '7'    	=>  $question5,
+                '8'    	=>  $question6
             ];
 
             $insertrounddata = [

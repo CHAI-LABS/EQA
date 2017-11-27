@@ -219,7 +219,7 @@ class Program extends MY_Controller {
         $round_name = $round->pt_round_no;
         $equipment_breakdown = $this->Program_m->getEquipmentBreakdown($round_uuid, $county_id, $facility_id)->equipments;
         $reagent_stock_out = $this->Program_m->getReagentStock($round_uuid, $county_id, $facility_id)->reagents;
-        // $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid, $county_id, $facility_id)->analysts;
+        $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid, $county_id, $facility_id)->analysts;
         $pending_capa = $this->Program_m->getPendingCapa($round_uuid, $county_id, $facility_id)->capas;
 
 
