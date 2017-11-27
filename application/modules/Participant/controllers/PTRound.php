@@ -28,7 +28,7 @@ class PTRound extends MY_Controller {
     }
 
     function createPTRoundTable(){
-        $this->db->where_not_in('type','future');
+        // $this->db->where_not_in('type','future');
         $rounds = $this->db->get('pt_round_v')->result();
         // echo "<pre>";print_r($rounds);echo "</pre>";die();
 
@@ -59,6 +59,9 @@ class PTRound extends MY_Controller {
 
                     if($ongoing_pt){
                         $checklocking = $this->M_PTRound->allowPTRound($ongoing_pt, $this->session->userdata('uuid'));
+
+                    // echo "<pre>";print_r($this->session->userdata('uuid'));echo "</pre>";die();
+
 
                         if($checklocking == null){
                             $view = "";
@@ -1134,7 +1137,6 @@ class PTRound extends MY_Controller {
         
 
         $participant_uuid = $user->uuid;
-        // echo "<pre>";print_r($participant_id);echo "</pre>";die();
         $equipment_tabs = $this->createTabs($round_uuid,$participant_uuid);
         
         $pt_round_to = $this->M_Readiness->findRoundByIdentifier('uuid', $round_uuid)->to;
@@ -1495,10 +1497,12 @@ class PTRound extends MY_Controller {
             $this->db->where('equipment_id',$equipment->id);
             $inability = $this->db->get('unable_response')->row();
 
-            $reason = "Reason: ".$inability->reason." Detailed Reason: ".$inability->detail. " ";
+            
             // echo "<pre>";print_r($reason);echo "</pre>";die();
 
             if($inability){
+                $reason = "Reason: ".$inability->reason." Detailed Reason: ".$inability->detail. " ";
+
                 $equipment_tabs .= "
                 <div>
                     <a data-type='unable' data-value='".$reason."' class='nav-link nav-link unable' role='button'>
@@ -1507,6 +1511,8 @@ class PTRound extends MY_Controller {
                     </a>
                 </div>";
             }else{
+                $reason = "";
+
                 $equipment_tabs .= "
                 <div>
                     <a class='nav-link nav-link'  href='".base_url('Participant/PTRound/Unable/'.$round_uuid.'/'.$round_id.'/'.$participant_id.'/'.$equipment->id)."' role='button'>
