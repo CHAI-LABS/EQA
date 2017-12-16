@@ -57,6 +57,17 @@ $(document).ready(function(){
 
   	function changeGraphs(round, county, facility){
 
+  		var axisname = '';
+
+    	if(county !== 0 && facility == 0){
+    		axisname = 'Facilities';
+    	}else if(facility !== 0 && county !== 0){
+    		axisname = 'Participants';
+    	}else if(county == 0 && facility == 0){
+    		axisname = 'Counties';
+    	}else{
+    		axisname = 'Count';
+    	}
 
 
   		$.get("<?=@base_url('Program/getFacilities/');?>" + county, function(facilities){
@@ -163,7 +174,6 @@ $(document).ready(function(){
 
 
 	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	    	// alert("reached3");
 	        
 	        $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
 
@@ -184,6 +194,7 @@ $(document).ready(function(){
 	    	document.getElementById('nonresp').innerHTML = nonresp;
 	    	document.getElementById('resp').innerHTML = resp;
 
+
 	        var ctx3 = document.getElementById('graph-3');
 	        var chart = new Chart(ctx3, {
 	            type: 'bar',
@@ -202,8 +213,12 @@ $(document).ready(function(){
 	                scales: {
 	                    yAxes: [{
 	                        ticks: {
-	                            beginAtZero:false
-	                        }
+	                            beginAtZero:true
+	                        },
+	                        scaleLabel: {
+	                        	display: true,
+					            labelString: 'Number of Participants'
+					        }
 	                    }]
 	                },
 	                tooltips: {
@@ -249,6 +264,7 @@ $(document).ready(function(){
 	    	document.getElementById('anal').innerHTML = anal;
 	    	document.getElementById('pend').innerHTML = pend;
 
+
 	        var ctx4 = document.getElementById('graph-4');
 	        var chart = new Chart(ctx4, {
 	            type: 'bar',
@@ -267,8 +283,12 @@ $(document).ready(function(){
 	                scales: {
 	                    yAxes: [{
 	                        ticks: {
-	                            beginAtZero:false
-	                        }
+	                            beginAtZero:true
+	                        },
+	                        scaleLabel: {
+	                        	display: true,
+					            labelString: 'Number of Participants'
+					        }
 	                    }]
 	                },
 	                tooltips: {
@@ -319,6 +339,10 @@ $(document).ready(function(){
 	                        stacked: true,
 	                    }],
 	                    yAxes: [{
+	                    	scaleLabel: {
+	                        	display: true,
+					            labelString: 'Number of Participants'
+					        },
 		    				stacked: true,
 	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 	                        display: true,
@@ -356,6 +380,10 @@ $(document).ready(function(){
 	                        stacked: true,
 	                    }],
 	                    yAxes: [{
+	                    	scaleLabel: {
+	                        	display: true,
+					            labelString: 'Percentage (%)'
+					        },
 		    				stacked: true,
 	                        type: "linear",
 	                        display: true,
@@ -394,6 +422,10 @@ $(document).ready(function(){
 	                        stacked: true,
 	                    }],
 	                    yAxes: [{
+	                    	scaleLabel: {
+	                        	display: true,
+					            labelString: 'Number of Participants'
+					        },
 		    				stacked: true,
 	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 	                        display: true,
@@ -430,6 +462,10 @@ $(document).ready(function(){
 	                        stacked: true,
 	                    }],
 	                    yAxes: [{
+	                    	scaleLabel: {
+	                        	display: true,
+					            labelString: 'Percentage (%)'
+					        },
 		    				stacked: true,
 	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 	                        display: true,
@@ -488,14 +524,17 @@ $(document).ready(function(){
 	                        stacked: true,
 	                        scaleLabel: {
 	                        	display: true,
-					            labelString: 'Number #'
+					            labelString: 'Number of ' + ChartData['x_axis_name']
 					        }
 	                    }, {
 	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 	                        display: true,
 	                        position: "right",
 	                        id: "y-axis-2",
-
+	                        scaleLabel: {
+	                        	display: true,
+					            labelString: 'Pass Rate (%)'
+					        },
 	                        // grid line settings
 	                        gridLines: {
 	                            drawOnChartArea: false, // only want the grid lines for one axis to show up

@@ -149,7 +149,7 @@ class Program_m extends CI_Model {
 
         $this->db->select("*");
         $this->db->from("facility_v fv");
-        // $this->db->join("facility_v fv", "fv.county_id = cv.id");
+        $this->db->join("participant_readiness pr", "fv.facility_id = pr.participant_facility");
         $this->db->where("fv.county_id", $county_id);
         $this->db->group_by("fv.facility_name");
         $this->db->order_by("fv.facility_name");
@@ -262,19 +262,21 @@ class Program_m extends CI_Model {
 
     public function getReadyParticipants($round_id, $county_id = null, $facility_id = null){
 
-        $this->db->select("participant_id");
-        $this->db->from("pt_participant_review_v");
-        $this->db->where("round_id",$round_id);
+        $this->db->select("ppr.participant_id");
+        $this->db->from("pt_participant_review_v ppr");
+        $this->db->where("ppr.round_id",$round_id);
 
         if($county_id){
-            $this->db->where("county_id", $county_id);
+            $this->db->where("ppr.county_id", $county_id);
         }
 
-        if($facility_id){
-            $this->db->where("facility_id", $facility_id);
+        if($facility_id){   
+            $this->db->join('participant_readiness pr', 'pr.participant_facility = ppr.facility_id');
+            $this->db->where("pr.lab_result", 1);
+            $this->db->where("ppr.facility_id", $facility_id);
         }
         
-        $this->db->group_by("participant_id");
+        $this->db->group_by("ppr.participant_id");
 
         $query = $this->db->get();
         

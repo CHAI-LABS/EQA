@@ -148,7 +148,7 @@
                         <div class="animated fadeIn">
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
-                                    <strong class="criteria">National</strong> Summary Outcomes: Disqualified Participants 
+                                    <strong class="criteria">National</strong> Summary Outcomes: Report / Disqualified Participants 
                                     <!-- <strong id="roundname2">Loading...</strong> -->
                                     <div class="card-actions">
                                     </div>
