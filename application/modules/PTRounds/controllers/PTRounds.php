@@ -15,7 +15,7 @@ class PTRounds extends DashboardController{
         $this->load->model('M_PTRounds');
         $this->load->model('M_PTRound');
 
-        $this->row_blueprint = "<tr class = 'reagent_row'><td colspan = '2'><label style='text-align: center;'>Reagent Name: </label> <input type = 'text' class = 'page-signup-form-control form-control' name = 'reagent_name[]' value = '|reagent_name|' required |disabled|/> </td><td colspan = '3'><label style='text-align: center;'>Lot Number: </label><input type = 'text' class = 'page-signup-form-control form-control' name = 'lot_number[]' value = '|lot_number|' required |disabled|/></td><td colspan = '3'><label style='text-align: center;'>Expiry Date: (YYYY-MM-DD)</label><input type = 'text' class = 'page-signup-form-control form-control' name = 'expiry_date[]' value = '|expiry_date|' required |disabled|/> </td></tr>";
+        $this->row_blueprint = "<tr class = 'reagent_row'><td colspan = '2'><label style='text-align: center;'>Reagent Name: </label> <input type = 'text' class = 'page-signup-form-control form-control' name = 'reagent_name[]' value = '|reagent_name|' required |disabled|/> </td><td colspan = '3'><label style='text-align: center;'>Lot Number: </label><input type = 'text' class = 'page-signup-form-control form-control' name = 'lot_number[]' value = '|lot_number|' required |disabled|/></td><td colspan = '3'><label style='text-align: center;'>Expiry Date: (MM/DD/YYYY)</label><input type = 'text' class = 'page-signup-form-control form-control' name = 'expiry_date[]' value = '|expiry_date|' required |disabled|/> </td></tr>";
 
         $this->menu = [
             'information'   =>  [
@@ -2001,11 +2001,11 @@ public function createTabs($round_uuid, $participant_uuid){
                                 Percent
                             </th>
                         </tr>";                    
-                    $counter2 = 0;
+                    
 
                     // echo "<pre>";print_r($samples);echo "</pre>";die();
                     if($samples){
-
+                        $counter2 = 0;
                         foreach ($samples as $key => $sample) {
                             
                             $value = 0;
@@ -2187,15 +2187,16 @@ public function createTabs($round_uuid, $participant_uuid){
             $participant_uuid = $user->uuid;
             $p_id = $user->p_id;
 
-            $samples = $this->M_PTRound->getSamples($round,$participant_uuid);
-             
+            $samples = $this->M_PTRound->getSamples($round,$participant_uuid,'nopart');
+            
+            // echo "<pre>";print_r($samples);echo "</pre>";die();
+ 
             $counter2 = 0;
             $submission = $this->M_PTRound->getDataSubmission($round_id,$p_id,$equipmentid);
 
             $lot_number = $this->input->post('lot_number');
             $reagent_name = $this->input->post('reagent_name');
             $expiry_date = $this->input->post('expiry_date');
-            // echo "<pre>";print_r($sample);echo "</pre>";die();
 
             // Uploading file
             $file_upload_errors = [];
@@ -2261,7 +2262,7 @@ public function createTabs($round_uuid, $participant_uuid){
                                 try {
                                     if($this->db->insert('pt_equipment_results', $insertequipmentdata)){
                                         $this->session->set_flashdata('success', "Successfully saved new data");
-                                        redirect('PTRounds/PTRounds/SubmitReport/' . $round);
+                                        
                                     }else{
                                         $this->session->set_flashdata('error', "There was a problem saving the new data. Please try again");
                                         redirect('PTRounds/PTRounds/SubmitReport/' . $round);
@@ -2327,7 +2328,9 @@ public function createTabs($round_uuid, $participant_uuid){
                                 ];
 
                         if($this->db->insert('pt_equipment_results', $insertequipmentdata)){
-                            
+                            // echo "<pre>";print_r("equip");echo "</pre>";die();
+                        }else{
+                            // echo "<pre>";print_r("no_equip");echo "</pre>";die();
                         }
 
                         $counter2 ++;
@@ -2363,7 +2366,7 @@ public function createTabs($round_uuid, $participant_uuid){
         }else{
             //echo "no_post";
             echo "error4";
-          $this->session->set_flashdata('error', "No data was received");
+          $this->session->set_flashdata('error', "No data was received. Please submit again");
           redirect('PTRounds/PTRounds/SubmitReport/' . $round);
         }
     }
