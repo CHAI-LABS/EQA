@@ -1,6 +1,7 @@
 <script>
 $(document).ready(function(){
 
+
 	$('input[name="expiry_date[]"]').datepicker({
             todayHighlight: true
     });
@@ -77,57 +78,51 @@ $(document).ready(function(){
 	var round_uuid = $(".ptround").val();
 
 
-
-	$("form").submit(function(e){
+	$('form').submit(function (e) {
+	// $("form").submit(function(e){
 		// alert("submitting");
 		 e.preventDefault();
 		  var form = $(this);
 		  var id = form.attr('id');
 	      // alert('id');
 		  var formData = new FormData(this);
+		  // alert(formData);
 
-		dataSubmit(id, formData);
+		if(facility == 0){
+		 	alert("Please select a facility first");
+		}else{
+			alert("Submitting");
+		 	// $.ajax({
+			 //   	type: "POST",
+			 //   	url: "<?= @base_url('PTRounds/dataSubmission/'); ?>"+equipmentid+ '/' +round_uuid,
+				// data: formData,
+	   //          processData: false,
+	   //          contentType: false,
+			 //   success: function(html){   
+	   //          console.log(html);
+			 //   		if(html){
+
+	   //              	$("#data-info").html(html);
+	   //                  window.location = "<?= @base_url('PTRounds/SubmitReport/'); ?>"+round_uuid;
+	   //              }else{
+	                	
+	   //              	$("#data-info").html("Failed to save the data ...");
+	   //              	// window.location = "<?= @base_url('PTRounds/SubmitReport/'); ?>"+round_uuid;
+	   //              }	
+			 //   },
+	   //         error: function(){
+
+	   //         },
+			 //   beforeSend:function()
+			 //   {
+				// // $("#add_err").css('display', 'inline', 'important');
+				// // $("#add_err").html("<img src='images/ajax-loader.gif' /> Loading...")
+			 //   }
+		  // 	});
+		} 	
 	 
 	});
 
-	function dataSubmit(equipmentid,formData){
-		 // alert(facility);
-
-		 if(facility == 0){
-		 	alert("Please select a facility first");
-		 }else{
-		 	$.ajax({
-			   	type: "POST",
-			   	url: "<?= @base_url('PTRounds/dataSubmission/'); ?>"+equipmentid+ '/' +round_uuid,
-				data: formData,
-	            processData: false,
-	            contentType: false,
-			   success: function(html){   
-	            // alert(html);
-			   		if(html){
-
-	                	$("#data-info").html(html);
-	                    window.location = "<?= @base_url('PTRounds/SubmitReport/'); ?>"+round_uuid;
-	                }else{
-	                	
-	                	$("#data-info").html("Failed to save the data ...");
-	                	// window.location = "<?= @base_url('PTRounds/SubmitReport/'); ?>"+round_uuid;
-	                }	
-			   },
-	           error: function(){
-
-	           },
-			   beforeSend:function()
-			   {
-				// $("#add_err").css('display', 'inline', 'important');
-				// $("#add_err").html("<img src='images/ajax-loader.gif' /> Loading...")
-			   }
-		  	});
-		 }
-
-
-	  	
-	}
 
 	$('#add-reagent').click(function(){
         var items = $('tr.reagent_row').length;

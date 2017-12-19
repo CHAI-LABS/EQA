@@ -1724,8 +1724,6 @@ public function createTabs($round_uuid, $participant_uuid){
         $equipment_tabs = $this->createSubmitTabs($round_uuid,$participant_uuid,$facility_code);
         // echo "<pre>";print_r($equipment_tabs);echo "</pre>";die();
 
-        
-
         $data = [
                 'pt_round_to' => $round->to,
                 'pt_uuid'    =>  $round_uuid,
@@ -1939,7 +1937,7 @@ public function createTabs($round_uuid, $participant_uuid){
 
             </div>
             <div class='card-block'>
-            <form method='POST' class='p-a-4 form' id='".$equipment->id."' enctype='multipart/form-data'>
+            <form method='POST' action = '".base_url('PTRounds/dataSubmission/'. $equipment->id . '/' . $round_uuid)."' class='p-a-4 form' id='".$equipment->id."' enctype='multipart/form-data'>
                 <input type='hidden' class='page-signup-form-control form-control ptround' value='".$round_uuid."'>
                 <div>
                 ";
@@ -2154,9 +2152,8 @@ public function createTabs($round_uuid, $participant_uuid){
                                         </div>
 
                                         {$uploader}
-                                        <button $disabled type='submit' class='btn btn-block btn-lg btn-primary m-t-3 submit'>
-                                            Save
-                                        </button>
+                                        <input $disabled type='submit' name='submit' value='Save' class='btn btn-block btn-lg btn-primary m-t-3 submit' />
+                                            
 
                                         </form>
 
@@ -2179,6 +2176,8 @@ public function createTabs($round_uuid, $participant_uuid){
 
     public function dataSubmission($equipmentid,$round){
         if($this->input->post()){
+
+
             $participant_id = $this->input->post('participant_id');
 
             $user = $this->M_Readiness->findUserByIdentifier('username', $participant_id);
@@ -2262,8 +2261,10 @@ public function createTabs($round_uuid, $participant_uuid){
                                 try {
                                     if($this->db->insert('pt_equipment_results', $insertequipmentdata)){
                                         $this->session->set_flashdata('success', "Successfully saved new data");
+                                        redirect('PTRounds/PTRounds/SubmitReport/' . $round);
                                     }else{
                                         $this->session->set_flashdata('error', "There was a problem saving the new data. Please try again");
+                                        redirect('PTRounds/PTRounds/SubmitReport/' . $round);
                                     }
                                     
                                 } catch (Exception $e) {
@@ -2289,10 +2290,12 @@ public function createTabs($round_uuid, $participant_uuid){
                     }else{
                         //echo "submission_error";
                         $this->session->set_flashdata('error', "A problem was encountered while saving data. Please try again...");
+                        redirect('PTRounds/PTRounds/SubmitReport/' . $round);
                     }
 
-                    echo "submission_save";
+                    // echo "submission_save";
                     $this->session->set_flashdata('success', "Successfully saved new data");
+                    redirect('PTRounds/PTRounds/SubmitReport/' . $round);
 
                 }else{
                     $reagent_insert = [];
@@ -2349,16 +2352,19 @@ public function createTabs($round_uuid, $participant_uuid){
 
 
                     $this->session->set_flashdata('success', "Successfully updated data");
+                    redirect('PTRounds/PTRounds/SubmitReport/' . $round);
                     echo "submission_update";
                 }
             }else{
                 echo "error3";
                 $this->session->set_flashdata('error', $file_upload_errors);
+                redirect('PTRounds/PTRounds/SubmitReport/' . $round);
             }
         }else{
             //echo "no_post";
             echo "error4";
           $this->session->set_flashdata('error', "No data was received");
+          redirect('PTRounds/PTRounds/SubmitReport/' . $round);
         }
     }
 
