@@ -87,14 +87,7 @@ class M_PTRound extends CI_Model {
             $this->db->where('par.participant_id', $participant_uuid);
         }
 
-    	
-
-    	// $this->db->group_by('ps.id');
-
         $query = $this->db->get();
-
-        // echo $this->db->last_query();die;
-
 		return $query->result();
     }
 

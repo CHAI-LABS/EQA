@@ -203,6 +203,8 @@ class Program extends MY_Controller {
         $graph_data['no_participants'] = $no_of_participants;
         $graph_data['datasets'] = [$datasets];
 
+        // echo "<pre>";print_r("reached");echo "</pre>";die();
+
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
 
@@ -223,43 +225,52 @@ class Program extends MY_Controller {
         $pending_capa = $this->Program_m->getPendingCapa($round_uuid, $county_id, $facility_id)->capas;
 
 
-        $datasets1 = [
-            'label'         =>  'Equipment Breakdown',
-            'backgroundColor' => 'rgba(211,84,0,0.5)',
-            'borderColor' => 'rgba(211,84,0,0.8)',
-            'highlightFill' => 'rgba(211,84,0,0.75)',
-            'highlightStroke' => 'rgba(211,84,0,1)',
-            'data' => [$equipment_breakdown]
+        // $datasets1 = [
+        //     'label'         =>  'Equipment Breakdown',
+        //     'backgroundColor' => 'rgba(211,84,0,0.5)',
+        //     'borderColor' => 'rgba(211,84,0,0.8)',
+        //     'highlightFill' => 'rgba(211,84,0,0.75)',
+        //     'highlightStroke' => 'rgba(211,84,0,1)',
+        //     'data' => [$equipment_breakdown]
+        // ];
+        // $datasets2 = [
+        //     'label'         =>  'Reagent Stock-Out',
+        //     'backgroundColor' => 'rgba(52,152,219,0.5)',
+        //     'borderColor' => 'rgba(52,152,219,0.8)',
+        //     'highlightFill' => 'rgba(52,152,219,0.75)',
+        //     'highlightStroke' => 'rgba(52,152,219,1)',
+        //     'data' => [$reagent_stock_out]
+        // ];
+        // $datasets3 = [
+        //     'label'         =>  'Analyst Unavailable',
+        //     'backgroundColor' => 'rgba(46,204,113,0.5)',
+        //     'borderColor' => 'rgba(46,204,113,0.8)',
+        //     'highlightFill' => 'rgba(46,204,113,0.75)',
+        //     'highlightStroke' => 'rgba(46,204,113,1)',
+        //     'data' => [$analyst_unavailable]
+        // ];
+        // $datasets4 = [
+        //     'label'         =>  'Pending CAPA',
+        //     'backgroundColor' => 'rgba(231,76,60,0.5)',
+        //     'borderColor' => 'rgba(231,76,60,0.8)',
+        //     'highlightFill' => 'rgba(231,76,60,0.75)',
+        //     'highlightStroke' => 'rgba(231,76,60,1)',
+        //     'data' => [$pending_capa]
+        // ];
+
+
+        $datasets = [
+            'label'         =>  ['Equipment Breakdown','Reagent Stock-Out','Analyst Unavailable','Pending CAPA'],
+            'backgroundColor' => ['rgba(211,84,0,0.5)','rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
+            'data' => [(int)$equipment_breakdown, (int)$reagent_stock_out, (int)$analyst_unavailable, (int)$pending_capa]
         ];
-        $datasets2 = [
-            'label'         =>  'Reagent Stock-Out',
-            'backgroundColor' => 'rgba(52,152,219,0.5)',
-            'borderColor' => 'rgba(52,152,219,0.8)',
-            'highlightFill' => 'rgba(52,152,219,0.75)',
-            'highlightStroke' => 'rgba(52,152,219,1)',
-            'data' => [$reagent_stock_out]
-        ];
-        $datasets3 = [
-            'label'         =>  'Analyst Unavailable',
-            'backgroundColor' => 'rgba(46,204,113,0.5)',
-            'borderColor' => 'rgba(46,204,113,0.8)',
-            'highlightFill' => 'rgba(46,204,113,0.75)',
-            'highlightStroke' => 'rgba(46,204,113,1)',
-            'data' => [$analyst_unavailable]
-        ];
-        $datasets4 = [
-            'label'         =>  'Pending CAPA',
-            'backgroundColor' => 'rgba(231,76,60,0.5)',
-            'borderColor' => 'rgba(231,76,60,0.8)',
-            'highlightFill' => 'rgba(231,76,60,0.75)',
-            'highlightStroke' => 'rgba(231,76,60,1)',
-            'data' => [$pending_capa]
-        ];
+        $labels = ['Equipment Breakdown','Reagent Stock-Out','Analyst Unavailable','Pending CAPA'];
 
         
         $graph_data['round'] = $round_name;
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
+        // $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
+        $graph_data['datasets'] = [$datasets];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

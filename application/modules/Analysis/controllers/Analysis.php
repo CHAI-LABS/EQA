@@ -117,6 +117,13 @@ class Analysis extends DashboardController {
                     $dropdown
                 ];
             }
+        }else{
+            $heading = [
+                        "Round Table"
+                    ];
+            $tabledata[] = [
+                    "No Rounds created"
+                ];
         }
         $this->table->set_heading($heading);
         $this->table->set_template($template);
@@ -125,7 +132,7 @@ class Analysis extends DashboardController {
     }
 
 
-    public function Capa()
+    public function Capa($round_uuid)
     {   
         $data = [];
         $title = "Capa Analysis";
@@ -134,7 +141,7 @@ class Analysis extends DashboardController {
             'page_title'    => 'Capa List',
             'back_text'     => 'Back to Dashboard',
             'back_link'     => base_url('Analysis/'),
-            'table_view'    =>  $this->createCapaTable()
+            'table_view'    =>  $this->createCapaTable($round_uuid)
         ];
 
         $this->assets
@@ -150,7 +157,7 @@ class Analysis extends DashboardController {
     }
 
 
-    public function createCapaTable(){
+    public function createCapaTable($round_uuid){
         $template = $this->config->item('default');
 
         $heading = [
@@ -161,6 +168,7 @@ class Analysis extends DashboardController {
             "Actions"
         ];
         $tabledata = [];
+        $this->db->where('round_uuid',$round_uuid);
         $this->db->where('approved',1);
         $capas = $this->db->get('capa_review')->result();
         
@@ -213,6 +221,13 @@ class Analysis extends DashboardController {
                     $dropdown
                 ];
             }
+        }else{
+            $heading = [
+                        "CAPA Table"
+                    ];
+            $tabledata[] = [
+                    "No CAPA Reponses were sent"
+                ];
         }
         $this->table->set_heading($heading);
         $this->table->set_template($template);
@@ -347,6 +362,14 @@ class Analysis extends DashboardController {
 
         $supervisor = $this->db->get_where('participant_readiness_v', ['facility_id' => $capa->facility_id, 'user_type' => 'qareviewer'])->row();
 
+        if($supervisor){
+            $firstname = $supervisor->firstname;
+            $lastname = $supervisor->lastname;
+        }else{
+            $firstname = "No firstname";
+            $lastname = "No lastname";
+        }
+
         $capa_view .= '<div class = "card">
                             <div class="card-header">
                                 Resolution
@@ -354,7 +377,7 @@ class Analysis extends DashboardController {
 
                             <div class = "card-block">
                                 <div class="col-sm-4"><strong>QA / Supervisor</strong></div>
-                                <div class="col-sm-8">' . $supervisor->firstname . '  ' . $supervisor->lastname . '</div>
+                                <div class="col-sm-8">' . $firstname . ' , ' . $lastname . '</div>
                                 <br/>&nbsp;<br/>
                                 <div class="col-sm-4"><strong>Date of Completion</strong></div>
                                 <div class="col-sm-8">' . $date . '</div>
@@ -457,6 +480,13 @@ class Analysis extends DashboardController {
                     $dropdown
                 ];
             }
+        }else{
+            $heading = [
+                        "Round Table"
+                    ];
+            $tabledata[] = [
+                    "No Rounds created"
+                ];
         }
         $this->table->set_heading($heading);
         $this->table->set_template($template);

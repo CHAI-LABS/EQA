@@ -133,7 +133,7 @@ $(document).ready(function(){
 	    });
 
 	    $.get("<?=@base_url('Program/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	    	// alert("reached2");
+	    	// console.log(ChartData.datasets);
 
 	        $('#graph-2').replaceWith('<canvas id="graph-2"></canvas>');
 
@@ -247,15 +247,22 @@ $(document).ready(function(){
 
 	    $.get("<?=@base_url('Program/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	    	// alert("reached4");
-
+	    	// console.log(ChartData.datasets);
 
 	        $('#graph-4').replaceWith('<canvas id="graph-4"></canvas>');
 
 	        var roundname2 = ChartData['round'];
+	        // var equip = ChartData['datasets']['0']['data']['0'];
+	        // var reag = ChartData['datasets']['1']['data']['0'];
+	        // var anal = ChartData['datasets']['2']['data']['0'];
+	        // var pend = ChartData['datasets']['3']['data']['0'];
+
 	        var equip = ChartData['datasets']['0']['data']['0'];
-	        var reag = ChartData['datasets']['1']['data']['0'];
-	        var anal = ChartData['datasets']['2']['data']['0'];
-	        var pend = ChartData['datasets']['3']['data']['0'];
+	        var reag = ChartData['datasets']['0']['data']['1'];
+	        var anal = ChartData['datasets']['0']['data']['2'];
+	        var pend = ChartData['datasets']['0']['data']['3'];
+
+	        
 
 
 	    	// document.getElementById('roundname2').innerHTML = roundname2;
@@ -267,50 +274,71 @@ $(document).ready(function(){
 
 	        var ctx4 = document.getElementById('graph-4');
 	        var chart = new Chart(ctx4, {
-	            type: 'bar',
-	            data: ChartData,
-	            options: {
-	                legend: {
-	                	backgroundColor: "rgba(255,99,132,0.2)",
-					    
-	                    display: true,
-	                    position: 'right',
-	                    fullWidth: true,
-	                    labels: {
-	                        fontColor: 'rgb(0, 0, 0)'
-	                    }
-	                },
-	                scales: {
-	                    yAxes: [{
-	                        ticks: {
-	                            beginAtZero:true
-	                        },
-	                        scaleLabel: {
-	                        	display: true,
-					            labelString: 'Number of Participants'
-					        }
-	                    }]
-	                },
-	                tooltips: {
-			            mode: 'nearest',
-			            intersect: true
-			        },
+	        	type: 'pie',
+				data: ChartData,
+		        options: {
 			        datasets: [{
 					    dataLabels: { 
-					    	display: true,          //  disabled by default
-					        colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
-					        minRadius: 30, //  minimum radius for display labels (on pie charts)
+					    	display: true,         
+					        colors: ['#fff', '#ccc', '#000'], 
+					        minRadius: 30,
 					        align: 'start',
 					        anchor: 'start'
-					    },
-					    borderColor: "rgba(255,99,132,1)",
-					    borderWidth: 2,
-					    hoverBackgroundColor: "rgba(255,99,132,0.4)",
-					    hoverBorderColor: "rgba(255,99,132,1)",
+					    }
 					}],
-	                responsive: true,
-   	 				maintainAspectRatio: false
-	            }
+					cutoutPercentage: 0,
+		            responsive: true,
+					    pieceLabel: {
+						    render: 'percentage',
+						    fontColor: ['black', 'black', 'black'],
+						    precision: 2,
+						    position: 'outside'
+						  }
+		        }
+	    //         type: 'bar',
+	    //         data: ChartData,
+	    //         options: {
+	    //             legend: {
+	    //             	backgroundColor: "rgba(255,99,132,0.2)",
+					    
+	    //                 display: true,
+	    //                 position: 'right',
+	    //                 fullWidth: true,
+	    //                 labels: {
+	    //                     fontColor: 'rgb(0, 0, 0)'
+	    //                 }
+	    //             },
+	    //             scales: {
+	    //                 yAxes: [{
+	    //                     ticks: {
+	    //                         beginAtZero:true
+	    //                     },
+	    //                     scaleLabel: {
+	    //                     	display: true,
+					//             labelString: 'Number of Participants'
+					//         }
+	    //                 }]
+	    //             },
+	    //             tooltips: {
+			  //           mode: 'nearest',
+			  //           intersect: true
+			  //       },
+			  //       datasets: [{
+					//     dataLabels: { 
+					//     	display: true,          //  disabled by default
+					//         colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
+					//         minRadius: 30, //  minimum radius for display labels (on pie charts)
+					//         align: 'start',
+					//         anchor: 'start'
+					//     },
+					//     borderColor: "rgba(255,99,132,1)",
+					//     borderWidth: 2,
+					//     hoverBackgroundColor: "rgba(255,99,132,0.4)",
+					//     hoverBorderColor: "rgba(255,99,132,1)",
+					// }],
+	    //             responsive: true,
+   	 // 				maintainAspectRatio: false
+	    //         }
 	        });
 	    });
 

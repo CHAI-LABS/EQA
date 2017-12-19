@@ -5,8 +5,9 @@ class PanelTracking extends DashboardController {
 	function __construct(){
 		parent::__construct();
 
-		$this->load->model('PTRounds/M_PanelTracking');
+		$this->load->module('PTRounds');
 		$this->load->module('Export');
+		$this->load->model('M_paneltracking');
 		$this->load->library('Mailer');
 	}
 

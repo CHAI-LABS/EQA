@@ -6,7 +6,11 @@
             $('#sample_table tbody').append(customizeRow(1));
         }
         <?php if($step == "information"){?>
-            $('input[name="round_duration"]').daterangepicker();
+            $('input[name="round_duration"]').daterangepicker({
+                locale: {
+                      format: 'DD-MM-YYYY'
+                }
+            });
             $('#rounds-form').validate({
                 rules: {
                     "samples[]": "required",
@@ -58,6 +62,9 @@
             $('.accordion div:first div.card-header h5 a').trigger('click');
         <?php }elseif($step == "calendar"){ ?>
             $('input.daterange').daterangepicker({
+                locale: {
+                      format: 'DD-MM-YYYY'
+                },
                 "minDate"   : '<?= @date('m/d/Y', strtotime($duration_from));  ?>',
                 "maxDate"   : '<?= @date('m/d/Y', strtotime($duration_to));  ?>'
             });
