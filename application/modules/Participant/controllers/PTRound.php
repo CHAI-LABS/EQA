@@ -1758,13 +1758,13 @@ class PTRound extends MY_Controller {
                             </div>";
                         }else{
                             $uploader = "<div class = 'form-group'>
-                                            <label class = 'control-label'>Please upload the data received from the machine</label>
+                                            <label class = 'control-label'>Please upload the data received from the machine ( jpg / png / excel / pdf / csv )</label>
                                             <input type = 'file' name = 'data_uploaded_form' required = 'true' class = 'form-control'/>
                                         </div>";
                         }
                     }else{
                         $uploader = "<div class = 'form-group'>
-                                            <label class = 'control-label'>Please upload the data received from the machine</label>
+                                            <label class = 'control-label'>Please upload the data received from the machine ( jpg / png / excel / pdf / csv )</label>
                                             <input type = 'file' name = 'data_uploaded_form' required = 'true' class = 'form-control'/>
                                         </div>";
                     }

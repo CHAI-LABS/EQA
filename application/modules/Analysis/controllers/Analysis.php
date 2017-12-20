@@ -498,201 +498,228 @@ class Analysis extends DashboardController {
 
 
     public function generateReport($type,$round_uuid){
+        $template = $this->config->item('default');
         $column_data = $row_data = $tablevalues = $tablebody = $table = [];
-        $facility_code = '';
         $count = $zerocount = $sub_counter = 0;
-        $round = $this->db->get_where('pt_round_v', ['uuid' => $round_uuid])->row();
-        $round_id = $round->id;
-        $round_name = $round->pt_round_no;
+
+        $rounds = $this->db->get_where('pt_round_v', ['uuid'=>$round_uuid])->row();
+        $round_name = str_replace('/', '-', $rounds->pt_round_no);
+        $round_uuid = $rounds->uuid;
+        $round_id = $rounds->id;
+
+        // $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
+        // $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
+
+        $html_body = '
+        <div class="centered">
+            <div>
+                <p> 
+                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
+                </p>
+            </div> 
+            <div>
+                <th>
+                     MINISTRY OF HEALTH <br/>
+                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
+                     NATIONAL HIV REFERENCE LABORATORY <br/>
+                     P. O. BOX 20750-00202, NAIROBI <br/>
+                </th>
+            </div><br/><br/>
+
+            <div><th>
+                Round No : ' .$round_name. ' <br/> 
+                </th>
+            </div>
+            <br/><br/>
+
+        </div>
+        <table>
+        <thead>
+        <tr>
+            <th>Mfl Code</th>
+            <th>Lab</th>';
+            
         $heading = [
-            "MFL Code",
-            "Lab",
-            "Analyte",
-            "Sample",
-            "Result (s)",
-            "Result Code",
-            "Grade",
+            "Mfl Code",
+            "Lab"
         ];
 
-        $column_data = array('MFL Code','Lab','Analyte','Sample','Result (s)','Result Code', 'Grade');
-        $tabledata = [];
+        $column_data = array('Mfl Code','Lab');
+        
+        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
 
-        $facilities = $this->Analysis_m->getParticipatedFacilities($round_id);
+        // foreach ($samples as $sample) {
+        //     array_push($heading, $sample->sample_name,"Comment");
+        //     array_push($column_data, $sample->sample_name,"Comment");
+        //     $html_body .= '<th>'.$sample->sample_name.'</th> <th>Comment</th>';
+        // }
 
-        // echo "<pre>";print_r($round_name);die();
+        array_push($heading, 'Grade (%)', 'Review');
+        array_push($column_data, 'Grade (%)', 'Review');
 
-        foreach ($facilities as $facility) {
-
-            $facility_code = $facility->facility_code;
-            $facility_name = $facility->facility_name;
-
-            $facility_data = $this->Analysis_m->getResult($round_id,$facility->facility_id);
-
-            if($facility_data){
-
-                $equipments = $this->Analysis_m->getUsedEquipments($facility->facility_code);
-                
-                foreach ($equipments as $equipment) {
-                    $analyte = 3;
-                    $samp_counter = $acceptable = $unacceptable = 0;
-                    
-
-                    $equipment_id = $equipment->id;
-
-                    $equipment_name = $equipment->equipment_name;
-
-                    for ($a=0; $a < $analyte; $a++) { 
-                        
-
-                        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
-
-                        foreach ($samples as $sample) {
-                            $samp_counter++;
-                            $tabledata = [];
-
-                            if($a == 0){
-                                array_push($tabledata, $facility_code, $facility_name, 'cd3', $equipment_name. ': '.$sample->sample_name);
-                            }elseif ($a == 1) {
-                                array_push($tabledata, $facility_code, $facility_name, 'cd4', $equipment_name. ': '.$sample->sample_name);
-                            }elseif ($a == 2) {
-                                array_push($tabledata, $facility_code, $facility_name, 'other', $equipment_name. ': '.$sample->sample_name);
-                            }else{
-                                array_push($tabledata, $facility_code, $facility_name, 'problem', $equipment_name. ': '.$sample->sample_name);
-                            }
-
-                            $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
-
-                            if($a == 0){
-                                if($cd4_values){
-                                    $upper_limit = $cd4_values->cd3_absolute_upper_limit;
-                                    $lower_limit = $cd4_values->cd3_absolute_lower_limit;
-                                }else{
-                                    $upper_limit = 0;
-                                    $lower_limit = 0;
-                                }
-                            }elseif ($a == 1) {
-                                if($cd4_values){
-                                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                                }else{
-                                    $upper_limit = 0;
-                                    $lower_limit = 0;
-                                }
-                            }elseif ($a == 2) {
-                                if($cd4_values){
-                                    $upper_limit = $cd4_values->other_absolute_upper_limit;
-                                    $lower_limit = $cd4_values->other_absolute_lower_limit;
-                                }else{
-                                    $upper_limit = 0;
-                                    $lower_limit = 0;
-                                }
-                            }else{
-                                    $upper_limit = 0;
-                                    $lower_limit = 0;
-                            }
-                            
-                            $part_cd4 = $this->Analysis_m->getResult($round_id,$facility->facility_id,$equipment_id,$sample->id);
-
-                            if($part_cd4){
-
-                                if($a == 0){
-                                    // $html_body .= '<td class="spacings">'.$part_cd4->cd3_absolute.'</td>';
-                                    if($part_cd4->cd3_absolute >= $lower_limit && $part_cd4->cd3_absolute <= $upper_limit){
-                                        $acceptable++;
-                                        $comment = "Acceptable";
-
-                                    }else{
-                                        $unacceptable++;
-                                        $comment = "Unacceptable";
-                                    }   
-
-                                    if($part_cd4->cd3_absolute == 0 || $part_cd4->cd3_absolute == null){
-                                        $zerocount++;
-                                    }
-
-                                    array_push($tabledata, $part_cd4->cd3_absolute, '', $comment);
-                                }elseif ($a == 1) {
-
-                                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                                        $acceptable++;
-                                        $comment = "Acceptable";
-
-                                    }else{
-                                        $unacceptable++;
-                                        $comment = "Unacceptable";
-                                    }   
-
-                                    if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
-                                        $zerocount++;
-                                    }
+        $html_body .= ' 
+        <th>Grade (%)</th>
+            <th>Review</th>
+            </tr> 
+        </thead>
+        <tbody>
+        <ol type="a">';
 
 
-                                    array_push($tabledata, $part_cd4->cd4_absolute, '', $comment);
-                                }elseif ($a == 2) {
-
-                                        // $html_body .= '<td class="spacings">'.$part_cd4->other_absolute.'</td>';
-
-                                    if($part_cd4->other_absolute >= $lower_limit && $part_cd4->other_absolute <= $upper_limit){
-                                        $acceptable++;
-                                        $comment = "Acceptable";
-
-                                    }else{
-                                        $unacceptable++;
-                                        $comment = "Unacceptable";
-                                    }   
-
-                                    if($part_cd4->other_absolute == 0 || $part_cd4->other_absolute == null){
-                                        $zerocount++;
-                                    }
+        $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id])->result();
 
 
-                                    array_push($tabledata, $part_cd4->other_absolute, '', $comment);
-                                }else{
-                                    echo "error here 1";die();
-                                    // array_push($tabledata, 0, '', "Unacceptable");
+        foreach ($submissions as $submission) {
+            $sub_counter++;
+            $samp_counter = $acceptable = $unacceptable = 0;
+            $tabledata = [];
+ 
 
-                                }
-                            }else{
-                                
-                                array_push($tabledata, 0, '', "Unacceptable");
-                            } 
+            $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
 
-                            switch ($type) {
-                                case 'excel':
-                                    array_push($row_data, $tabledata);
-                                break;
+            
+            if($facilityid){
+                $facility_id = $facilityid->facility_id;
 
-                                // case 'pdf':
-                                 
-                                //     $html_body .= '<td class="spacings">'.$review.'</td>';
-                                //     $html_body .= "</tr></ol>";
-                                // break;
-                                    
-                                
-                                default:
-                                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
-                                break;
-                            }
+                $facil = $this->db->get_where('facility_v', ['facility_id' =>  $facility_id])->row();
 
-                            // $html_body .= '<td class="spacings">'.$comment.'</td>'; 
-                        }
-                    }
-
+                if($facil){
+                    $facility_name = $facil->facility_name;
+                    $facility_code = $facil->facility_code;
+                }else{
+                    $facility_name = "No Facility";
+                    $facility_code = "No Facility Code";
                 }
 
+                
             }else{
-                echo "error here";die();
+                $facility_name = "No Facility";
+                $facility_code = "No Facility Code";
             }
 
+        
+
+            array_push($tabledata, $facility_code, $facility_name);
+
+            $html_body .= '<tr>
+                            <td class="spacings">'.$facility_code.'</td>';
+            $html_body .= '<td class="spacings">'.$facility_name.'</td>';
+
+            foreach ($samples as $sample) {
+                $comment = '';
+                $samp_counter++;
+                
+                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $submission->equipment_id, 'sample_id'  =>  $sample->id])->row();
+
+                
+
+
+                if($cd4_values){
+                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                }else{
+                    $upper_limit = 0;
+                    $lower_limit = 0;
+                } 
+
+                
+                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,$submission->participant_id);
+
+               
+                if($part_cd4){
+
+                    $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+
+                    if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                        $acceptable++;
+                        $comment = "Acceptable";
+
+                    }else{
+                        $unacceptable++;
+                        $comment = "Unacceptable";
+                    }   
+
+                    if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
+                        $zerocount++;
+                    }
+
+                    // array_push($tabledata, $part_cd4->cd4_absolute);
+                    
+                }else{
+                    // array_push($tabledata, 0);
+                }   
+                $html_body .= '<td class="spacings">'.$comment.'</td>'; 
+            }
+
+            
+
+            $grade = round((($acceptable / $samp_counter) * 100), 2);
+
+
+            $overall_grade = $grade . ' %';
+
+            if($grade == 100){
+                $review = "Satisfactory Performance";
+            }else if($grade > 0 && $grade < 100){
+                $review = "Unsatisfactory Performance";
+            }else{
+                $review = "Non-responsive";
+            }
+
+            $username = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row()->participant_id;
+
+            $part_details = $this->db->get_where('users_v', ['username' =>  $username])->row();
+            
+            $name = $part_details->firstname . ' ' . $part_details->lastname;
+
+            // array_push($tabledata, $overall_grade,$review,$name,$part_details->phone,$part_details->email_address);
+            array_push($tabledata, $grade, $review);
+
+
+            
+            switch ($type) {
+                case 'table':
+                    
+                    $table[$count] = $tabledata;
+
+                break;
+
+                case 'excel':
+                    array_push($row_data, $tabledata);
+                break;
+
+                case 'pdf':
+                 
+                    
+                    $html_body .= '<td class="spacings">'.$grade.' %</td>';
+                    $html_body .= '<td class="spacings">'.$review.'</td>';
+                    $html_body .= "</tr></ol>";
+                break;
+                    
+                
+                default:
+                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
+                break;
+            }
+
+
+           
+            $count++;
+                      
         }
 
-        $round_name = str_replace('/', '-', $round_name);
+        // echo "<pre>";print_r($round_name);echo "</pre>";die();
 
+        if($type == 'table'){
 
-        if($type == 'excel'){
+            $this->table->set_template($template);
+            $this->table->set_heading($heading);
 
+            return $this->table->generate($table);
+
+        }else if($type == 'excel'){
             $excel_data = array();
-            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'PT_'.$round_name.'_Results', 'file_name' => 'PT_'.$round_name.'_Results', 'excel_topic' => 'PT_'.$round_name.'_Results');
+            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Round_'.$round_name.'_', 'file_name' => 'Round_'.$round_name.'_', 'excel_topic' => 'Round_'.$round_name);
 
             
             $excel_data['column_data'] = $column_data;
@@ -700,16 +727,14 @@ class Analysis extends DashboardController {
 
             $this->export->create_excel($excel_data);
 
+        }else if($type == 'pdf'){
+
+            $html_body .= '</tbody></table>';
+            $pdf_data = array("pdf_title" => 'Round_'.$round_name.'_', 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Round_'.$round_name.'_', 'pdf_topic' => 'Round_'.$round_name.'_');
+
+            $this->export->create_pdf($html_body,$pdf_data);
+
         }
-        // else if($type == 'pdf'){
-
-        //     $html_body .= '</tbody></table>';
-        //     $pdf_data = array("pdf_title" => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_topic' => 'Participants_'.$round_name.'_'.$equipment_name);
-
-        //     $this->export->create_pdf($html_body,$pdf_data);
-
-        // }
-
     }
 
 
@@ -3096,11 +3121,6 @@ class Analysis extends DashboardController {
     // }
 
 
-
-    
-
-
-
 	public function createTabs($round_id){
         
         $datas=[];
@@ -3178,8 +3198,6 @@ class Analysis extends DashboardController {
                     $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
 
                     
-
-
                     if($cd4_values){
                         $upper_limit = $cd4_values->cd4_absolute_upper_limit;
                         $lower_limit = $cd4_values->cd4_absolute_lower_limit;
