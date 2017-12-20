@@ -29,21 +29,18 @@ $(document).ready(function(){
                         stacked: true,
                     }],
                     yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        },
+                        scaleLabel: {
+                                display: true,
+                                labelString: 'Number of Participants'
+                        },
 	    				stacked: true,
                         type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
                         display: true,
                         position: "left",
                         id: "y-axis-1",
-                    }, {
-                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                        display: true,
-                        position: "right",
-                        id: "y-axis-2",
-
-                        // grid line settings
-                        gridLines: {
-                            drawOnChartArea: false, // only want the grid lines for one axis to show up
-                        },
                     }]
                 }
             }
@@ -76,6 +73,13 @@ $(document).ready(function(){
                         stacked: true,
                     }],
                     yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        },
+                        scaleLabel: {
+                                display: true,
+                                labelString: 'Percentage (%)'
+                        },
 	    				stacked: true,
                         type: "linear",
                         display: true,

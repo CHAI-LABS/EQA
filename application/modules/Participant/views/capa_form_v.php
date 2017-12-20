@@ -28,17 +28,17 @@
 				            </div>
 
 				            <div class = "card-block">
-				            	<div class="col-md-3">
+				            	<!-- <div class="col-md-3">
 				            		CD4 Results that you provided
 				            		<br/> 
 			                		<?= @$sampledata; ?>
-			                	</div> 
+			                	</div> --> 
 
-			                	<div class="col-md-9">
+			                	<div class="col-md-12">
 				                    <div class = "form-group">
-				                        1. Explanation of the incorrect results
+				                        <!-- 1. Explanation of the incorrect results -->
 				                        
-			                            <textarea id="occurrence" name="occurrence" rows="8" maxlength="500" class="form-control" placeholder="Enter reason here..."></textarea>
+			                            <textarea id="occurrence" name="occurrence" rows="8" maxlength="500" class="form-control" placeholder="..."></textarea>
 				                    </div>
 			                    </div>
 
