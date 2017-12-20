@@ -10,7 +10,12 @@
 		Hey there. Please fill in CAPA Form for this PT (<?= @$dashboard_data->pt_round->pt_round_no; ?>) before <span style = "color:red;"><?= @date('dS F, Y', strtotime($dashboard_data->pt_round->to)); ?></span>. To fill in the form, please head over to the <a href = "<?= @base_url('Participant/Participant/CapaForm/' . $dashboard_data->pt_round->uuid); ?>">PT Round Section</a>
 	<?php } ?>
 </div>
-<a href = "<?= @base_url('Participant/Participant/CapaForm/' . $dashboard_data->pt_round->uuid); ?>" class = "btn btn-primary pull-right">Fill in CAPA Form</a><br/><br/>
+
+
+<?php if($capa_check){ ?>
+	<a href = "<?= @base_url('Participant/Participant/CapaForm/' . $dashboard_data->pt_round->uuid); ?>" class = "btn btn-primary pull-right">Fill in CAPA Form</a><br/><br/>
+<?php } ?>
+
 
 
 

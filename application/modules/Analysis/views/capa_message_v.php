@@ -23,6 +23,7 @@
                    <div class = "form-group">
                         <label class = "control-label col-md-3">Email</label>
                         <div class="col-md-9">
+                          <input type = "hidden" name = "facility_code" value="<?= @$facility_code; ?>" class = "form-control"/>
                             <input type = "text" name = "email" value="<?= @$email; ?>" class = "form-control"/>
                         </div>
                     </div>

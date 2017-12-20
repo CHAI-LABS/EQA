@@ -658,9 +658,9 @@ class Analysis extends DashboardController {
 
             $overall_grade = $grade . ' %';
 
-            if($grade == 100){
+            if($grade >= 80){
                 $review = "Satisfactory Performance";
-            }else if($grade > 0 && $grade < 100){
+            }else if($grade > 0 && $grade < 80){
                 $review = "Unsatisfactory Performance";
             }else{
                 $review = "Non-responsive";
@@ -2105,13 +2105,14 @@ class Analysis extends DashboardController {
     }
 
 
-    function newCAPAMessage($round_uuid,$email){
+    function newCAPAMessage($round_uuid,$email,$facility_code){
         $data = [];
         $title = "CAPA Message";
 
         $data = [
             'round_uuid' => $round_uuid,
-            'email' => $email
+            'email' => $email,
+            'facility_code' => $facility_code
         ];
 
         $this->assets
@@ -2129,6 +2130,7 @@ class Analysis extends DashboardController {
 
     function sendCAPAMessage($round_uuid){
         if($this->input->post()){
+            $facility_code = $this->input->post('facility_code');
             $email = $this->input->post('email');
             $subject = $this->input->post('subject');
             $message = $this->input->post('message');
@@ -2143,6 +2145,7 @@ class Analysis extends DashboardController {
 
                 $insertdata = [
                     'from'          =>  'nhrlCD4eqa@nphls.or.ke',
+                    'to_facility'   =>  $facility_code,
                     'email'         =>  $email,
                     'subject'       =>  $subject,
                     'message'       =>  $message
@@ -2334,13 +2337,16 @@ class Analysis extends DashboardController {
                 $review = "Non-responsive";
             }
 
-            $username = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row()->participant_id;
+            $ready_part = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row();
+
+            $username = $ready_part->participant_id;
+            $facility_code = $ready_part->facility_code;
             // echo "<pre>";print_r($part_cd4);echo "</pre>";die();
             $part_details = $this->db->get_where('users_v', ['username' =>  $username])->row();
             
             $name = $part_details->firstname . ' ' . $part_details->lastname;
 
-            $capa = '<a href = ' . base_url("Analysis/newCAPAMessage/$round_uuid/$part_details->email_address") . ' class = "btn btn-warning btn-sm"><i class = "icon-envelope"></i>&nbsp;Send Capa </a>';
+            $capa = '<a href = ' . base_url("Analysis/newCAPAMessage/$round_uuid/$part_details->email_address/$facility_code") . ' class = "btn btn-warning btn-sm"><i class = "icon-envelope"></i>&nbsp;Send Capa </a>';
 
             array_push($tabledata, $overall_grade,$review,$name,$part_details->phone,$part_details->email_address, $capa);
     

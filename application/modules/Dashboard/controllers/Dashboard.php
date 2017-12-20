@@ -55,9 +55,18 @@ class Dashboard extends DashboardController {
 
 			$participant = $this->M_Participant->findParticipantByIdentifier('uuid', $this->session->userdata('uuid'));
 
-			// echo "<pre>";print_r($participant->participant_facility);echo "</pre>";die();
 			
+			$facility = $this->db->get_where('facility_v', ['facility_id' => $participant->participant_facility])->row();
 
+			$capa_check = $this->db->get_where('messages', ['to_facility' => $facility->facility_code])->row();
+
+			if($capa_check){
+				$capa = 1;
+			}else{
+				$capa = 0;
+			}
+			
+			// echo "<pre>";print_r($facility);echo "</pre>";die();
 			$this->load->model('participant/M_Participant');
 			$view = "dashboard_v";
 			$this->assets
@@ -66,10 +75,11 @@ class Dashboard extends DashboardController {
                 ->addJs('js/Chart.PieceLabel.js');
 			$this->assets->setJavascript('Dashboard/dashboard_js');
 			$data = [
-				'receipt'   		=> $locking,
+				'receipt'   		=>  $locking,
 				'dashboard_data'	=>	$this->getParticipantDashboardData($this->session->userdata('uuid')),
 				'participant'		=>	$participant,
-				'facility_id'		=>	$participant->participant_facility
+				'facility_id'		=>	$participant->participant_facility,
+				'capa_check'		=>	$capa
 			];
 		}elseif($type == "admin"){
 			$view = "admin_dashboard";
