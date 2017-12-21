@@ -11,13 +11,17 @@ $(document).ready(function(){
 
 	$(document).on('change','#round-select',function(){
 		// alert("changed");
+
 		var r = document.getElementById("round-select");
-		var c = document.getElementById("county-select");
-		var f = document.getElementById("facility-select");
+		// var c = document.getElementById("county-select");
+		// var f = document.getElementById("facility-select");
 
 		var round = r.options[r.selectedIndex].value;
-		var county = c.options[c.selectedIndex].value;
-		var facility = f.options[f.selectedIndex].value;
+		// var county = c.options[c.selectedIndex].value;
+		// var facility = f.options[f.selectedIndex].value;
+
+		var county = 0;
+		var facility = 0;
 
         changeGraphs(round,county,facility);
   	});

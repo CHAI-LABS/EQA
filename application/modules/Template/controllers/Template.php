@@ -25,7 +25,7 @@ class Template extends MX_Controller {
 		if($sop){
 			$sop_path = $sop->sop_path;
 		}else{
-			$sop_path = "Home";
+			$sop_path = "/";
 		}
 
 		// echo "<pre>";print_r($sop->sop_path);echo "</pre>";die();
@@ -228,12 +228,28 @@ class Template extends MX_Controller {
 				'link'	=>	'Participant/PTRound/',
 				'users'	=>	['participant']
 			],
-
 			'calendar'	=>	[
 				'icon'	=>	'icon-calendar',
 				'text'	=>	'Calendar',
 				'link'	=>	'Participant/Calendar/',
 				'users'	=>	['participant']
+			],
+			'libraries' => [
+				'icon' => 'fa fa-book',
+				'text' => 'Libraries',
+				'sublist' => [
+					[
+						'icon' => 'fa fa-bookmark',
+						'link' => 'Participant/Readiness/FAQs',
+						'text' => 'FAQs'
+					],
+					[
+						'icon' => 'fa fa-bookmark',
+						'link' => $this->getCurrentSOP(),
+						'text' => 'SOPs'
+					]
+				],
+				'users' => ['participant']
 			],
 			'qarounds'	=>	[
 				'icon'	=>	'icon-chemistry',

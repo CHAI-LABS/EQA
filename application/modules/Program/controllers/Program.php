@@ -69,10 +69,17 @@ class Program extends MY_Controller {
 
     public function getFacilities($county_id = null){
         if($county_id == 0){
-            $facilities = $this->db->get('facility_v')->result();
+            $this->db->join("pt_participant_review_v prv", "prv.facility_id = fv.facility_id");
+            $this->db->group_by("fv.facility_id");
+            // $facilities = $this->db->get('facility_v fv')->result();
         }else{
-            $facilities = $this->db->get_where('facility_v', ['county_id' => $county_id])->result();
+            $this->db->join("pt_participant_review_v prv", "prv.facility_id = fv.facility_id");
+            $this->db->where('prv.county_id', $county_id);
+            $this->db->group_by("fv.facility_id");
+            
+            // $facilities = $this->db->get_where('facility_v', ['county_id' => $county_id])->result();
         }
+        $facilities = $this->db->get('facility_v fv')->result();
         
         return $this->output->set_content_type('application/json')->set_output(json_encode($facilities));
     }

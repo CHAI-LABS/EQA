@@ -44,6 +44,51 @@ class Readiness extends MY_Controller {
 		}
 	}
 
+	public function FAQs(){
+		$faq_view = '';
+
+        $this->db->where('status', 1);
+        $faqs = $this->db->get('faqs')->result();
+        $counter = 1;
+        $color_counter = 1;
+        foreach($faqs as $faq){
+
+        	$faq_view .= '<div class="col-sm-12 col-md-12">';
+
+        	if($color_counter == 1){
+        		$faq_view .= '<div class="card card-accent-info">';
+        	}else{
+        		$faq_view .= '<div class="card card-accent-danger">';
+        		$color_counter = 0;
+        	}
+
+        	$faq_view .= '<div class="card-header">';
+        	$faq_view .= $counter . '. ' . $faq->title . ' : ' .$faq->question;
+        	$faq_view .= '</div>
+                            <div class="card-block">';
+            if($faq->title == 'CONTACT US'){
+            	$faq_view .= 'Use the bottom section at the Home Page Screen';
+            }else{
+            	$faq_view .= $faq->answer;
+            }
+
+            
+            $faq_view .= '</div>
+                        </div>
+                    </div>';
+
+            $color_counter ++;
+            $counter ++;
+        }
+
+        $data = [
+            'faq_view'          =>  $faq_view
+        ];
+
+
+        $this->template->setPageTitle('FAQs')->setPartial('faqs', $data)->adminTemplate();
+	}
+
 	
 
 	public function authentication(){
