@@ -134,7 +134,7 @@ class Program_m extends CI_Model {
         $this->db->select("cv.id AS county_id,cv.county_name AS county_name,fv.facility_id AS facility_id,fv.facility_name AS facility_name");
         $this->db->from("county_v cv");
         $this->db->join("facility_v fv", "fv.county_id = cv.id");
-        $this->db->join("pt_participant_review_v prv", "prv.facility_id = fv.facility_id", "left");
+        $this->db->join("pt_participant_review_v prv", "prv.facility_id = fv.facility_id");
         $this->db->where("fv.cd4", 1);
         // $this->db->limit(6);
         $this->db->group_by("cv.county_name");

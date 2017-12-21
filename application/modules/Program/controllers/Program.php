@@ -28,8 +28,10 @@ class Program extends MY_Controller {
         }
         $round_list .= '</select>';
 
-
-        $counties = $this->db->get('county_v')->result();
+        $this->db->join("pt_participant_review_v prv", "cv.id = prv.county_id");
+        $this->db->group_by("cv.id");
+        $this->db->order_by("cv.county_name");
+        $counties = $this->db->get('county_v cv')->result();
         $county_list = '<select id="county-select" class="form-control select2-single">
                         <option selected = "selected" value="0">All Counties</option>';
         foreach ($counties as $county) {
