@@ -1116,7 +1116,9 @@ class Analysis extends DashboardController {
             'round_name' => $round_name
         ];
             
-        $this->assets->addCss('css/main.css');
+        $this->assets
+                ->addCss('sweetalert2/dist/sweetalert2.min.css')
+                ->addCss('css/main.css');
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
@@ -1124,7 +1126,8 @@ class Analysis extends DashboardController {
                 ->addJs('dashboard/js/libs/select2.min.js')
                 ->addJs('js/Chart.min.js')
                 ->addJs('js/chartsjs-plugin-data-labels.js')
-                ->addJs('js/Chart.PieceLabel.js');
+                ->addJs('js/Chart.PieceLabel.js')
+                ->addJs('sweetalert2/dist/sweetalert2.min.js');
         $this->assets->setJavascript('Program/program_js');
         $this->template
                 ->setPageTitle($title)
@@ -1181,7 +1184,9 @@ class Analysis extends DashboardController {
             'round_name' => $round_name
         ];
             
-        $this->assets->addCss('css/main.css');
+        $this->assets
+                ->addCss('sweetalert2/dist/sweetalert2.min.css')
+                ->addCss('css/main.css');
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
@@ -1189,7 +1194,8 @@ class Analysis extends DashboardController {
                 ->addJs('dashboard/js/libs/select2.min.js')
                 ->addJs('js/Chart.min.js')
                 ->addJs('js/chartsjs-plugin-data-labels.js')
-                ->addJs('js/Chart.PieceLabel.js');
+                ->addJs('js/Chart.PieceLabel.js')
+                ->addJs('sweetalert2/dist/sweetalert2.min.js');
         $this->assets->setJavascript('Program/program_js');
         $this->template
                 ->setPageTitle($title)
@@ -3220,7 +3226,6 @@ class Analysis extends DashboardController {
 
                         if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
                             $acceptable++;
-
                         }else{
                             $unacceptable++;
                         }   
@@ -3283,7 +3288,7 @@ class Analysis extends DashboardController {
 
             $equipment_tabs .= $failed;
 
-            $equipment_tabs .= ' </a></strong><br/>
+            $equipment_tabs .= ' (View)</a></strong><br/>
 				            </div>
 				        </div>
 				    </div>

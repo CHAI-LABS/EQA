@@ -263,7 +263,7 @@ class Program_m extends CI_Model {
 
     public function getReadyParticipants($round_id, $county_id = null, $facility_id = null){
 
-        $this->db->select("ppr.participant_id");
+        $this->db->select("ppr.participant_id,ppr.equipment_id");
         $this->db->from("pt_participant_review_v ppr");
         $this->db->where("ppr.round_id",$round_id);
 

@@ -82,12 +82,12 @@
                                         </div>
                                     </div>
                                     <div class="card-block">
-                                        Total # site enrolled :<strong id="enrolled"> 0 </strong><br/>
-                                        # of participants :<strong id="partno"> 0 </strong><br/>
-                                        Disqualified :<strong id="disqualified"> 0 </strong><br/>
-                                        Unable to report :<strong id="unable"> 0 </strong><br/>
-                                        Non-Responsive :<strong id="nonresp"> 0 </strong><br/>
-                                        Responded :<strong id="resp"> 0 </strong>
+                                        Total # site enrolled : <strong id="enrolled"> 0 </strong><br/>
+                                        # of participants : <strong id="partno"> 0 </strong><br/>
+                                        Disqualified : <strong id="disqualified"> 0 </strong><br/>
+                                        Unable to report : <strong id="unable"> 0 </strong><br/>
+                                        Non-Responsive : <strong id="nonresp"> 0 </strong><br/>
+                                        Responded : <strong id="resp"> 0 </strong>
                                         <br/><br/>
                                         <div class="chart-wrapper">
                                             <canvas id="graph-1"></canvas>
@@ -102,9 +102,9 @@
                                         </div>
                                     </div>
                                     <div class="card-block">
-                                        # of responded participants :<strong id="part"> 0 </strong><br/>
-                                        # of passed :<strong id="pass"> 0 </strong><br/>
-                                        # of failed :<strong id="fail"> 0 </strong>
+                                        No. of responded participants : <strong id="part"> 0 </strong><br/>
+                                        No. of passed : <strong id="pass"> 0 </strong><br/>
+                                        <div id="failure" style="color: blue;"><a class="failedlinks">No. of failed : <strong id="fail"> 0 </strong> (View)</a></div>
                                         <br/><br/>
                                         <div class="chart-wrapper">
                                             <canvas id="graph-2"></canvas>
