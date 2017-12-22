@@ -117,31 +117,22 @@
                         </div>
                     </div>
 
-                    <div class="col-md-12 container-fluid">
+                    <!-- <div class="col-md-12 container-fluid">
                         <div class="animated fadeIn">
-                            <!-- <div class="card-columns col-2"> -->
-
-
-                                <div class="card" style="width:100%";>
-                                    <div class="card-header">
-                                        <strong class="criteria">National</strong> Summary Outcomes
-                                        <!-- : <strong id="roundname1">Loading...</strong> -->
-                                        <div class="card-actions">
-                                        </div>
-                                    </div>
-                                    <div class="card-block">
-                                        <div class="chart-wrapper">
-                                            <canvas id="graph-3"></canvas>
-                                        </div>
+                            <div class="card" style="width:100%";>
+                                <div class="card-header">
+                                    <strong class="criteria">National</strong> Summary Outcomes
+                                    <div class="card-actions">
                                     </div>
                                 </div>
-
-
-                            <!-- </div> -->
-
-                            
+                                <div class="card-block">
+                                    <div class="chart-wrapper">
+                                        <canvas id="graph-3"></canvas>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </div> -->
 
 
                     <div class="col-md-12 container-fluid">

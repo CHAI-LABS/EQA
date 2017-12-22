@@ -177,76 +177,75 @@ $(document).ready(function(){
 	    });
 
 
-	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	    // $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        
-	        $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
+	    //     $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
 
-	    	var roundname1 = ChartData['round'];
-	    	var enrolled = ChartData['datasets']['0']['data']['0'];
-	        var partno = ChartData['datasets']['1']['data']['0'];
-	        var nonresp = ChartData['datasets']['2']['data']['0'];
-	        var unable = ChartData['datasets']['3']['data']['0'];
-	        var disqualified = ChartData['datasets']['4']['data']['0'];
-	        var resp = ChartData['responsive'];
-
-
-	    	document.getElementById('enrolled').innerHTML = enrolled;
-	    	// document.getElementById('roundname1').innerHTML = roundname1;
-	    	document.getElementById('partno').innerHTML = partno;
-	    	document.getElementById('disqualified').innerHTML = disqualified;
-	    	document.getElementById('unable').innerHTML = unable;
-	    	document.getElementById('nonresp').innerHTML = nonresp;
-	    	document.getElementById('resp').innerHTML = resp;
+	    // 	var roundname1 = ChartData['round'];
+	    // 	var enrolled = ChartData['datasets']['0']['data']['0'];
+	    //     var partno = ChartData['datasets']['1']['data']['0'];
+	    //     var nonresp = ChartData['datasets']['2']['data']['0'];
+	    //     var unable = ChartData['datasets']['3']['data']['0'];
+	    //     var disqualified = ChartData['datasets']['4']['data']['0'];
+	    //     var resp = ChartData['responsive'];
 
 
-	        var ctx3 = document.getElementById('graph-3');
-	        var chart = new Chart(ctx3, {
-	            type: 'bar',
-	            data: ChartData,
-	            options: {
-	                legend: {
-	                	backgroundColor: "rgba(255,99,132,0.2)",
+	    // 	document.getElementById('enrolled').innerHTML = enrolled;
+	    // 	document.getElementById('partno').innerHTML = partno;
+	    // 	document.getElementById('disqualified').innerHTML = disqualified;
+	    // 	document.getElementById('unable').innerHTML = unable;
+	    // 	document.getElementById('nonresp').innerHTML = nonresp;
+	    // 	document.getElementById('resp').innerHTML = resp;
+
+
+	    //     var ctx3 = document.getElementById('graph-3');
+	    //     var chart = new Chart(ctx3, {
+	    //         type: 'bar',
+	    //         data: ChartData,
+	    //         options: {
+	    //             legend: {
+	    //             	backgroundColor: "rgba(255,99,132,0.2)",
 					    
-	                    display: true,
-	                    position: 'right',
-	                    fullWidth: true,
-	                    labels: {
-	                        fontColor: 'rgb(0, 0, 0)'
-	                    }
-	                },
-	                scales: {
-	                    yAxes: [{
-	                        ticks: {
-	                            beginAtZero:true
-	                        },
-	                        scaleLabel: {
-	                        	display: true,
-					            labelString: 'Number of Participants'
-					        }
-	                    }]
-	                },
-	                tooltips: {
-			            mode: 'nearest',
-			            intersect: true
-			        },
-			        datasets: [{
-					    dataLabels: { 
-					    	display: true,          //  disabled by default
-					        colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
-					        minRadius: 30, //  minimum radius for display labels (on pie charts)
-					        align: 'start',
-					        anchor: 'start'
-					    },
-					    borderColor: "rgba(255,99,132,1)",
-					    borderWidth: 2,
-					    hoverBackgroundColor: "rgba(255,99,132,0.4)",
-					    hoverBorderColor: "rgba(255,99,132,1)",
-					}],
-	                responsive: true,
-   	 				maintainAspectRatio: false
-	            }
-	        });
-	    });
+	    //                 display: true,
+	    //                 position: 'right',
+	    //                 fullWidth: true,
+	    //                 labels: {
+	    //                     fontColor: 'rgb(0, 0, 0)'
+	    //                 }
+	    //             },
+	    //             scales: {
+	    //                 yAxes: [{
+	    //                     ticks: {
+	    //                         beginAtZero:true
+	    //                     },
+	    //                     scaleLabel: {
+	    //                     	display: true,
+					//             labelString: 'Number of Participants'
+					//         }
+	    //                 }]
+	    //             },
+	    //             tooltips: {
+			  //           mode: 'nearest',
+			  //           intersect: true
+			  //       },
+			  //       datasets: [{
+					//     dataLabels: { 
+					//     	display: true,          //  disabled by default
+					//         colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
+					//         minRadius: 30, //  minimum radius for display labels (on pie charts)
+					//         align: 'start',
+					//         anchor: 'start'
+					//     },
+					//     borderColor: "rgba(255,99,132,1)",
+					//     borderWidth: 2,
+					//     hoverBackgroundColor: "rgba(255,99,132,0.4)",
+					//     hoverBorderColor: "rgba(255,99,132,1)",
+					// }],
+	    //             responsive: true,
+   	 // 				maintainAspectRatio: false
+	    //         }
+	    //     });
+	    // });
 
 
 	    $.get("<?=@base_url('Program/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){
