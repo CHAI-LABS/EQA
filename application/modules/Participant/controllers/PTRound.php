@@ -990,18 +990,18 @@ class PTRound extends MY_Controller {
         <ol type="a">';
 
 
-        $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
+        $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id, 'participant_id' => $participant->p_id])->result();
 
             
             $batch = $this->db->get_where('pt_ready_participants', ['p_id' => $participant->p_id, 'pt_round_uuid' => $round_uuid])->row();
 
-            array_push($tabledata, $batch->batch);
-
-            // $html_body .= '<tr><td class="spacings">'.$sub_counter.'</td>';
-            // $html_body .= '<td class="spacings">'.$facility_name.'</td>';
-            $html_body .= '<tr><td class="spacings">'.$batch->batch.'</td>';
-
-            
+            if($batch){
+                array_push($tabledata, $batch->batch);
+                $html_body .= '<tr><td class="spacings">'.$batch->batch.'</td>';
+            }else{
+                array_push($tabledata, 'No Batch');
+                $html_body .= '<tr><td class="spacings">No Batch</td>';
+            }
 
             foreach ($samples as $sample) {
                 $samp_counter++;
