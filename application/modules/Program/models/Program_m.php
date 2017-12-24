@@ -266,13 +266,14 @@ class Program_m extends CI_Model {
         $this->db->select("ppr.participant_id,ppr.equipment_id");
         $this->db->from("pt_participant_review_v ppr");
         $this->db->where("ppr.round_id",$round_id);
+        $this->db->join('participant_readiness pr', 'pr.participant_facility = ppr.facility_id');
 
         if($county_id){
             $this->db->where("ppr.county_id", $county_id);
         }
 
         if($facility_id){   
-            $this->db->join('participant_readiness pr', 'pr.participant_facility = ppr.facility_id');
+            
             $this->db->where("pr.lab_result", 1);
             $this->db->where("ppr.facility_id", $facility_id);
         }
