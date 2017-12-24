@@ -442,7 +442,7 @@ $(document).ready(function(){
 
 	        var ctx5 = document.getElementById('graph-6');
 	        var chart = new Chart(ctx5, {
-	            type: 'bar',
+	            type: 'line',
 	            data: ChartData,
 	            options: {
 	                title:{
