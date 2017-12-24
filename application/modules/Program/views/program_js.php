@@ -175,6 +175,14 @@ $(document).ready(function(){
 	    	$('#failure').replaceWith('<div id="failure" style="color: blue;"><a class="failedlinks">No. of failed : <strong id="fail"> '+fail+' </strong> (View)</a></div>');
 
 	    	$("a.failedlinks").click(function(){
+	    		swal({
+					  // position: 'top-right',
+					  type: 'info',
+					  title:'Please Wait !',
+					  html: 'Loading Failed Participants',
+					  width: '800px',
+					  showConfirmButton: false
+					})
 
 		   	$.get("<?=@base_url('Program/createFailedParticipants/');?>" + round + '/' + county + '/' + facility, function(table){
 			   		swal({
