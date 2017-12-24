@@ -641,7 +641,7 @@ class Program extends MY_Controller {
                         }
                     }
 
-                    $labels[] = $round->pt_round_no;
+                    
 
                     // $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid, $county_id, $facility_id)->participants;
 
@@ -652,6 +652,7 @@ class Program extends MY_Controller {
                     $passed = 0;
                     $failed = 0;
                 }
+                $labels[] = $round->pt_round_no;
                 $no_participants['data'][] = $pass_rate;
                 
                 $pass['data'][] = $passed;
