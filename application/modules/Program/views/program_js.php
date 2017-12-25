@@ -439,8 +439,8 @@ $(document).ready(function(){
 
 	        $('#graph-6').replaceWith('<canvas id="graph-6"></canvas>');
 
-	        var ctx5 = document.getElementById('graph-6');
-	        var chart = new Chart(ctx5, {
+	        var ctx6 = document.getElementById('graph-6');
+	        var chart = new Chart(ctx6, {
 	            type: 'line',
 	            data: ChartData,
 	            options: {
@@ -481,8 +481,8 @@ $(document).ready(function(){
 
 	        $('#graph-7').replaceWith('<canvas id="graph-7"></canvas>');
 
-	        var ctx5 = document.getElementById('graph-7');
-	        var chart = new Chart(ctx5, {
+	        var ctx7 = document.getElementById('graph-7');
+	        var chart = new Chart(ctx7, {
 	            type: 'bar',
 	            data: ChartData,
 	            options: {
@@ -521,8 +521,8 @@ $(document).ready(function(){
 
 	        $('#graph-8').replaceWith('<canvas id="graph-8"></canvas>');
 
-	        var ctx5 = document.getElementById('graph-8');
-	        var chart = new Chart(ctx5, {
+	        var ctx8 = document.getElementById('graph-8');
+	        var chart = new Chart(ctx8, {
 	            type: 'line',
 	            data: ChartData,
 	            options: {
@@ -563,64 +563,105 @@ $(document).ready(function(){
 
 	        var roundname3 = ChartData['round'];
 
-	        var ctx5 = document.getElementById('graph-9');
-	        var chart = new Chart(ctx5, {
-	            type: 'bar',
-	            data: ChartData,
-	            options: {
-	                title:{
-	                    display:false,
-	                    text:"Participants Outcome"
-	                },
-	                legend: {
-	                    display: true,
-	                    position: 'top',
-	                    fullWidth: true,
-	                    labels: {
-	                        fontColor: 'rgb(0, 0, 0)'
-	                    }
-	                },
-	                tooltips: {
-	                    mode: 'index',
-	                    intersect: false
-	                },
-	                responsive: true,
-	                scales: {
-	                    xAxes: [{
-	                        stacked: true,
-	                        scaleLabel: {
-	                        	display: true,
-					            labelString: ChartData['x_axis_name']
-					        },
-					        ticks: {
-					            stepSize: 1,
-					            min: 0,
-					            autoSkip: false
-					        }
-	                    }],
-	                    yAxes: [{
-	                        stacked: true,
-	                        scaleLabel: {
-	                        	display: true,
-					            labelString: 'Number of ' + ChartData['x_axis_name']
-					        }
-	                    }, {
-	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-	                        display: true,
-	                        position: "right",
-	                        id: "y-axis-2",
-	                        scaleLabel: {
-	                        	display: true,
-					            labelString: 'Score (%)'
-					        },
-	                        // grid line settings
-	                        gridLines: {
-	                            drawOnChartArea: false, // only want the grid lines for one axis to show up
-	                        },
-	                    }]
-	                },
-	            }
-	        });
+	        var ctx9 = document.getElementById('graph-9');
+
+
+	        if(facility == 0){
+	        	var chart = new Chart(ctx9, {
+		            type: 'bar',
+		            data: ChartData,
+		            options: {
+		                title:{
+		                    display:false,
+		                    text:"Participants Outcome"
+		                },
+		                legend: {
+		                    display: true,
+		                    position: 'top',
+		                    fullWidth: true,
+		                    labels: {
+		                        fontColor: 'rgb(0, 0, 0)'
+		                    }
+		                },
+		                tooltips: {
+		                    mode: 'index',
+		                    intersect: false
+		                },
+		                responsive: true,
+		                scales: {
+		                    xAxes: [{
+		                        stacked: true,
+		                        scaleLabel: {
+		                        	display: true,
+						            labelString: ChartData['x_axis_name']
+						        },
+						        ticks: {
+						            stepSize: 1,
+						            min: 0,
+						            autoSkip: false
+						        }
+		                    }],
+		                    yAxes: [{
+		                        stacked: true,
+		                        scaleLabel: {
+		                        	display: true,
+						            labelString: 'Number of ' + ChartData['x_axis_name']
+						        }
+		                    }, {
+		                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+		                        display: true,
+		                        position: "right",
+		                        id: "y-axis-2",
+		                        scaleLabel: {
+		                        	display: true,
+						            labelString: 'Score (%)'
+						        },
+		                        // grid line settings
+		                        gridLines: {
+		                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+		                        },
+		                    }]
+		                },
+		            }
+		        });
+
+	        }else{
+	        	var chart = new Chart(ctx9, {
+	        		type: 'line',
+		            data: ChartData,
+		            options: {
+		                title:{
+		                    display:false,
+		                    text:"Participant Trends (%)"
+		                },
+		                tooltips: {
+		                    mode: 'index',
+		                    intersect: false
+		                },
+		                responsive: true,
+		                scales: {
+		                    xAxes: [{
+		                        stacked: true,
+		                        scaleLabel: {
+		                        	display: true,
+						            labelString: ChartData['x_axis_name']
+						        }
+		                    }],
+		                    yAxes: [{
+		                    	scaleLabel: {
+		                        	display: true,
+						            labelString: ChartData['y_axis_name']
+						        },
+			    				stacked: true,
+		                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+		                        display: true,
+		                        position: "left"
+		                    }]
+		                }
+		            }
+		        });
+	        }
+
 	    });
 
 

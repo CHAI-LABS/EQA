@@ -1,59 +1,8 @@
-    $submissions = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
-    
-        foreach ($submissions as $submission) {
-            $partcount++;
-            $samp_counter = $acceptable = $unacceptable = 0;
-            $tabledata = [];
- 
-
-            $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
-
-            if($facilityid){
-                $facil_id = $facilityid->facility_id;
-
-                $faci_name = $this->db->get_where('facility_v', ['facility_id' =>  $facil_id])->row();
-
-                if($faci_name){
-                    $facility_name = $faci_name->facility_name;
-                    $county = $this->db->get_where('county_v', ['id' =>  $facilityid->county_id])->row();
-                    if($county){
-                        $county_name = $county->county_name;
-                    }else{
-                        $county_name = "No County";
-                    }
-                }else{
-                    $facility_name = "No Facility";
-                    $county_name = "No County";
-                }
-            }else{
-                $facility_name = "No Facility";
-                $county_name = "No County";
-            }
-
-            foreach ($samples as $sample) {
-                $samp_counter++;
-                
-                $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $submission->equipment_id, 'sample_id'  =>  $sample->id])->row();
-
-                if($cd4_values){
-                    $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                    $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                }else{
-                    $upper_limit = 0;
-                    $lower_limit = 0;
-                } 
-                
-                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,$submission->participant_id);
-               
-                if($part_cd4){
-
-                    if($part_cd4->cd4_absolute == 0){
-                        $novalue++;
-                    }
-                }      
-            }
-
-            if($novalue == $sampcount){
-                $no_non_responsive++;
-            }
-        }
+$graph_data['backgroundColor'] = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
+                ];
+            $graph_data['borderColor'] = ['rgba(52,152,219,0.8)','rgba(46,204,113,0.8)','rgba(211,84,0,0.8)','rgba(231,76,60,0.8)','rgba(127,140,141,0.8)','rgba(241,196,15,0.8)','rgba(52,73,94,0.8)'
+                ];
+            $graph_data['highlightFill'] = ['rgba(52,152,219,0.75)','rgba(46,204,113,0.75)','rgba(211,84,0,0.75)','rgba(231,76,60,0.75)','rgba(127,140,141,0.75)','rgba(241,196,15,0.75)','rgba(52,73,94,0.75)'
+                ];
+            $graph_data['highlightStroke'] = ['rgba(52,152,219,1)','rgba(46,204,113,1)','rgba(211,84,0,1)','rgba(231,76,60,1)','rgba(127,140,141,1)','rgba(241,196,15,1)','rgba(52,73,94,1)'
+                ];
