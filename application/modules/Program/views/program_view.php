@@ -140,15 +140,14 @@
                             <div class="card" style="width:100%";>
                                 <div class="card-header">
                                     <strong class="criteria">National</strong> Summary Outcomes: Report / Disqualified Participants 
-                                    <!-- <strong id="roundname2">Loading...</strong> -->
                                     <div class="card-actions">
                                     </div>
                                 </div>
                                 <div class="card-block">
-                                    Equipment Breakdown :<strong id="equip"> 0 </strong><br/>
+                                    <!-- Equipment Breakdown :<strong id="equip"> 0 </strong><br/>
                                     Reagent Stock-Out :<strong id="reag"> 0 </strong><br/>
                                     Analyst Unavailable :<strong id="anal"> 0 </strong><br/>
-                                    Pending Capa :<strong id="pend"> 0 </strong>
+                                    Pending Capa :<strong id="pend"> 0 </strong> -->
                                     <br/><br/>
                                     <div class="chart-wrapper">
                                         <canvas id="graph-4"></canvas>

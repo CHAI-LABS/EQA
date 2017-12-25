@@ -309,88 +309,86 @@ $(document).ready(function(){
 	        // var anal = ChartData['datasets']['2']['data']['0'];
 	        // var pend = ChartData['datasets']['3']['data']['0'];
 
-	        var equip = ChartData['datasets']['0']['data']['0'];
-	        var reag = ChartData['datasets']['0']['data']['1'];
-	        var anal = ChartData['datasets']['0']['data']['2'];
-	        var pend = ChartData['datasets']['0']['data']['3'];
+	        // var equip = ChartData['datasets']['0']['data']['0'];
+	        // var reag = ChartData['datasets']['0']['data']['1'];
+	        // var anal = ChartData['datasets']['0']['data']['2'];
+	        // var pend = ChartData['datasets']['0']['data']['3'];
 
 	        
 
 
 	    	// document.getElementById('roundname2').innerHTML = roundname2;
-	    	document.getElementById('equip').innerHTML = equip;
-	    	document.getElementById('reag').innerHTML = reag;
-	    	document.getElementById('anal').innerHTML = anal;
-	    	document.getElementById('pend').innerHTML = pend;
+	    	// document.getElementById('equip').innerHTML = equip;
+	    	// document.getElementById('reag').innerHTML = reag;
+	    	// document.getElementById('anal').innerHTML = anal;
+	    	// document.getElementById('pend').innerHTML = pend;
 
 
 	        var ctx4 = document.getElementById('graph-4');
 	        var chart = new Chart(ctx4, {
-	        	type: 'pie',
-				data: ChartData,
-		        options: {
-			        datasets: [{
-					    dataLabels: { 
-					    	display: true,         
-					        colors: ['#fff', '#ccc', '#000'], 
-					        minRadius: 30,
-					        align: 'start',
-					        anchor: 'start'
-					    }
-					}],
-					cutoutPercentage: 0,
-		            responsive: true,
-					    pieceLabel: {
-						    render: 'percentage',
-						    fontColor: ['black', 'black', 'black'],
-						    precision: 2,
-						    position: 'outside'
-						  }
-		        }
-	    //         type: 'bar',
-	    //         data: ChartData,
-	    //         options: {
-	    //             legend: {
-	    //             	backgroundColor: "rgba(255,99,132,0.2)",
-					    
-	    //                 display: true,
-	    //                 position: 'right',
-	    //                 fullWidth: true,
-	    //                 labels: {
-	    //                     fontColor: 'rgb(0, 0, 0)'
-	    //                 }
-	    //             },
-	    //             scales: {
-	    //                 yAxes: [{
-	    //                     ticks: {
-	    //                         beginAtZero:true
-	    //                     },
-	    //                     scaleLabel: {
-	    //                     	display: true,
-					//             labelString: 'Number of Participants'
-					//         }
-	    //                 }]
-	    //             },
-	    //             tooltips: {
-			  //           mode: 'nearest',
-			  //           intersect: true
-			  //       },
-			  //       datasets: [{
-					//     dataLabels: { 
-					//     	display: true,          //  disabled by default
-					//         colors: ['#fff', '#ccc', '#000'], //  Array colors for each labels
-					//         minRadius: 30, //  minimum radius for display labels (on pie charts)
-					//         align: 'start',
-					//         anchor: 'start'
-					//     },
-					//     borderColor: "rgba(255,99,132,1)",
-					//     borderWidth: 2,
-					//     hoverBackgroundColor: "rgba(255,99,132,0.4)",
-					//     hoverBorderColor: "rgba(255,99,132,1)",
-					// }],
-	    //             responsive: true,
-   	 // 				maintainAspectRatio: false
-	    //         }
+	   //      	type: 'pie',
+				// data: ChartData,
+		  //       options: {
+			 //        datasets: [{
+				// 	    dataLabels: { 
+				// 	    	display: true,         
+				// 	        colors: ['#fff', '#ccc', '#000'], 
+				// 	        minRadius: 30,
+				// 	        align: 'start',
+				// 	        anchor: 'start'
+				// 	    }
+				// 	}],
+				// 	cutoutPercentage: 0,
+		  //           responsive: true,
+				// 	    pieceLabel: {
+				// 		    render: 'percentage',
+				// 		    fontColor: ['black', 'black', 'black'],
+				// 		    precision: 2,
+				// 		    position: 'outside'
+				// 		  }
+		  //       }
+	            type: 'bar',
+	            data: ChartData,
+	            options: {
+	                title:{
+	                    display:false,
+	                    text: "Report / Disqualified Outcome"
+	                },
+	                legend: {
+	                    display: true,
+	                    position: 'top',
+	                    fullWidth: true,
+	                    labels: {
+	                        fontColor: 'rgb(0, 0, 0)'
+	                    }
+	                },
+	                tooltips: {
+	                    mode: 'index',
+	                    intersect: false
+	                },
+	                responsive: true,
+	                scales: {
+	                    xAxes: [{
+	                        stacked: true,
+	                        scaleLabel: {
+	                        	display: true,
+					            labelString: 'Rounds'
+					        },
+					        ticks: {
+					            stepSize: 1,
+					            min: 0,
+					            autoSkip: false
+					        }
+	                    }],
+	                    yAxes: [{
+	                        stacked: true,
+	                        scaleLabel: {
+	                        	display: true,
+					            labelString: 'Number of Participants'
+					        }
+	                    }]
+	                },
+	            }
 	        });
 	    });
 
@@ -572,7 +570,7 @@ $(document).ready(function(){
 	            options: {
 	                title:{
 	                    display:false,
-	                    text:ChartData['x_axis_name'] + " Outcome"
+	                    text:"Participants Outcome"
 	                },
 	                legend: {
 	                    display: true,
@@ -624,17 +622,13 @@ $(document).ready(function(){
 	            }
 	        });
 	    });
+
+
+
     }
 
 
     
-
-
-	   
-
-
- 
-
                    
 });    
 </script>

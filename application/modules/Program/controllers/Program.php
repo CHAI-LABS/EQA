@@ -190,61 +190,100 @@ class Program extends MY_Controller {
 
         // echo "<pre>";print_r("reached");echo "</pre>";die();
 
-        $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
-        $round_uuid = $round->uuid;
-        $round_name = $round->pt_round_no;
-        $equipment_breakdown = $this->Program_m->getEquipmentBreakdown($round_uuid, $county_id, $facility_id)->equipments;
-        $reagent_stock_out = $this->Program_m->getReagentStock($round_uuid, $county_id, $facility_id)->reagents;
-        $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid, $county_id, $facility_id)->analysts;
-        $pending_capa = $this->Program_m->getPendingCapa($round_uuid, $county_id, $facility_id)->capas;
+        // $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
 
+        $rounds = $this->Program_m->getLatestRounds();
 
-        // $datasets1 = [
-        //     'label'         =>  'Equipment Breakdown',
-        //     'backgroundColor' => 'rgba(211,84,0,0.5)',
-        //     'borderColor' => 'rgba(211,84,0,0.8)',
-        //     'highlightFill' => 'rgba(211,84,0,0.75)',
-        //     'highlightStroke' => 'rgba(211,84,0,1)',
-        //     'data' => [$equipment_breakdown]
-        // ];
-        // $datasets2 = [
-        //     'label'         =>  'Reagent Stock-Out',
-        //     'backgroundColor' => 'rgba(52,152,219,0.5)',
-        //     'borderColor' => 'rgba(52,152,219,0.8)',
-        //     'highlightFill' => 'rgba(52,152,219,0.75)',
-        //     'highlightStroke' => 'rgba(52,152,219,1)',
-        //     'data' => [$reagent_stock_out]
-        // ];
-        // $datasets3 = [
-        //     'label'         =>  'Analyst Unavailable',
-        //     'backgroundColor' => 'rgba(46,204,113,0.5)',
-        //     'borderColor' => 'rgba(46,204,113,0.8)',
-        //     'highlightFill' => 'rgba(46,204,113,0.75)',
-        //     'highlightStroke' => 'rgba(46,204,113,1)',
-        //     'data' => [$analyst_unavailable]
-        // ];
-        // $datasets4 = [
-        //     'label'         =>  'Pending CAPA',
-        //     'backgroundColor' => 'rgba(231,76,60,0.5)',
-        //     'borderColor' => 'rgba(231,76,60,0.8)',
-        //     'highlightFill' => 'rgba(231,76,60,0.75)',
-        //     'highlightStroke' => 'rgba(231,76,60,1)',
-        //     'data' => [$pending_capa]
-        // ];
-
-
-        $datasets = [
-            'label'         =>  ['Equipment Breakdown','Reagent Stock-Out','Analyst Unavailable','Pending CAPA'],
-            'backgroundColor' => ['rgba(211,84,0,0.5)','rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-            'data' => [(int)$equipment_breakdown, (int)$reagent_stock_out, (int)$analyst_unavailable, (int)$pending_capa]
+        $equipment = [
+            'label'         =>  'Equipment Breakdown',
+            'backgroundColor' => 'rgba(211,84,0,0.5)',
+            'borderColor' => 'rgba(211,84,0,0.8)',
+            'highlightFill' => 'rgba(211,84,0,0.75)',
+            'highlightStroke' => 'rgba(211,84,0,1)'
         ];
-        $labels = ['Equipment Breakdown','Reagent Stock-Out','Analyst Unavailable','Pending CAPA'];
+
+        $reagent = [
+            'label'         =>  'Reagent Stock-Out',
+            'backgroundColor' => 'rgba(52,152,219,0.5)',
+            'borderColor' => 'rgba(52,152,219,0.8)',
+            'highlightFill' => 'rgba(52,152,219,0.75)',
+            'highlightStroke' => 'rgba(52,152,219,1)'
+        ];
+
+        $analysts = [
+            'label'         =>  'Unavailable Analysts',
+            'backgroundColor' => 'rgba(46,204,113,0.5)',
+            'borderColor' => 'rgba(46,204,113,0.8)',
+            'highlightFill' => 'rgba(46,204,113,0.75)',
+            'highlightStroke' => 'rgba(46,204,113,1)'
+        ];
+
+        $capa = [
+            'label'         =>  'Pending CAPA',
+            'backgroundColor' => 'rgba(231,76,60,0.5)',
+            'borderColor' => 'rgba(231,76,60,0.8)',
+            'highlightFill' => 'rgba(231,76,60,0.75)',
+            'highlightStroke' => 'rgba(231,76,60,1)'
+        ];
+
+        if($rounds){
+            foreach ($rounds as $round) {
+                $round_uuid = $round->uuid;
+
+                $labels[] = $round->pt_round_no;
+
+                $equipment_breakdown = $this->Program_m->getEquipmentBreakdown($round_uuid, $county_id, $facility_id);
+
+                if($equipment_breakdown){
+                    $equipment['data'][] = $equipment_breakdown->equipments;
+                }else{
+                    $equipment['data'][] = 0;
+                }
+
+                $reagent_stock_out = $this->Program_m->getReagentStock($round_uuid, $county_id, $facility_id);
+
+                if($reagent_stock_out){
+                    $reagent['data'][] = $reagent_stock_out->reagents;
+                }else{
+                    $reagent['data'][] = 0;
+                }
+                
+                $analyst_unavailable = $this->Program_m->getUnavailableAnalyst($round_uuid, $county_id, $facility_id);
+
+                if($analyst_unavailable){
+                    $analysts['data'][] = $analyst_unavailable->analysts;
+                }else{
+                    $analysts['data'][] = 0;
+                }
+
+                $pending_capa = $this->Program_m->getPendingCapa($round_uuid, $county_id, $facility_id);
+
+                if($pending_capa){
+                    $capa['data'][] = $pending_capa->capas;
+                }else{
+                    $capa['data'][] = 0;
+                }
+
+            }
+        }else{
+            $equipment['data'][] = 0;
+            $analysts['data'][] = 0;
+            $reagent['data'][] = 0;
+            $capa['data'][] = 0;
+        }
+
+        // $datasets = [
+        //     'label'         =>  ['Equipment Breakdown','Reagent Stock-Out','Analyst Unavailable','Pending CAPA'],
+        //     'backgroundColor' => ['rgba(211,84,0,0.5)','rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
+        //     'data' => [(int)$equipment_breakdown, (int)$reagent_stock_out, (int)$analyst_unavailable, (int)$pending_capa]
+        // ];
+
+        // $labels = ['Equipment Breakdown','Reagent Stock-Out','Analyst Unavailable','Pending CAPA'];
 
         
-        $graph_data['round'] = $round_name;
+        $graph_data['round'] = $round->pt_round_no;
         $graph_data['labels'] = $labels;
-        // $graph_data['datasets'] = [$datasets1, $datasets2, $datasets3, $datasets4];
-        $graph_data['datasets'] = [$datasets];
+        $graph_data['datasets'] = [$equipment,$reagent,$analysts,$capa];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
@@ -554,22 +593,6 @@ class Program extends MY_Controller {
             'highlightFill' => 'rgba(52,152,219,0.75)',
             'highlightStroke' => 'rgba(52,152,219,1)'
         ];
-
-        // $pass = [
-        //     'label'         =>  'Pass',
-        //     'backgroundColor' => 'rgba(46,204,113,0.5)',
-        //     'borderColor' => 'rgba(46,204,113,0.8)',
-        //     'highlightFill' => 'rgba(46,204,113,0.75)',
-        //     'highlightStroke' => 'rgba(46,204,113,1)'
-        // ];
-
-        // $fail = [
-        //     'label'         =>  'Fail',
-        //     'backgroundColor' => 'rgba(211,84,0,0.5)',
-        //     'borderColor' => 'rgba(211,84,0,0.8)',
-        //     'highlightFill' => 'rgba(211,84,0,0.75)',
-        //     'highlightStroke' => 'rgba(211,84,0,1)'
-        // ];
 
         if($rounds){
             foreach ($rounds as $round) {
