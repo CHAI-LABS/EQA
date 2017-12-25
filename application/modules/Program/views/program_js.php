@@ -66,7 +66,7 @@ $(document).ready(function(){
 		  type: 'info',
 		  title:'Please wait',
 		  text: 'Loading Graphs',
-		  timer: 6000,
+		  timer: 7000,
 		  showConfirmButton: false
 		});
 
@@ -223,13 +223,6 @@ $(document).ready(function(){
 			        }
 	        });
 	    });
-
-	    $("#pass").click(function(){
-	    	alert("div clicked");
-	    });
-
-	    
-
 
 	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
 	        
@@ -409,12 +402,12 @@ $(document).ready(function(){
 
 	        var ctx5 = document.getElementById('graph-5');
 	        var chart = new Chart(ctx5, {
-	            type: 'bar',
+	            type: 'line',
 	            data: ChartData,
 	            options: {
 	                title:{
-	                    display:false,
-	                    text:"Participant Outcome Trends"
+	                    display:true,
+	                    text:ChartData['title'] + " Trends"
 	                },
 	                tooltips: {
 	                    mode: 'index',
@@ -469,7 +462,7 @@ $(document).ready(function(){
 	                    yAxes: [{
 	                    	scaleLabel: {
 	                        	display: true,
-					            labelString: 'Percentage (%)'
+					            labelString: 'Score (%)'
 					        },
 		    				stacked: true,
 	                        type: "linear",
@@ -551,7 +544,7 @@ $(document).ready(function(){
 	                    yAxes: [{
 	                    	scaleLabel: {
 	                        	display: true,
-					            labelString: 'Percentage (%)'
+					            labelString: 'Score (%)'
 					        },
 		    				stacked: true,
 	                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
@@ -620,7 +613,7 @@ $(document).ready(function(){
 	                        id: "y-axis-2",
 	                        scaleLabel: {
 	                        	display: true,
-					            labelString: 'Pass Rate (%)'
+					            labelString: 'Score (%)'
 					        },
 	                        // grid line settings
 	                        gridLines: {

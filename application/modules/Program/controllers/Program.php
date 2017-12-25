@@ -268,7 +268,7 @@ class Program extends MY_Controller {
 
 
         $no_participants = [
-            'label'         =>  'Pass Rate (%)',
+            'label'         =>  'Score (%)',
             'borderColor' => $borderColor[$counter],
             'highlightFill' => $highlightFill[$counter],
             'highlightStroke' => $highlightStroke[$counter],
@@ -547,21 +547,29 @@ class Program extends MY_Controller {
 
         $rounds = $this->Program_m->getLatestRounds();
 
-        $pass = [
-            'label'         =>  'Pass',
-            'backgroundColor' => 'rgba(46,204,113,0.5)',
-            'borderColor' => 'rgba(46,204,113,0.8)',
-            'highlightFill' => 'rgba(46,204,113,0.75)',
-            'highlightStroke' => 'rgba(46,204,113,1)'
+        $no_participants = [
+            'label'         =>  'No. of Participants',
+            'backgroundColor' => 'rgba(52,152,219,0.5)',
+            'borderColor' => 'rgba(52,152,219,0.8)',
+            'highlightFill' => 'rgba(52,152,219,0.75)',
+            'highlightStroke' => 'rgba(52,152,219,1)'
         ];
 
-        $fail = [
-            'label'         =>  'Fail',
-            'backgroundColor' => 'rgba(211,84,0,0.5)',
-            'borderColor' => 'rgba(211,84,0,0.8)',
-            'highlightFill' => 'rgba(211,84,0,0.75)',
-            'highlightStroke' => 'rgba(211,84,0,1)'
-        ];
+        // $pass = [
+        //     'label'         =>  'Pass',
+        //     'backgroundColor' => 'rgba(46,204,113,0.5)',
+        //     'borderColor' => 'rgba(46,204,113,0.8)',
+        //     'highlightFill' => 'rgba(46,204,113,0.75)',
+        //     'highlightStroke' => 'rgba(46,204,113,1)'
+        // ];
+
+        // $fail = [
+        //     'label'         =>  'Fail',
+        //     'backgroundColor' => 'rgba(211,84,0,0.5)',
+        //     'borderColor' => 'rgba(211,84,0,0.8)',
+        //     'highlightFill' => 'rgba(211,84,0,0.75)',
+        //     'highlightStroke' => 'rgba(211,84,0,1)'
+        // ];
 
         if($rounds){
             foreach ($rounds as $round) {
@@ -572,7 +580,14 @@ class Program extends MY_Controller {
                 $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round->id])->result();
 
                 if($facility_id){
-                    $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
+                    $facility = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row();
+                    $county_id = $facility->county_id;
+                    $title = $facility->facility_name;
+                }else if($county_id != 0 && $facility_id == 0){
+                    $county = $this->db->get_where('county_v', ['id' => $county_id])->row();
+                    $title = $county->county_name;
+                }else{
+                    $title = 'National';
                 }
 
                 $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
@@ -581,91 +596,92 @@ class Program extends MY_Controller {
                     
                     foreach ($submissions as $submission) {
                         $partcount++;
-                        $samp_counter = $acceptable = $unacceptable = 0;
-                        $tabledata = [];
+                        // $samp_counter = $acceptable = $unacceptable = 0;
+                        // $tabledata = [];
              
-                        $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
+                        // $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
 
-                        if($facilityid){
-                            $facil_id = $facilityid->facility_id;
+                        // if($facilityid){
+                        //     $facil_id = $facilityid->facility_id;
 
-                            $faci_name = $this->db->get_where('facility_v', ['facility_id' =>  $facil_id])->row();
+                        //     $faci_name = $this->db->get_where('facility_v', ['facility_id' =>  $facil_id])->row();
 
-                            if($faci_name){
-                                $facility_name = $faci_name->facility_name;
-                                $county = $this->db->get_where('county_v', ['id' =>  $facilityid->county_id])->row();
-                                if($county){
-                                    $county_name = $county->county_name;
-                                }else{
-                                    $county_name = "No County";
-                                }
-                            }else{
-                                $facility_name = "No Facility";
-                                $county_name = "No County";
-                            }
-                        }else{
-                            $facility_name = "No Facility";
-                            $county_name = "No County";
-                        }
+                        //     if($faci_name){
+                        //         $facility_name = $faci_name->facility_name;
+                        //         $county = $this->db->get_where('county_v', ['id' =>  $facilityid->county_id])->row();
+                        //         if($county){
+                        //             $county_name = $county->county_name;
+                        //         }else{
+                        //             $county_name = "No County";
+                        //         }
+                        //     }else{
+                        //         $facility_name = "No Facility";
+                        //         $county_name = "No County";
+                        //     }
+                        // }else{
+                        //     $facility_name = "No Facility";
+                        //     $county_name = "No County";
+                        // }
 
-                        foreach ($samples as $sample) {
-                            $samp_counter++;
+                        // foreach ($samples as $sample) {
+                        //     $samp_counter++;
                             
-                            $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' => $round->id, 'equipment_id'   =>  $submission->equipment_id, 'sample_id'  =>  $sample->id])->row();
+                        //     $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' => $round->id, 'equipment_id'   =>  $submission->equipment_id, 'sample_id'  =>  $sample->id])->row();
 
-                            if($cd4_values){
-                                $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                                $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                            }else{
-                                $upper_limit = 0;
-                                $lower_limit = 0;
-                            } 
+                        //     if($cd4_values){
+                        //         $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                        //         $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                        //     }else{
+                        //         $upper_limit = 0;
+                        //         $lower_limit = 0;
+                        //     } 
                             
-                            $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$submission->equipment_id,$sample->id,$submission->participant_id);
+                        //     $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$submission->equipment_id,$sample->id,$submission->participant_id);
                            
-                            if($part_cd4){
+                        //     if($part_cd4){
 
-                                if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                                    $acceptable++;
+                        //         if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                        //             $acceptable++;
 
-                                }    
-                            }      
-                        }
+                        //         }    
+                        //     }      
+                        // }
 
-                        $grade = (($acceptable / $samp_counter) * 100);
+                        // $grade = (($acceptable / $samp_counter) * 100);
 
-                        if($grade == 100){
-                            $passed++;
-                        }else{
-                            $failed++;
-                        }
+                        // if($grade == 100){
+                        //     $passed++;
+                        // }else{
+                        //     $failed++;
+                        // }
                     }
 
                     
 
                     // $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid, $county_id, $facility_id)->participants;
 
-                    $pass_rate = round((($passed / $partcount) * 100) , 2);
+                    // $pass_rate = round((($passed / $partcount) * 100) , 2);
 
                 }else{
-                    $pass_rate = round(0, 2);
-                    $passed = 0;
-                    $failed = 0;
+                    $partcount = 0;
+                    // $pass_rate = round(0, 2);
+                    // $passed = 0;
+                    // $failed = 0;
                 }
                 $labels[] = $round->pt_round_no;
-                $no_participants['data'][] = $pass_rate;
+                $no_participants['data'][] = $partcount;
                 
-                $pass['data'][] = $passed;
-                $fail['data'][] = $failed; 
+                // $pass['data'][] = $passed;
+                // $fail['data'][] = $failed; 
 
                 $subcount++;   
             }
         }
 
-        // $no_participants['yAxisID'] = 'y-axis-2';
-
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$pass, $fail];
+        $graph_data['title'] = $title;
+        $graph_data['datasets'] = [$no_participants];
+        // $graph_data['datasets'] = [$pass, $fail];
 
         // echo "<pre>";print_r($subcount);die;
 
@@ -693,7 +709,7 @@ class Program extends MY_Controller {
         $rounds = $this->Program_m->getLatestRounds();
 
         $no_participants = [
-                    'label'         =>  'Pass Rate (%)',
+                    'label'         =>  'Score (%)',
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
                     'highlightStroke' => $highlightStroke[$counter],
@@ -824,7 +840,7 @@ class Program extends MY_Controller {
 
         $rounds = $this->Program_m->getLatestRounds();
         $no_participants = [
-                    'label'         =>  'Pass Rate (%)',
+                    'label'         =>  'Score (%)',
                     'borderColor' => $borderColor[$counter],
                     'highlightFill' => $highlightFill[$counter],
                     'highlightStroke' => $highlightStroke[$counter],
