@@ -523,82 +523,88 @@ class Program extends MY_Controller {
                             $color = $counter = 0;
                             $labels[] = $round->pt_round_no; 
                             
-                            $participants = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
+                            $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
 
-                            foreach ($participants as $participant) {
-                                $partcount ++;
-                                $novalue = $sampcount = $acceptable = $unacceptable = 0;
+                            if($submissions){
 
-                                $participant_no = $this->db->get_where('participant_readiness_v', ['p_id' =>  $participant->participant_id])->row()->username;
+                                foreach ($submissions as $participant) {
+                                    $partcount ++;
+                                    $novalue = $sampcount = $acceptable = $unacceptable = 0;
 
-                                $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round->id])->result();
+                                    $participant_no = $this->db->get_where('participant_readiness_v', ['p_id' =>  $participant->participant_id])->row()->username;
 
-                                foreach ($samples as $sample) {
-                                    $sampcount++;
-                                    $cd4_values = $this->Program_m->getRoundResults($round->id, $participant->equipment_id, $sample->id);
+                                    $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round->id])->result();
 
-                                    if($cd4_values){
-                                        $upper_limit = $cd4_values->cd4_absolute_upper_limit;
-                                        $lower_limit = $cd4_values->cd4_absolute_lower_limit;
-                                    }else{
-                                        $upper_limit = 0;
-                                        $lower_limit = 0;
-                                    } 
+                                    foreach ($samples as $sample) {
+                                        $sampcount++;
+                                        $cd4_values = $this->Program_m->getRoundResults($round->id, $participant->equipment_id, $sample->id);
 
-                                    $part_cd4 = $this->Program_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->participant_id);
-
-                                    if($part_cd4){
-                                        if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
-                                            $acceptable++;    
-                                        } else{
-                                            $unacceptable++;    
+                                        if($cd4_values){
+                                            $upper_limit = $cd4_values->cd4_absolute_upper_limit;
+                                            $lower_limit = $cd4_values->cd4_absolute_lower_limit;
+                                        }else{
+                                            $upper_limit = 0;
+                                            $lower_limit = 0;
                                         } 
+
+                                        $part_cd4 = $this->Program_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->participant_id);
+
+                                        if($part_cd4){
+                                            if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
+                                                $acceptable++;    
+                                            } else{
+                                                $unacceptable++;    
+                                            } 
+                                        }
                                     }
-                                }
 
-                                if($acceptable == $sampcount) {
-                                    $passed++;
-                                }
-                                
-                                $pass_rate = (($passed / $partcount) * 100);
-
-                                if($color == 7){
-                                    $color = 0;
-                                }
-
-                                if (!(array_key_exists($participant_no, $participating))) {
-
-                                    $facility_participants[$counter] = [
-                                        'label'         =>  $participant_no,
-                                        'backgroundColor' => $backgroundColor[$color],
-                                        'borderColor' => $borderColor[$color],
-                                        'highlightFill' => $highlightFill[$color],
-                                        'highlightStroke' => $highlightStroke[$color],
-                                        'data' => []
-                                    ];
-
-                                    $participating[$participant_no] = $counter;
+                                    if($acceptable == $sampcount) {
+                                        $passed++;
+                                    }
                                     
-                                       
-                                }
+                                    $pass_rate = (($passed / $partcount) * 100);
 
-                                // $facility_participants[$participant_no] = array(
-                                //     'data'  => array(round($pass_rate, 2))
-                                // );
-
-                                foreach ($facility_participants as $partkey => $partvalue) {
-                                                                            
-                                    if($partvalue['label'] == $participant_no){
-                                       
-                                        array_push($facility_participants[$partkey]['data'], round($pass_rate, 2));
-                                        
+                                    if($color == 7){
+                                        $color = 0;
                                     }
+
+                                    if (!(array_key_exists($participant_no, $participating))) {
+
+                                        $facility_participants[$counter] = [
+                                            'label'         =>  $participant_no,
+                                            'backgroundColor' => $backgroundColor[$color],
+                                            'borderColor' => $borderColor[$color],
+                                            'highlightFill' => $highlightFill[$color],
+                                            'highlightStroke' => $highlightStroke[$color],
+                                            'data' => []
+                                        ];
+
+                                        $participating[$participant_no] = $counter;
+                                        
+                                           
+                                    }
+
+                                    // $facility_participants[$participant_no] = array(
+                                    //     'data'  => array(round($pass_rate, 2))
+                                    // );
+
+                                    foreach ($facility_participants as $partkey => $partvalue) {
+                                                                                
+                                        if($partvalue['label'] == $participant_no){
+                                           
+                                            array_push($facility_participants[$partkey]['data'], round($pass_rate, 2));
+                                            
+                                        }
+                                    }
+
+                                    
+
+                                    $color++;
+                                    $counter++;
                                 }
-
+                            }else{
+                                //No submissions
                                 
-
-                                $color++;
-                                $counter++;
                             }
                         }
                     }else{

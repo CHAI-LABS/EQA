@@ -381,6 +381,9 @@ $(document).ready(function(){
 					        }
 	                    }],
 	                    yAxes: [{
+	                    	ticks: {
+	                            beginAtZero:true
+	                        },
 	                        stacked: true,
 	                        scaleLabel: {
 	                        	display: true,
@@ -602,6 +605,9 @@ $(document).ready(function(){
 						        }
 		                    }],
 		                    yAxes: [{
+		                    	ticks: {
+		                            beginAtZero:true
+		                        },
 		                        stacked: true,
 		                        scaleLabel: {
 		                        	display: true,
