@@ -486,7 +486,7 @@ class Program extends MY_Controller {
                 $graph_data['x_axis_name'] = "Facilities";
             }else{
                 //Facility Data
-                $participating = $data = array();
+                $facility_participants = $participating = $data = array();
 
                 $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'
                 ];
@@ -524,7 +524,7 @@ class Program extends MY_Controller {
                             $labels[] = $round->pt_round_no; 
                             
                             $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
-
+                            
                             if($submissions){
 
                                 foreach ($submissions as $participant) {
@@ -603,10 +603,31 @@ class Program extends MY_Controller {
                                     $counter++;
                                 }
                             }else{
-                                //No submissions
+                                foreach ($facility_participants as $partkey => $partvalue) {
+                                    
+                                    // echo "<pre>";print_r("not equal");echo "</pre>";die();
+                                    array_push($facility_participants[$partkey]['data'], round(0, 2));
+                                }
                                 
                             }
                         }
+
+                        $round_number = count($rounds);
+                        
+
+                        if(!(empty($facility_participants))){
+                            foreach ($facility_participants as $partkey => $partvalue) {
+                                if ($round_number != count($partvalue['data'])) {
+                                    // echo "<pre>";print_r("not equal");echo "</pre>";die();
+
+                                    for ($i=0; $i < $round_number-1; $i++) { 
+                                        array_unshift($facility_participants[$partkey]['data'], 0);
+                                    }
+                                }  
+                            }
+                        }
+
+                        
                     }else{
                         $labels[] = 'No previous round';
 
