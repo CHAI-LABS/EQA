@@ -572,7 +572,7 @@ class Program extends MY_Controller {
 
                                         $facility_participants[$counter] = [
                                             'label'         =>  $participant_no,
-                                            'backgroundColor' => $backgroundColor[$color],
+                                            // 'backgroundColor' => $backgroundColor[$color],
                                             'borderColor' => $borderColor[$color],
                                             'highlightFill' => $highlightFill[$color],
                                             'highlightStroke' => $highlightStroke[$color],
@@ -1079,7 +1079,7 @@ class Program extends MY_Controller {
         $rounds = $this->Program_m->getLatestRounds();
 
         $responsive = [
-            'label'         =>  'Responsive',
+            'label'         =>  'Submitted Results',
             'backgroundColor' => 'rgba(46,204,113,0.5)',
             'borderColor' => 'rgba(46,204,113,0.8)',
             'highlightFill' => 'rgba(46,204,113,0.75)',
@@ -1088,7 +1088,7 @@ class Program extends MY_Controller {
 
 
         $non_responsive = [
-            'label'         =>  'Non-Responsive',
+            'label'         =>  ' Not Responded',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',

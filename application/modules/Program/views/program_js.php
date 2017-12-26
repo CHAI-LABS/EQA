@@ -491,7 +491,7 @@ $(document).ready(function(){
 	            options: {
 	                title:{
 	                    display:false,
-	                    text:"Participant Responsiveness Trends"
+	                    text:"Participants Enrolled vs Participants Submitted Results Trends"
 	                },
 	                tooltips: {
 	                    mode: 'index',
@@ -531,7 +531,7 @@ $(document).ready(function(){
 	            options: {
 	                title:{
 	                    display:false,
-	                    text:"Participant Responsiveness Trends (%)"
+	                    text:"Participants Enrolled vs Participants Submitted Results Trends (%)"
 	                },
 	                tooltips: {
 	                    mode: 'index',

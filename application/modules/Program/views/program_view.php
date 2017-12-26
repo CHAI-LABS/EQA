@@ -202,7 +202,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        <strong class="criteria">National</strong> Participant Responsiveness Trends
+                                        <strong class="criteria">National</strong> Participants Enrolled vs Participants Submitted Results Trends
                                         <div class="card-actions">
                                         </div>
                                     </div>
@@ -215,7 +215,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        <strong class="criteria">National</strong> Participant Responsiveness Trends (%)
+                                        <strong class="criteria">National</strong> Participants Enrolled vs Participants Submitted Results Trends (%)
                                         <div class="card-actions">
                                         </div>
                                     </div>
