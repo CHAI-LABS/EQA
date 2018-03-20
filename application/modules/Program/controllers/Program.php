@@ -483,7 +483,7 @@ class Program extends MY_Controller {
                     $fail['data'][] = $failed;
                 }
 
-                $graph_data['x_axis_name'] = "Facilities";
+                $graph_data['x_axis_name'] = "Health Facilities";
             }else{
                 //Facility Data
                 $facility_participants = $participating = $data = array();

@@ -87,6 +87,12 @@ class Dashboard extends DashboardController {
 
 			$round = $this->dashboard_m->getCurrentRound();
 
+			if($round){
+				$round_uuid = $round->uuid;
+			}else{
+				$round_uuid = '';
+			}
+
 			
 
 			$stats = $this->getDashboardStats();
@@ -94,7 +100,7 @@ class Dashboard extends DashboardController {
                 'pending_participants'    =>  $this->dashboard_m->pendingParticipants(),
                 'new_equipments'    =>  $this->dashboard_m->newEquipments(),
                 'stats'			=>	$stats,
-                'round_uuid' => $round->uuid
+                'round_uuid' => $round_uuid
             ];
 		}else if($type == "qareviewer"){
 			$this->db->where('status','active');

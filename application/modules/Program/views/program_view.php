@@ -165,7 +165,7 @@
 
                                 <div class="card">
                                     <div class="card-header">
-                                        <strong class="criteria">National</strong> Participants Outcomes Trends
+                                        <strong class="criteria">National</strong> Participants Enrolment Trends
                                         <div class="card-actions">
                                         </div>
                                     </div>

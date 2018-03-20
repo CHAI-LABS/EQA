@@ -188,7 +188,7 @@ $(document).ready(function(){
 			   		swal({
 					  // position: 'top-right',
 					  type: 'info',
-					  title:'Unable to Respond!',
+					  title:'Failed Facilities',
 					  html: table,
 					  width: '800px',
 					  showConfirmButton: true
@@ -382,7 +382,8 @@ $(document).ready(function(){
 	                    }],
 	                    yAxes: [{
 	                    	ticks: {
-	                            beginAtZero:true
+	                            beginAtZero:true,
+	                            stepSize: 1
 	                        },
 	                        stacked: true,
 	                        scaleLabel: {
@@ -407,8 +408,8 @@ $(document).ready(function(){
 	            data: ChartData,
 	            options: {
 	                title:{
-	                    display:true,
-	                    text:ChartData['title'] + " Trends"
+	                    // display:true,
+	                    // text:ChartData['title'] + " Trends"
 	                },
 	                tooltips: {
 	                    mode: 'index',
@@ -611,7 +612,8 @@ $(document).ready(function(){
 		                        stacked: true,
 		                        scaleLabel: {
 		                        	display: true,
-						            labelString: 'Number of ' + ChartData['x_axis_name']
+						            labelString: 'Number of Health Facilities'
+						            // labelString: 'Number of ' + ChartData['x_axis_name']
 						        }
 		                    }, {
 		                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
