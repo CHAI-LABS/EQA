@@ -409,11 +409,12 @@ class Program extends MY_Controller {
                 $pass['data'][] = $passed;
                 $fail['data'][] = $failed;
             }
-
+            $graph_data['y_axis_left_name'] = "Health Facilities";
             $graph_data['x_axis_name'] = "Counties";
         }else{
 
             if($facility_id == 0){
+                $graph_data['y_axis_left_name'] = "Participants";
                 $facilities = $this->Program_m->getFacilities($county_id);
 
                 foreach ($facilities as $facility) {
@@ -483,9 +484,10 @@ class Program extends MY_Controller {
                     $fail['data'][] = $failed;
                 }
 
-                $graph_data['x_axis_name'] = "Health Facilities";
+                $graph_data['x_axis_name'] = "Participants";
             }else{
                 //Facility Data
+                $graph_data['y_axis_left_name'] = "Participant";
                 $facility_participants = $participating = $data = array();
 
                 $backgroundColor = ['rgba(52,152,219,0.5)','rgba(46,204,113,0.5)','rgba(211,84,0,0.5)','rgba(231,76,60,0.5)','rgba(127,140,141,0.5)','rgba(241,196,15,0.5)','rgba(52,73,94,0.5)'

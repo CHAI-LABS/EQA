@@ -375,7 +375,7 @@ $(document).ready(function(){
 					            labelString: 'Rounds'
 					        },
 					        ticks: {
-					            stepSize: 1,
+					            stepSize: 10,
 					            min: 0,
 					            autoSkip: false
 					        }
@@ -383,7 +383,7 @@ $(document).ready(function(){
 	                    yAxes: [{
 	                    	ticks: {
 	                            beginAtZero:true,
-	                            stepSize: 1
+	                            stepSize: 10
 	                        },
 	                        stacked: true,
 	                        scaleLabel: {
@@ -600,24 +600,25 @@ $(document).ready(function(){
 						            labelString: ChartData['x_axis_name']
 						        },
 						        ticks: {
-						            stepSize: 1,
+						            stepSize: 10,
 						            min: 0,
 						            autoSkip: false
 						        }
 		                    }],
 		                    yAxes: [{
 		                    	ticks: {
-		                            beginAtZero:true
+		                            beginAtZero:true,
+		                            stepSize: 10
 		                        },
 		                        stacked: true,
 		                        scaleLabel: {
 		                        	display: true,
-						            labelString: 'Number of Health Facilities'
-						            // labelString: 'Number of ' + ChartData['x_axis_name']
+						            labelString: 'Number of ' + ChartData['x_axis_name']
 						        }
 		                    }, {
 		                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 		                        display: true,
+		                        max: 100,
 		                        position: "right",
 		                        id: "y-axis-2",
 		                        scaleLabel: {
@@ -660,6 +661,11 @@ $(document).ready(function(){
 		                        	display: true,
 						            labelString: ChartData['y_axis_name']
 						        },
+						        ticks: {
+		                            beginAtZero:true,
+		                            stepSize: 10,
+		                            max: 100
+		                        },
 			    				stacked: true,
 		                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
 		                        display: true,
