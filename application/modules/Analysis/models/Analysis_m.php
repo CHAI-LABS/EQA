@@ -150,7 +150,7 @@ class Analysis_m extends CI_Model {
     public function getSubmissionsNumber($round_id,$equipment_id){
 
         $this->db->select("count(equipment_id) AS submissions_count");
-        $this->db->from("pt_participant_result_v");
+        $this->db->from("pt_data_submission");
         $this->db->where("round_id",$round_id);
         $this->db->where("equipment_id",$equipment_id);
         $this->db->group_by("equipment_id");

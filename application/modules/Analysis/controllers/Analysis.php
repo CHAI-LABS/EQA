@@ -3220,7 +3220,6 @@ class Analysis extends DashboardController {
 
                     
                     $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
-
                    
                     if($part_cd4){
 
@@ -3235,7 +3234,7 @@ class Analysis extends DashboardController {
                         }
                         
                     }else{
-                        echo "<pre>";print_r("Problem Here");echo "</pre>";die();
+                        echo "<pre>";print_r("Participants Data not found");echo "</pre>";die();
                     }   
                 }
 

@@ -147,7 +147,7 @@ class Import extends MY_Controller {
 	function importRoundDataSubmissions(){
 		//new round change excel name (1), round id (3), sample id (1)
 
-		$file_path = './uploads/data/R17_Results.xlsx';
+		$file_path = './uploads/data/R18_Results.xlsx';
 		$participant = 0;
 
 		$data = $this->excel->readExcel($file_path);
@@ -224,7 +224,7 @@ class Import extends MY_Controller {
 						
 						
 						$insertdata = [
-								'round_id'    =>  1,
+								'round_id'    =>  2,
 				                'participant_id'    =>  $participant,
 				                'equipment_id'    =>  $equip_id,
 				                'status'    =>  1,
@@ -232,7 +232,7 @@ class Import extends MY_Controller {
 			            ];
 
 			            // $this->db->insert('pt_data_submission', $insertdata);
-						$sample_counter = 1;
+						$sample_counter = 4;
 						$batch_counter = 1;
 
 			            if($this->db->insert('pt_data_submission', $insertdata)){
@@ -299,14 +299,14 @@ class Import extends MY_Controller {
 			            	$insertdata5 = [
 			            		'batch_name'    =>  "Batch_".$submission_id,
 				                'description'    => "Testing for batch for Participant ID ".$participant,
-				                'pt_round_id'    =>  1
+				                'pt_round_id'    =>  2
 			            	];
 
 			            	$this->db->insert('pt_batches', $insertdata5);
 
 
 
-			            	$round_uuid = $this->db->get_where('pt_round', ['id' => 1])->row()->uuid;
+			            	$round_uuid = $this->db->get_where('pt_round', ['id' => 2])->row()->uuid;
 			            	$participant_det = $this->db->get_where('participants', ['participant_id'=>$participant])->row();
 
 			            	$insertdata6 = [
