@@ -144,7 +144,9 @@ class Import extends MY_Controller {
 	}
 
 
-	function importR17DataSubmissions(){
+	function importRoundDataSubmissions(){
+		//new round change excel name (1), round id (3), sample id (1)
+
 		$file_path = './uploads/data/R17_Results.xlsx';
 		$participant = 0;
 
@@ -160,7 +162,7 @@ class Import extends MY_Controller {
 				
 				for ($i=4; $i < 72; $i++) {
 
-					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated'){
+					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment'){
 						
 						$equip = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row();
 						if($equip){
@@ -180,15 +182,29 @@ class Import extends MY_Controller {
 						}else{
 							$facility_id = 0;
 						}
-						
+
 						$participant++;
 
-						$insertdata4 = [
-				                'participant_id'    =>  $participant,
-				                'participant_lname'    =>  $itemData[$i][23] ? $itemData[$i][23] : 'No name',
-				                'participant_phonenumber'    =>  $itemData[$i][24] ? $itemData[$i][24] : 0,
+						//only if no participant is in the database
+
+						$part_exist = $this->db->get_where('participants', ['participant_id' => $participant])->row();
+
+
+						if(!($part_exist)){
+        					$this->db->from("participants");
+							$this->db->order_by('id', 'DESC');
+        					$this->db->limit(1);
+        					$par_id = (($this->db->get()->row()->participant_id) + 1);
+        					// echo "<pre>";print_r($par_id);die();
+
+
+							$insertdata4 = [
+				                'participant_id'    =>  $par_id,
+				                'participant_fname'    =>  'not indicated',
+				                'participant_lname'    =>  $itemData[$i][24] ? $itemData[$i][24] : 'not indicated',
+				                'participant_phonenumber'    =>  $itemData[$i][25] ? $itemData[$i][25] : 0,
 				                'participant_facility'    =>  $facility_id ? $facility_id : 0,
-				                'participant_email'    =>  $itemData[$i][25] ? $itemData[$i][25] : 0,
+				                'participant_email'    =>  $itemData[$i][26] ? $itemData[$i][26] : 0,
 				                'participant_sex'    =>  '',
 				                'participant_age'    =>  0,
 				                'participant_education'    =>  '',
@@ -198,11 +214,14 @@ class Import extends MY_Controller {
 				                'avatar'    =>  '',
 				                'approved'    =>  1,
 				                'status'    =>  1,
-				                'date_registered'    =>  '',
+				                'date_registered'    =>  date("Y-m-d h:i:sa"),
 				                'confirm_token'    =>  null
 			            	];
 
 			            	$this->db->insert('participants', $insertdata4);
+						}
+						
+						
 						
 						$insertdata = [
 								'round_id'    =>  1,
@@ -217,15 +236,18 @@ class Import extends MY_Controller {
 						$batch_counter = 1;
 
 			            if($this->db->insert('pt_data_submission', $insertdata)){
+
                         $submission_id = $this->db->insert_id();
+
+                        // echo "<pre>"; print_r($submission_id);echo "</pre>";die();
 
                         $insertdata1 = [
 								'equip_result_id'    =>  $submission_id,
 				                'sample_id'    =>  $sample_counter,
-				                'cd3_absolute'    =>  $itemData[$i][10] ? $itemData[$i][10] : 0,
-				                'cd3_percent'    =>  $itemData[$i][11] ? $itemData[$i][11] : 0,
-				                'cd4_absolute'    =>  $itemData[$i][12] ? $itemData[$i][12] : 0,
-				                'cd4_percent'    =>  $itemData[$i][13] ? $itemData[$i][13] : 0,
+				                'cd3_absolute'    =>  $itemData[$i][11] ? $itemData[$i][11] : 0,
+				                'cd3_percent'    =>  $itemData[$i][12] ? $itemData[$i][12] : 0,
+				                'cd4_absolute'    =>  $itemData[$i][13] ? $itemData[$i][13] : 0,
+				                'cd4_percent'    =>  $itemData[$i][14] ? $itemData[$i][14] : 0,
 				                'other_absolute'    =>  0,
 				                'other_percent'    =>  0
 			            	];
@@ -237,10 +259,10 @@ class Import extends MY_Controller {
 			            	$insertdata2 = [
 			            		'equip_result_id'    =>  $submission_id,
 				                'sample_id'    =>  $sample_counter,
-				                'cd3_absolute'    =>  $itemData[$i][14] ? $itemData[$i][14] : 0,
-				                'cd3_percent'    =>  $itemData[$i][15] ? $itemData[$i][15] : 0,
-				                'cd4_absolute'    =>  $itemData[$i][16] ? $itemData[$i][16] : 0,
-				                'cd4_percent'    =>  $itemData[$i][17] ? $itemData[$i][17] : 0,
+				                'cd3_absolute'    =>  $itemData[$i][15] ? $itemData[$i][15] : 0,
+				                'cd3_percent'    =>  $itemData[$i][16] ? $itemData[$i][16] : 0,
+				                'cd4_absolute'    =>  $itemData[$i][17] ? $itemData[$i][17] : 0,
+				                'cd4_percent'    =>  $itemData[$i][18] ? $itemData[$i][18] : 0,
 				                'other_absolute'    =>  0,
 				                'other_percent'    =>  0
 			            	];
@@ -252,10 +274,10 @@ class Import extends MY_Controller {
 			            	$insertdata3 = [
 			            		'equip_result_id'    =>  $submission_id,
 				                'sample_id'    =>  $sample_counter,
-				                'cd3_absolute'    =>  $itemData[$i][18] ? $itemData[$i][18] : 0,
-				                'cd3_percent'    =>  $itemData[$i][19] ? $itemData[$i][19] : 0,
-				                'cd4_absolute'    =>  $itemData[$i][20] ? $itemData[$i][20] : 0,
-				                'cd4_percent'    =>  $itemData[$i][21] ? $itemData[$i][21] : 0,
+				                'cd3_absolute'    =>  $itemData[$i][19] ? $itemData[$i][19] : 0,
+				                'cd3_percent'    =>  $itemData[$i][20] ? $itemData[$i][20] : 0,
+				                'cd4_absolute'    =>  $itemData[$i][21] ? $itemData[$i][21] : 0,
+				                'cd4_percent'    =>  $itemData[$i][22] ? $itemData[$i][22] : 0,
 				                'other_absolute'    =>  0,
 				                'other_percent'    =>  0
 			            	];
@@ -267,7 +289,7 @@ class Import extends MY_Controller {
 
 
 			            	$insertdata4 = [
-								'participant_id'    =>  $submission_id,
+								'participant_id'    =>  $participant,
 				                'equipment_id'    =>  $equipment->id
 			            	];
 
@@ -276,7 +298,7 @@ class Import extends MY_Controller {
 
 			            	$insertdata5 = [
 			            		'batch_name'    =>  "Batch_".$submission_id,
-				                'description'    => "Testing for batch for Participant ID ".$submission_id,
+				                'description'    => "Testing for batch for Participant ID ".$participant,
 				                'pt_round_id'    =>  1
 			            	];
 
@@ -284,8 +306,8 @@ class Import extends MY_Controller {
 
 
 
-			            	$round_uuid = $this->db->get_where('pt_round', ['id'=>1])->row()->uuid;
-			            	$participant_det = $this->db->get_where('participants', ['participant_id'=>$submission_id])->row();
+			            	$round_uuid = $this->db->get_where('pt_round', ['id' => 1])->row()->uuid;
+			            	$participant_det = $this->db->get_where('participants', ['participant_id'=>$participant])->row();
 
 			            	$insertdata6 = [
 			            		'pt_round_no'    =>  $round_uuid,
@@ -298,9 +320,9 @@ class Import extends MY_Controller {
 
 			            	$this->db->insert('participant_readiness', $insertdata6);
 
-							$date1 = date("Y-m-d",strtotime("2017-08-08"));
-							$date2 = date("Y-m-d",strtotime("2017-08-09"));
-							$date3 = date("Y-m-d",strtotime("2017-08-10"));
+							$date1 = date("Y-m-d",strtotime("2018-04-02"));
+							$date2 = date("Y-m-d",strtotime("2018-04-02"));
+							$date3 = date("Y-m-d",strtotime("2018-04-02"));
 
 
 			            	$insertdata7 = [
@@ -325,7 +347,7 @@ class Import extends MY_Controller {
 			            	$insertdata7 = [
 			            		'batch_id'    =>  $submission_id,
 				                'tube_id'    => $batch_counter,
-				                'sample_id'    =>  $batch_counter
+				                'sample_id'    =>  $sample_counter
 			            	];
 
 			            	$this->db->insert('pt_batch_tube', $insertdata7);
@@ -335,7 +357,7 @@ class Import extends MY_Controller {
 			            	$insertdata7 = [
 			            		'batch_id'    =>  $submission_id,
 				                'tube_id'    => $batch_counter,
-				                'sample_id'    =>  $batch_counter
+				                'sample_id'    =>  $sample_counter
 			            	];
 
 			            	$this->db->insert('pt_batch_tube', $insertdata7);
@@ -345,7 +367,7 @@ class Import extends MY_Controller {
 			            	$insertdata7 = [
 			            		'batch_id'    =>  $submission_id,
 				                'tube_id'    => $batch_counter,
-				                'sample_id'    =>  $batch_counter
+				                'sample_id'    =>  $sample_counter
 			            	];
 
 			            	$this->db->insert('pt_batch_tube', $insertdata7);
@@ -355,10 +377,19 @@ class Import extends MY_Controller {
 
 					
 				}
+				
 
-				//A QA / Supervisor for testing purposes
+				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_batch_tube, pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();
 
-				$insertdata4 = [
+				 //         	$this->db->set('participant_id',$facility->facility_code.'-001');
+				// $this->db->where('id',$submission_id);
+				// $this->db->update('participants');		
+			}
+		}
+	}
+
+	function addQAUser (){
+		$insertdata4 = [
 				                'participant_id'    =>  '12881_001',
 				                'participant_fname'    =>  'Willy',
 				                'participant_lname'    =>  'Mareka',
@@ -379,15 +410,37 @@ class Import extends MY_Controller {
 			            	];
 
 			            	$this->db->insert('participants', $insertdata4);
+			            	echo "<pre>"; print_r("Added the QA User");echo "</pre>";die();
 
-				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_batch_tube, pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results");echo "</pre>";die();
-
-				 //         	$this->db->set('participant_id',$facility->facility_code.'-001');
-				// $this->db->where('id',$submission_id);
-				// $this->db->update('participants');		
-			}
-		}
 	}
+
+	function addParticipantUser (){
+		$insertdata4 = [
+				                'participant_id'    =>  '1',
+				                'participant_fname'    =>  'Willy',
+				                'participant_lname'    =>  'Mareka',
+				                'participant_phonenumber'    =>  '0714135480',
+				                'participant_facility'    =>  3277,
+				                'participant_email'    =>  'marekawilly@gmail.com',
+				                'participant_sex'    =>  'Male',
+				                'participant_age'    =>  23,
+				                'participant_education'    =>  'Higher Diploma',
+				                'participant_experience'    =>  'Very Little',
+				                'user_type'    =>  'participant',
+				                'participant_password'    =>  '$2y$10$kHEgvCOIRVePKcwc00n0puvWsrCXN6ab2HIxwvKsNsCbvt8UK49au',
+				                'avatar'    =>  '',
+				                'approved'    =>  1,
+				                'status'    =>  1,
+				                'date_registered'    =>  '',
+				                'confirm_token'    =>  null
+			            	];
+
+			            	$this->db->insert('participants', $insertdata4);
+
+			            	echo "<pre>"; print_r("Added the Participant User");echo "</pre>";die();
+	}
+
+
 
 
 
