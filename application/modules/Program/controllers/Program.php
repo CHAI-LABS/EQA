@@ -704,7 +704,7 @@ class Program extends MY_Controller {
                 $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
 
                 if($submissions){
-                    
+                    $pass_rate = $passed = $failed = 0;
                     foreach ($submissions as $submission) {
                         $partcount++;
                         // $samp_counter = $acceptable = $unacceptable = 0;
@@ -843,7 +843,7 @@ class Program extends MY_Controller {
                 $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
 
                 if($submissions){
-                
+                $passed = $failed = $partcount = 0;
                     foreach ($submissions as $submission) {
                         $partcount++;
                         $samp_counter = $acceptable = $unacceptable = 0;
@@ -905,10 +905,10 @@ class Program extends MY_Controller {
                             $failed++;
                         }
                     }
-                    // echo "<pre>";print_r($no_of_participants);die;
 
                     $failed = $partcount - $passed;
                     $pass_rate = round((($passed / $partcount) * 100), 2);
+
 
                 }else{
                     $pass_rate = round(0, 2);
@@ -974,7 +974,7 @@ class Program extends MY_Controller {
 
                 if($submissions){
                     // echo "<pre>";print_r($submissions);echo "</pre>";
-        
+                    $no_responsive = $partcount = $no_non_responsive = 0;
                     foreach ($submissions as $submission) {
                         $partcount++;
                         $novalue = $sampcount = $acceptable = $unacceptable = 0;
@@ -1110,7 +1110,7 @@ class Program extends MY_Controller {
                 $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
 
                 if($submissions){
-        
+                    $no_responsive = $partcount = $no_non_responsive = 0;
                     foreach ($submissions as $submission) {
                         $partcount++;
                         $novalue = $sampcount = $acceptable = $unacceptable = 0;
