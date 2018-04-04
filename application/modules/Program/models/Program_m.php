@@ -97,7 +97,7 @@ class Program_m extends CI_Model {
         $this->db->select("*");
         $this->db->from("pt_round_v");
         $this->db->where('type', 'previous');
-        $this->db->order_by('id', 'DESC');
+        $this->db->order_by('id', 'ASC');
         $this->db->limit(6);
 
         $query = $this->db->get();

@@ -3,21 +3,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Analysis extends DashboardController {
 
-	public function __construct(){
-		parent::__construct();
+    public function __construct(){
+        parent::__construct();
 
-		$this->load->library('table');
+        $this->load->library('table');
         $this->load->config('table');
         $this->load->module('Export');
         $this->load->module('Program');
-		$this->load->model('Analysis_m');
+        $this->load->model('Analysis_m');
         $this->load->model('Program_m');
 
-	}
-	
-	public function index()
-	{	
-		$data = [];
+    }
+    
+    public function index()
+    {   
+        $data = [];
         $title = "Analysis";
 
         $data = [
@@ -37,7 +37,7 @@ class Analysis extends DashboardController {
                 ->setPageTitle($title)
                 ->setPartial('Analysis/analysis_v', $data)
                 ->adminTemplate();
-	}
+    }
 
 
 
@@ -416,10 +416,10 @@ class Analysis extends DashboardController {
         $this->Capa();
     }
 
-	public function createPTTable()
-	{
+    public function createPTTable()
+    {
 
-		$template = $this->config->item('default');
+        $template = $this->config->item('default');
 
         $heading = [
             "No.",
@@ -492,7 +492,7 @@ class Analysis extends DashboardController {
         $this->table->set_template($template);
 
         return $this->table->generate($tabledata);
-	}
+    }
 
 
 
@@ -884,8 +884,8 @@ class Analysis extends DashboardController {
 
 
 
-	public function createParticipantResultsPercent($type, $round_id,$equipment_id,$sample_id,$cdtype)
-	{
+    public function createParticipantResultsPercent($type, $round_id,$equipment_id,$sample_id,$cdtype)
+    {
         
         // echo'<pre>';print_r($cdtype);echo'</pre>';die();
 
@@ -897,7 +897,7 @@ class Analysis extends DashboardController {
         $equipment = $this->db->get_where('equipments_v', ['id' => $equipment_id])->row();
         $equipment_name = $equipment->equipment_name;
 
-		$template = $this->config->item('default');
+        $template = $this->config->item('default');
         $column_data = $row_data = array();
 
         $html_body = '
@@ -941,7 +941,7 @@ class Analysis extends DashboardController {
             "Facility",
             $cdtype." Percent Result"
         ];
-		$tabledata = [];
+        $tabledata = [];
 
         
         $part_results = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample_id])->result();
@@ -1037,25 +1037,25 @@ class Analysis extends DashboardController {
 
         }
         
-	}
+    }
 
    
 
 
-	public function Results($round_uuid){
-		$data = [];
+    public function Results($round_uuid){
+        $data = [];
         $title = "Analysis";
 
         $pt_id = $this->db->get_where('pt_round', ['uuid'   => $round_uuid])->row()->id;
-		// $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
-		//echo "<pre>";print_r($equipments);echo "</pre>";die();
+        // $equipments = $this->db->get_where('equipment', ['equipment_status'=>1])->result();
+        //echo "<pre>";print_r($equipments);echo "</pre>";die();
 
-		
-			$data = [
-				'sample_tabs' => $this->createTabs($pt_id)
-			];
+        
+            $data = [
+                'sample_tabs' => $this->createTabs($pt_id)
+            ];
             
-		$this->assets->addCss('css/main.css');
+        $this->assets->addCss('css/main.css');
         $this->assets
                 ->addJs("dashboard/js/libs/jquery.dataTables.min.js")
                 ->addJs("dashboard/js/libs/dataTables.bootstrap4.min.js")
@@ -1065,7 +1065,7 @@ class Analysis extends DashboardController {
                 ->setPageTitle($title)
                 ->setPartial('Analysis/nhrl_peer_results_v', $data)
                 ->adminTemplate();
-	}
+    }
 
 
     public function Graphs($round_uuid){
@@ -1204,8 +1204,8 @@ class Analysis extends DashboardController {
     }
 
 
-	public function createNHRLTable($form, $round_id, $equipment_id){
-		$template = $this->config->item('default');
+    public function createNHRLTable($form, $round_id, $equipment_id){
+        $template = $this->config->item('default');
 
         $tabledata = [];
 
@@ -1213,7 +1213,7 @@ class Analysis extends DashboardController {
 
         $counter = 0;
 
-		$where = ['pt_round_id' =>  $round_id];
+        $where = ['pt_round_id' =>  $round_id];
         $samples = $this->db->get_where('pt_samples', $where)->result();
         $testers = $this->db->get_where('pt_testers', $where)->result();
         $labs = $this->db->get_where('pt_labs', $where)->result();
@@ -1356,7 +1356,7 @@ class Analysis extends DashboardController {
             $this->export->create_pdf($html_body,$pdf_data);
 
         }
-	}
+    }
 
 
 
@@ -1482,16 +1482,16 @@ class Analysis extends DashboardController {
 
 
 
-	public function ParticipantPercentInfo($round_id,$equipment_id,$sample_id, $type)
-	{
+    public function ParticipantPercentInfo($round_id,$equipment_id,$sample_id, $type)
+    {
 
-		$round_id_name = $this->db->get_where('pt_round', ['id' =>  $round_id])->row()->pt_round_no;
-		$equipment_name = $this->db->get_where('equipment', ['id' =>  $equipment_id])->row()->equipment_name;
-		$sample_name = $this->db->get_where('pt_samples', ['id' =>  $sample_id])->row()->sample_name;
+        $round_id_name = $this->db->get_where('pt_round', ['id' =>  $round_id])->row()->pt_round_no;
+        $equipment_name = $this->db->get_where('equipment', ['id' =>  $equipment_id])->row()->equipment_name;
+        $sample_name = $this->db->get_where('pt_samples', ['id' =>  $sample_id])->row()->sample_name;
 
-		
+        
 
-		$cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample_id])->row();
+        $cd4_calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample_id])->row();
 
         switch ($type) {
             case 'cd3':
@@ -1523,89 +1523,89 @@ class Analysis extends DashboardController {
                 break;
         }
 
-		
+        
 
 
-		// echo "<pre>";print_r($round_id_name);echo "</pre>";die();
-		$part_info = '';
+        // echo "<pre>";print_r($round_id_name);echo "</pre>";die();
+        $part_info = '';
 
-		$part_info .= '<div class = "row">
-								    <div class="col-md-6">
-								        <div class = "card card-outline-danger">
-								            <div class="card-header col-4">
-								                <i class = "icon-chart"></i>
-								                &nbsp;
+        $part_info .= '<div class = "row">
+                                    <div class="col-md-6">
+                                        <div class = "card card-outline-danger">
+                                            <div class="card-header col-4">
+                                                <i class = "icon-chart"></i>
+                                                &nbsp;
 
-								                    General Details
+                                                    General Details
 
-								            </div>
+                                            </div>
 
-								            <div class = "card-block">
-								            Round ID : <strong>';
+                                            <div class = "card-block">
+                                            Round ID : <strong>';
 
-									        $part_info .= $round_id_name;
+                                            $part_info .= $round_id_name;
 
-									        $part_info .= '</strong> <br/> Equipment : <strong>';
+                                            $part_info .= '</strong> <br/> Equipment : <strong>';
 
-									        $part_info .= $equipment_name;
+                                            $part_info .= $equipment_name;
 
-									        $part_info .= '</strong> <br/> Sample : <strong>';
+                                            $part_info .= '</strong> <br/> Sample : <strong>';
 
-									        $part_info .= $sample_name;
+                                            $part_info .= $sample_name;
 
-        $part_info .= '	</strong> <br/></div>
-				       </div>
-				    </div>
+        $part_info .= ' </strong> <br/></div>
+                       </div>
+                    </div>
 
-				    <div class="col-md-6">
-								        <div class = "card card-outline-info">
-								            <div class="card-header col-4">
-								                <i class = "icon-chart"></i>
-								                &nbsp;
+                    <div class="col-md-6">
+                                        <div class = "card card-outline-info">
+                                            <div class="card-header col-4">
+                                                <i class = "icon-chart"></i>
+                                                &nbsp;
 
-								                    Participants Information
+                                                    Participants Information
 
-								            </div>
-								            <div class = "card-block">
-									            <div class="col-md-6">
-									            Mean : <strong>';
+                                            </div>
+                                            <div class = "card-block">
+                                                <div class="col-md-6">
+                                                Mean : <strong>';
 
-									            $part_info .= $mean;
+                                                $part_info .= $mean;
 
-										        $part_info .= '</strong> <br/> SD : <strong>';
+                                                $part_info .= '</strong> <br/> SD : <strong>';
 
-										        $part_info .= $sd;
+                                                $part_info .= $sd;
 
-										        $part_info .= '</strong> <br/> 2SD : <strong>';
+                                                $part_info .= '</strong> <br/> 2SD : <strong>';
 
-										        $part_info .= $sd2;
+                                                $part_info .= $sd2;
 
-		$part_info .= '	</strong> <br/>
-						</div>
-						<div class="col-md-6">
-							Upper Limit: <strong>';
+        $part_info .= ' </strong> <br/>
+                        </div>
+                        <div class="col-md-6">
+                            Upper Limit: <strong>';
 
-							$part_info .= $upper;
+                            $part_info .= $upper;
 
-					        $part_info .= '</strong> <br/> Lower Limit : <strong>';
+                            $part_info .= '</strong> <br/> Lower Limit : <strong>';
 
-					        $part_info .= $lower;
+                            $part_info .= $lower;
 
-							$part_info .= '	</strong> <br/> 
-						</div>
-				       </div>
-				    </div>
-				  </div>
-				  </div>';
-  		
+                            $part_info .= ' </strong> <br/> 
+                        </div>
+                       </div>
+                    </div>
+                  </div>
+                  </div>';
+        
         return $part_info;
-	}
+    }
 
 
 
-	public function ParticipantResults($round_id,$equipment_id,$sample_id,$cdtype,$resulttype)
-	{	
-		$data = [];
+    public function ParticipantResults($round_id,$equipment_id,$sample_id,$cdtype,$resulttype)
+    {   
+        $data = [];
         $title = "Participant Results";
         
 
@@ -1648,7 +1648,7 @@ class Analysis extends DashboardController {
                 ->setPageTitle($title)
                 ->setPartial('Analysis/participant_analysis_v', $data)
                 ->adminTemplate();
-	}
+    }
 
 
 
@@ -1870,8 +1870,8 @@ class Analysis extends DashboardController {
 
 
 
-	public function createPercentPeerTable($form, $round_id, $equipment_id, $type){
-		$template = $this->config->item('default');
+    public function createPercentPeerTable($form, $round_id, $equipment_id, $type){
+        $template = $this->config->item('default');
 
         $column_data = $row_data = array();
 
@@ -1927,7 +1927,7 @@ class Analysis extends DashboardController {
         <tbody>
         <ol type="a">';
 
-	
+    
         $heading = [
             "Sample",
             "Mean",
@@ -2081,7 +2081,7 @@ class Analysis extends DashboardController {
             $this->export->create_pdf($html_body,$pdf_data);
 
         }              
-	}
+    }
 
 
     function failedList($round_id,$equipment_id){
@@ -3133,7 +3133,7 @@ class Analysis extends DashboardController {
     // }
 
 
-	public function createTabs($round_id){
+    public function createTabs($round_id){
         
         $datas=[];
 
@@ -3184,7 +3184,7 @@ class Analysis extends DashboardController {
             $equipmentname = str_replace(' ', '_', $equipmentname);
 
             if($counter == 1){
-            	
+                
                 $equipment_tabs .= "<div class='tab-pane active' id='". $equipmentname ."' role='tabpanel'>";
             }else{
 
@@ -3220,6 +3220,7 @@ class Analysis extends DashboardController {
 
                     
                     $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
+
                    
                     if($part_cd4){
 
@@ -3234,7 +3235,7 @@ class Analysis extends DashboardController {
                         }
                         
                     }else{
-                        echo "<pre>";print_r("Participants Data not found");echo "</pre>";die();
+                        echo "<pre>";print_r("Problem Here");echo "</pre>";die();
                     }   
                 }
 
@@ -3248,32 +3249,32 @@ class Analysis extends DashboardController {
             // echo "<pre>";print_r($passed);echo "</pre>";die();
 
             $equipment_tabs .= '<div class = "row">
-								    <div class="col-md-12">
-								        <div class = "card card-outline-info">
-								            <div class="card-header col-4">
-								                <i class = "icon-chart"></i>
-								                &nbsp;
+                                    <div class="col-md-12">
+                                        <div class = "card card-outline-info">
+                                            <div class="card-header col-4">
+                                                <i class = "icon-chart"></i>
+                                                &nbsp;
 
-								                    Equipment Info
+                                                    Equipment Info
 
-								            </div>
+                                            </div>
 
-								            <div class = "card-block">
-								            No. of Registrations : <strong>';
+                                            <div class = "card-block">
+                                            No. of Registrations : <strong>';
 
             if($registrations){
-            	$equipment_tabs .= $registrations->register_count;
+                $equipment_tabs .= $registrations->register_count;
             }else{
-            	$equipment_tabs .= 0;
+                $equipment_tabs .= 0;
             }
 
             $equipment_tabs .= ' </strong><br/>
                 No. of Submissions : <strong>';
 
                 if($submissions){
-                	$equipment_tabs .= $submissions->submissions_count;
+                    $equipment_tabs .= $submissions->submissions_count;
                 }else{
-                	$equipment_tabs .= 0;
+                    $equipment_tabs .= 0;
                 }
 
             
@@ -3288,36 +3289,36 @@ class Analysis extends DashboardController {
             $equipment_tabs .= $failed;
 
             $equipment_tabs .= ' (View)</a></strong><br/>
-				            </div>
-				        </div>
-				    </div>
-				</div>';
+                            </div>
+                        </div>
+                    </div>
+                </div>';
             
             $equipment_tabs .= '<div class = "row">
-				  
-						<div class="col-md-12">
-							<div class = "card">
-					            <div class="card-header col-6">
-					            	<i class = "icon-chart"></i>
-				                &nbsp;
+                  
+                        <div class="col-md-12">
+                            <div class = "card">
+                                <div class="card-header col-6">
+                                    <i class = "icon-chart"></i>
+                                &nbsp;
 
-				                    NHRL Results
+                                    NHRL Results
 
                                     <div class = "pull-right">
                                         <a href = "'.base_url("Analysis/createNHRLTable/excel/$round_id/$equipment_id/").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
                                         <a href = "'.base_url("Analysis/createNHRLTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
-					            </div>
-					            <div class = "card-block"><div class="table-responsive">';
+                                </div>
+                                <div class = "card-block"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createNHRLTable('table', $round_id, $equipment_id);
 
             $equipment_tabs .= '</div></div>
-						    </div>
-					    </div>
+                            </div>
+                        </div>
 
-				</div>';
+                </div>';
 
 
             $equipment_tabs .= '<div class = "row">
@@ -3462,13 +3463,13 @@ class Analysis extends DashboardController {
                 </div>';
 
 
-			$equipment_tabs .= 	'<div class = "row">
-				    <div class="col-md-12">
-				        <div class = "card card-outline-danger">
-				            <div class="card-header col-12">
-				                <i class = "icon-chart"></i>
-				                &nbsp;
-				                    Participant Results
+            $equipment_tabs .=  '<div class = "row">
+                    <div class="col-md-12">
+                        <div class = "card card-outline-danger">
+                            <div class="card-header col-12">
+                                <i class = "icon-chart"></i>
+                                &nbsp;
+                                    Participant Results
 
 
                                     <div class = "pull-right">
@@ -3476,20 +3477,20 @@ class Analysis extends DashboardController {
 
                                         <a href = "'.base_url("Analysis/createParticipantTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
-				            </div>
+                            </div>
 
-				            <div class = "card-block col-md-12"><div class="table-responsive">';
+                            <div class = "card-block col-md-12"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id);
 
             $equipment_tabs .= '</div></div>
 
 
-				        </div>
-				    
-					</div>
-			    </div>
-			</div>';
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>';
                
         }
 
@@ -3499,7 +3500,7 @@ class Analysis extends DashboardController {
 
     }
 
-	
+    
 
 
 

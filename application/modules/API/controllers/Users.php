@@ -100,7 +100,7 @@ class Users extends MY_Controller{
              foreach($participants as $participant){
                  $activation = $status = $details = $approval = "";
                  $facility = $this->db->get_where('facility', ['id'=>$participant->participant_facility])->row();
-                 // echo "<pre>";print_r($participants);echo "</pre>";die();
+                 // echo "<pre>";print_r($participant);echo "</pre>";die();
                  $details = "<a class = 'btn btn-sm btn-warning dropdown-item' href = '".base_url('Users/Participants/details/' . $participant->uuid)."'><i class = 'fa fa-newspaper-o'></i>&nbsp;Details</a>";
 
                  if($participant->confirm_token != NULL && $participant->status == 0){
@@ -136,8 +136,10 @@ class Users extends MY_Controller{
                             </div>
                         </div>";
 
+                $participant_name = str_replace('not indicated', ' ', $participant->name);
+
                  $data[] = [
-                     $participant->name,
+                     $participant_name,
                      $facility->facility_name,
                      $participant->participant_email,
                      $participant->participant_phonenumber,

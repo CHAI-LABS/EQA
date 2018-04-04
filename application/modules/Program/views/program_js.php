@@ -326,6 +326,11 @@ $(document).ready(function(){
 
 	        var ctx4 = document.getElementById('graph-4');
 	        var chart = new Chart(ctx4, {
+
+
+	        	
+
+
 	   //      	type: 'pie',
 				// data: ChartData,
 		  //       options: {
@@ -385,7 +390,9 @@ $(document).ready(function(){
 	                            beginAtZero:true,
 	                            stepSize: 10
 	                        },
+	                        type: "linear", 
 	                        stacked: true,
+	                        display: true,
 	                        scaleLabel: {
 	                        	display: true,
 					            labelString: 'Number of Participants'
@@ -418,7 +425,7 @@ $(document).ready(function(){
 	                responsive: true,
 	                scales: {
 	                    xAxes: [{
-	                        stacked: true,
+	                        stacked: true
 	                    }],
 	                    yAxes: [{
 	                    	scaleLabel: {
@@ -613,7 +620,7 @@ $(document).ready(function(){
 		                        stacked: true,
 		                        scaleLabel: {
 		                        	display: true,
-						            labelString: 'Number of ' + ChartData['x_axis_name']
+						            labelString: 'Number of ' + ChartData['y_axis_left_name']
 						        }
 		                    }, {
 		                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
