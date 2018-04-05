@@ -176,10 +176,10 @@ class Import extends MY_Controller {
 	function importRoundDataSubmissions(){
 		//new round change excel name (1), round id (1), sample id (1)
 
-		$file_path = './uploads/data/R18_Results.xlsx';
+		$file_path = './uploads/data/R17_Results.xlsx';
 
-		$round_id = 2;
-		$sample_id = 4;
+		$round_id = 1;
+		$sample_id = 1;
 
 		$data = $this->excel->readExcel($file_path);
 		if (count($data) > 0) {
@@ -224,20 +224,21 @@ class Import extends MY_Controller {
 								$lname = $names[1];
 							}
 						}else{
-							$fname = $lname = '';
+							$fname = $lname = 'not indicated';
 						}
 
 						
 						// $participant++;
 
 						$part_exist = $this->getParticipant($fname,$facility_id,$lname,'no_indication');
+						$new_participant = '';
 
 						if(!($part_exist)){
 
 							$insertdata4 = [
 				                'participant_id'    =>  '10000-001',
 				                'participant_fname'    =>  $fname ? $fname : 'not indicated',
-				                'participant_lname'    =>  $lname ? $lname : ' ',
+				                'participant_lname'    =>  $lname ? $lname : 'not indicated',
 				                'participant_phonenumber'    =>  $itemData[$i][25] ? $itemData[$i][25] : 0,
 				                'participant_facility'    =>  $facility_id ? $facility_id : 0,
 				                'participant_email'    =>  $itemData[$i][26] ? $itemData[$i][26] : 0,
@@ -460,11 +461,11 @@ class Import extends MY_Controller {
 	function addQAUser (){
 		$insertdata4 = [
 				                'participant_id'    =>  '12881_002',
-				                'participant_fname'    =>  'Willy',
-				                'participant_lname'    =>  'Mareka',
+				                'participant_fname'    =>  'Supervisor',
+				                'participant_lname'    =>  'NHRL',
 				                'participant_phonenumber'    =>  '0714135480',
 				                'participant_facility'    =>  3277,
-				                'participant_email'    =>  'marekawilly@gmail.com',
+				                'participant_email'    =>  'supervisor@nhrl.com',
 				                'participant_sex'    =>  'Male',
 				                'participant_age'    =>  23,
 				                'participant_education'    =>  'Higher Diploma',
