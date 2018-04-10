@@ -185,17 +185,13 @@ class Import extends MY_Controller {
 		if (count($data) > 0) {
 			foreach ($data as $item => $itemData) {
 
-				// echo "<pre>"; print_r($itemData);echo "</pre>";die();
 				$headers = $itemData[0];
-				
 				$insertData = $datas = [];
-				
 				
 				for ($i=4; $i < 72; $i++) {
 
 					$expiry_date = 0;
-
-					// echo date('Y-m-d','not indicated'); die();
+					
 	
 					$equip = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row();
 					if($equip){
@@ -232,10 +228,10 @@ class Import extends MY_Controller {
 					// $date_prepared = date('Y-m-d',strtotime($itemData[7][30]));
 					// $date_picked = date('Y-m-d',strtotime($itemData[$i][31]));
 					// $date_received = date('Y-m-d',strtotime($itemData[$i][32]));
-					// $date_analysed = date('Y-m-d',strtotime($itemData[$i][33]));
+					
 					
 
-					// echo "<pre>"; print_r($date_prepared);echo "</pre>";die();
+					// echo "<pre>"; print_r($itemData[66][9]);echo "</pre>";die();
 
 					
 					// $participant++;
@@ -316,12 +312,8 @@ class Import extends MY_Controller {
 		            	$this->db->insert('unable_response', $insertdata8);
 					}
 
+					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment' && $itemData[$i][9] != "Unable to report"){	
 
-
-					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment' && $itemData[$i][9] != "Unable to report"){
-
-
-					
 						$insertdata = [
 							'round_id'    =>  $round_id,
 			                'participant_id'    =>  $participant_id,
@@ -330,7 +322,6 @@ class Import extends MY_Controller {
 			                'verdict'    =>  1
 			            ];
 
-			            // $this->db->insert('pt_data_submission', $insertdata);
 						$sample_counter = $sample_id;
 						$batch_counter = 1;
 
@@ -338,7 +329,7 @@ class Import extends MY_Controller {
 
 	                        $submission_id = $this->db->insert_id();
 
-	                        // echo "<pre>"; print_r($submission_id);echo "</pre>";die();
+	                        
 
 	                        $insertdata1 = [
 									'equip_result_id'    =>  $submission_id,
@@ -402,10 +393,6 @@ class Import extends MY_Controller {
 			            	$this->db->insert('pt_data_submission_reagent', $insertdata9);
 
 
-
-
-
-
 			            	$equipment = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row(); 
 
 			            	if(!($participant_id)){
@@ -433,16 +420,26 @@ class Import extends MY_Controller {
 			            	$round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
 			            	$participant_det = $this->db->get_where('participants', ['id'=>$participant_id])->row();
 
+			            	$analysed_date = date('Y-m-d',strtotime($itemData[$i][33]));
+							if(strtotime($analysed_date) > strtotime(date('Y-m-d', strtotime('2017-10-30')))){
+								$verdict = 0;
+							}else{
+								$verdict = 1;
+							}
+
 			            	$insertdata6 = [
 			            		'pt_round_no'    =>  $round_uuid,
 				                'participant_id'    => $participant_det->uuid,
 				                'participant_facility'    =>  $facility_id,
 				                'status'    =>  1,
-				                'verdict'    =>  1,
+				                'verdict'    =>  $verdict,
 				                'lab_result'    =>  1
 			            	];
 
 			            	$this->db->insert('participant_readiness', $insertdata6);
+
+			            	$readiness_id = $this->db->insert_id();
+
 
 							$date1 = date("Y-m-d",strtotime("2018-04-02"));
 							$date2 = date("Y-m-d",strtotime("2018-04-02"));
@@ -500,7 +497,30 @@ class Import extends MY_Controller {
 							
 					}
 
-					
+					if($itemData[$i][9] == 'Unable to report'){
+						if($itemData[$i][10] == 'Reagent stock out'){
+		            		$questionnaire_id = 3;
+		            		$comments = '';
+		            		
+	            		}elseif($itemData[$i][10] == 'No equipment'){
+		            		$questionnaire_id = 2;
+		            		$comments = 'No equipment';
+		            		
+		            	}else{
+		            		$questionnaire_id = 5;
+		            		$comments = 'panels misplaced';
+		            	}
+
+		            	$insertdata10 = [
+		            		'readiness_id'    =>  $readiness_id,
+			                'questionnaire_id'    => $questionnaire_id,
+			                'response' => 1,
+			                'extra_comments'    =>  $comments
+		            	];
+
+		            	$this->db->insert('participant_readiness_responses', $insertdata10);
+					}
+	
 				}
 				
 

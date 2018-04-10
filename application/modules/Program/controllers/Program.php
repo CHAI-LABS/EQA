@@ -174,7 +174,7 @@ class Program extends MY_Controller {
         $labels = ['Passed','Failed'];
 
         $graph_data['labels'] = $labels;
-        $graph_data['no_participants'] = $no_of_participants;
+        $graph_data['no_participants'] = $partcount;
         $graph_data['datasets'] = [$datasets];
 
         // echo "<pre>";print_r("reached");echo "</pre>";die();
@@ -1033,10 +1033,14 @@ class Program extends MY_Controller {
                         }
                     }
 
+                    $unable = $this->Program_m->getUnableParticipants($round->uuid, $county_id, $facility_id)->participants;
 
-                    $no_responsive = $partcount - $no_non_responsive;
+                    $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid, $county_id, $facility_id)->participants;
 
-                    $respondent_rate = round((($no_responsive / $partcount) * 100), 2);
+                    $no_non_responsive = $no_of_participants - $partcount - $unable;
+                    $no_responsive = $partcount;
+
+                    $respondent_rate = round((($partcount / $no_of_participants) * 100), 2);
                 }else{
                     // echo "<pre>";print_r("reaching here");die;
                     $respondent_rate = round(0, 2);
@@ -1168,10 +1172,12 @@ class Program extends MY_Controller {
                             $no_non_responsive++;
                         }
 
-                    // $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid, $county_id, $facility_id)->participants;
+                    $unable = $this->Program_m->getUnableParticipants($round->uuid, $county_id, $facility_id)->participants;
 
-                        $no_responsive = $partcount - $no_non_responsive;
+                    $no_of_participants = $this->Program_m->ParticipatingParticipants($round->uuid, $county_id, $facility_id)->participants;
 
+                        $no_non_responsive = $no_of_participants - $partcount - $unable;
+                        $no_responsive = $partcount;
                     }
 
                 }else{
@@ -1511,12 +1517,12 @@ class Program extends MY_Controller {
         }  
 
 
-
+        $unable = $this->Program_m->getUnableParticipants($round_uuid, $county_id, $facility_id)->participants;
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
 
         
-
-        $nonresponsive = $no_of_participants - $partcount;
+        $nonresponsive = $no_of_participants - $partcount - $unable;
+        // $nonresponsive = $no_of_participants - $partcount;
         // echo "<pre>";print_r($nonresponsive);echo "</pre>";die();
 
         // $datasets = [
@@ -1527,7 +1533,7 @@ class Program extends MY_Controller {
         $datasets = [
             'label'         =>  ['Responsive','Non-Responsive'],
             'backgroundColor' => ['rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-            'data' => [$partcount, $non_responsive]
+            'data' => [$partcount, $nonresponsive]
         ];
         $labels = ['Responsive','Non-Responsive'];
 
