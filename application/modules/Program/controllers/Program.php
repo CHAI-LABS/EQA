@@ -1211,7 +1211,7 @@ class Program extends MY_Controller {
         if($facility_id == 0){
             foreach ($equipments as $key => $equipment) {
                 $counter++;
-                
+                $partcount = 0;
                 $equipment_id = $equipment->id;
 
                 foreach ($participants as $participant) {
@@ -1259,6 +1259,7 @@ class Program extends MY_Controller {
                 }
             }
         }else{
+            $partcount = 0;
             foreach ($participants as $participant) {
                 $partcount ++;
                 $novalue = $sampcount = $acceptable = $unacceptable = 0;
@@ -1314,12 +1315,12 @@ class Program extends MY_Controller {
 
         $unable = $this->Program_m->getUnableParticipants($round_uuid, $county_id, $facility_id)->participants;
         $disqualified = $this->Program_m->getRoundVerdict($round_uuid, $county_id, $facility_id)->participants;
-        $total_facilities = $this->Program_m->TotalFacilities($round_uuid, $county_id, $facility_id)->facilities;
+        $total_participants = $this->Program_m->TotalFacilities($round_uuid, $county_id, $facility_id)->facilities;
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
         $failed = $no_of_participants - $passed;
-        $responsive = $no_of_participants - $non_responsive;
+        $nonresponsive = $no_of_participants - $partcount - $unable;
 
-        // echo "<pre>";print_r($total_facilities);echo "</pre>";die();
+        // echo "<pre>";print_r($nonresponsive);echo "</pre>";die();
 
         $datasets7 = [
             'label'         =>  'Total No. of Facilities Enrolled',
@@ -1327,7 +1328,7 @@ class Program extends MY_Controller {
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
             'highlightStroke' => 'rgba(211,84,0,1)',
-            'data' => [$total_facilities]
+            'data' => [$no_of_participants]
         ];
         $datasets1 = [
             'label'         =>  'No. of Participants (Current Round)',
@@ -1335,7 +1336,7 @@ class Program extends MY_Controller {
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
             'highlightStroke' => 'rgba(52,152,219,1)',
-            'data' => [$no_of_participants]
+            'data' => [$total_participants]
         ];
         $datasets2 = [
             'label'         =>  'Passed',
@@ -1352,7 +1353,7 @@ class Program extends MY_Controller {
             'borderColor' => 'rgba(127,140,141,0.8)',
             'highlightFill' => 'rgba(127,140,141,0.75)',
             'highlightStroke' => 'rgba(127,140,141,1)',
-            'data' => [$non_responsive]
+            'data' => [$nonresponsive]
         ];
         $datasets4 = [
             'label'         =>  'Unable to Report',
@@ -1381,7 +1382,7 @@ class Program extends MY_Controller {
 
         // echo "<pre>";print_r($unable);echo "</pre>";die();
         $graph_data['round'] = $round_name;
-        $graph_data['responsive'] = $responsive;
+        $graph_data['responsive'] = $partcount;
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$datasets7, $datasets1, $datasets3, $datasets4, $datasets6, $datasets2, $datasets5];
 
@@ -1401,7 +1402,7 @@ class Program extends MY_Controller {
                 }
         $participants = $this->Program_m->getReadyParticipants($round_id, $county_id, $facility_id);
         $equipments = $this->Program_m->Equipments();
-
+        // echo "<pre>";print_r($participants);echo "</pre>";die();
 
 
         if($facility_id == 0){
@@ -1409,7 +1410,7 @@ class Program extends MY_Controller {
                 $counter++;
                 
                 $equipment_id = $equipment->id;
-
+                $partcount = 0;
                 foreach ($participants as $participant) {
                     $partcount ++;
                     $novalue = $sampcount = $acceptable = $unacceptable = 0;
@@ -1455,6 +1456,7 @@ class Program extends MY_Controller {
                 }
             }
         }else{
+            $partcount = 0;
             foreach ($participants as $participant) {
                 $partcount ++;
                 $novalue = $sampcount = $acceptable = $unacceptable = 0;
@@ -1494,9 +1496,9 @@ class Program extends MY_Controller {
                         } 
                     } 
 
-                    if($novalue == $sampcount){
-                        $non_responsive++;
-                    }
+                    // if($sampcount == $novalue){
+                    //     $non_responsive++;
+                    // }
 
                     if($acceptable == $sampcount) {
                         $passed++;
@@ -1511,7 +1513,11 @@ class Program extends MY_Controller {
 
 
         $no_of_participants = $this->Program_m->ParticipatingParticipants($round_uuid, $county_id, $facility_id)->participants;
-        $responsive = $no_of_participants - $non_responsive;
+
+        
+
+        $nonresponsive = $no_of_participants - $partcount;
+        // echo "<pre>";print_r($nonresponsive);echo "</pre>";die();
 
         // $datasets = [
         //     'label'         =>  ['NO OF PARTICIPANTS','RESPONSIVE','NON RESPONSIVE'],
@@ -1521,13 +1527,13 @@ class Program extends MY_Controller {
         $datasets = [
             'label'         =>  ['Responsive','Non-Responsive'],
             'backgroundColor' => ['rgba(46,204,113,0.5)','rgba(231,76,60,0.5)'],
-            'data' => [$responsive, $non_responsive]
+            'data' => [$partcount, $non_responsive]
         ];
         $labels = ['Responsive','Non-Responsive'];
 
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$datasets];
-        // echo "<pre>";print_r($no_of_participants);echo "</pre>";die();
+        
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

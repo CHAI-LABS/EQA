@@ -176,10 +176,10 @@ class Import extends MY_Controller {
 	function importRoundDataSubmissions(){
 		//new round change excel name (1), round id (1), sample id (1)
 
-		$file_path = './uploads/data/R17_Results.xlsx';
+		$file_path = './uploads/data/R18_Results.xlsx';
 
-		$round_id = 1;
-		$sample_id = 1;
+		$round_id = 2;
+		$sample_id = 4;
 
 		$data = $this->excel->readExcel($file_path);
 		if (count($data) > 0) {
@@ -193,278 +193,311 @@ class Import extends MY_Controller {
 				
 				for ($i=4; $i < 72; $i++) {
 
-					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment'){
-						
-						$equip = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row();
-						if($equip){
-							$equip_id = $equip->id;
-						}else{
-							$equip_id = 0;
+					$expiry_date = 0;
+
+					// echo date('Y-m-d','not indicated'); die();
+	
+					$equip = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row();
+					if($equip){
+						$equip_id = $equip->id;
+					}else{
+						$equip_id = 0;
+					}
+
+
+					// echo "<pre>"; print_r($itemData[$i]);echo "</pre>";die();
+					
+					$facility = $this->db->get_where('facility_v', ['facility_name'=>$itemData[$i][0]])->row();
+
+
+					if($facility){
+						$facility_id = $facility->facility_id;
+
+					}else{
+						$facility_id = 0;
+					}
+
+					if($itemData[$i][24]){
+						$names = explode(" ", $itemData[$i][24]);
+
+						$fname = $names[0];
+
+						if($names[1]){
+							$lname = $names[1];
 						}
+					}else{
+						$fname = $lname = 'not indicated';
+					}
 
+					// $date_prepared = date('Y-m-d',strtotime($itemData[7][30]));
+					// $date_picked = date('Y-m-d',strtotime($itemData[$i][31]));
+					// $date_received = date('Y-m-d',strtotime($itemData[$i][32]));
+					// $date_analysed = date('Y-m-d',strtotime($itemData[$i][33]));
+					
 
-						// echo "<pre>"; print_r($itemData[$i]);echo "</pre>";die();
-						
-						$facility = $this->db->get_where('facility_v', ['facility_name'=>$itemData[$i][0]])->row();
+					// echo "<pre>"; print_r($date_prepared);echo "</pre>";die();
 
+					
+					// $participant++;
 
-						if($facility){
-							$facility_id = $facility->facility_id;
+					$part_exist = $this->getParticipant($fname,$facility_id,$lname,'no_indication');
+					$new_participant = '';
 
-						}else{
-							$facility_id = 0;
-						}
+					if(!($part_exist)){
 
-						if($itemData[$i][24]){
-							$names = explode(" ", $itemData[$i][24]);
+						$insertdata4 = [
+			                'participant_id'    =>  '10000-001',
+			                'participant_fname'    =>  $fname ? $fname : 'not indicated',
+			                'participant_lname'    =>  $lname ? $lname : 'not indicated',
+			                'participant_phonenumber'    =>  $itemData[$i][25] ? $itemData[$i][25] : 0,
+			                'participant_facility'    =>  $facility_id ? $facility_id : 0,
+			                'participant_email'    =>  $itemData[$i][26] ? $itemData[$i][26] : 0,
+			                'participant_sex'    =>  '',
+			                'participant_age'    =>  0,
+			                'participant_education'    =>  '',
+			                'participant_experience'    =>  '',
+			                'user_type'    =>  'participant',
+			                'participant_password'    =>  '$2y$10$kHEgvCOIRVePKcwc00n0puvWsrCXN6ab2HIxwvKsNsCbvt8UK49au',
+			                'avatar'    =>  '',
+			                'approved'    =>  1,
+			                'status'    =>  1,
+			                'date_registered'    =>  date("Y-m-d h:i:sa"),
+			                'confirm_token'    =>  null
+		            	];
 
-							$fname = $names[0];
+		            	$this->db->insert('participants', $insertdata4);
+		            	$new_participant = $this->db->insert_id();
 
-							if($names[1]){
-								$lname = $names[1];
-							}
-						}else{
-							$fname = $lname = 'not indicated';
-						}
+		            	$part_no = 0;
 
-						
-						// $participant++;
+						$facility_exists = $this->db->get_where('participants', ['participant_facility'=>$facility_id])->result();
 
-						$part_exist = $this->getParticipant($fname,$facility_id,$lname,'no_indication');
-						$new_participant = '';
-
-						if(!($part_exist)){
-
-							$insertdata4 = [
-				                'participant_id'    =>  '10000-001',
-				                'participant_fname'    =>  $fname ? $fname : 'not indicated',
-				                'participant_lname'    =>  $lname ? $lname : 'not indicated',
-				                'participant_phonenumber'    =>  $itemData[$i][25] ? $itemData[$i][25] : 0,
-				                'participant_facility'    =>  $facility_id ? $facility_id : 0,
-				                'participant_email'    =>  $itemData[$i][26] ? $itemData[$i][26] : 0,
-				                'participant_sex'    =>  '',
-				                'participant_age'    =>  0,
-				                'participant_education'    =>  '',
-				                'participant_experience'    =>  '',
-				                'user_type'    =>  'participant',
-				                'participant_password'    =>  '$2y$10$kHEgvCOIRVePKcwc00n0puvWsrCXN6ab2HIxwvKsNsCbvt8UK49au',
-				                'avatar'    =>  '',
-				                'approved'    =>  1,
-				                'status'    =>  1,
-				                'date_registered'    =>  date("Y-m-d h:i:sa"),
-				                'confirm_token'    =>  null
-			            	];
-
-			            	$this->db->insert('participants', $insertdata4);
-			            	$new_participant = $this->db->insert_id();
-
-			            	$part_no = 0;
-
-							$facility_exists = $this->db->get_where('participants', ['participant_facility'=>$facility_id])->result();
-
-							foreach ($facility_exists as $facility_exist) {
-								$part_no++;
-								
-							}
+						foreach ($facility_exists as $facility_exist) {
+							$part_no++;
 							
-
-							$this->db->set('participant_id',$facility->facility_code.'-00'.$part_no);
-							$this->db->where('id', $new_participant);
-							$this->db->update('participants');
 						}
-
-
 						
 
-						$part = $this->getParticipant($names[0],$facility_id,$names[1]);
-						// echo "<pre>"; print_r($part);echo "</pre>";die();
-
-						$participant = $part->participant_id;
-
-						if($new_participant){
-							$participant_id = $new_participant; 
-						}else{
-							$participant_id = $part->id;
-						}
+						$this->db->set('participant_id',$facility->facility_code.'-00'.$part_no);
+						$this->db->where('id', $new_participant);
+						$this->db->update('participants');
+					}
 
 
-						if($itemData[$i][9] == "Unable to report"){
-							$part_uuid = $this->db->get_where('participants', ['id'=>$participant_id])->row()->uuid;
-							$round_uuid = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row()->uuid;
+					
+
+					$part = $this->getParticipant($names[0],$facility_id,$names[1]);
+					// echo "<pre>"; print_r($part);echo "</pre>";die();
+
+					$participant = $part->participant_id;
+
+					if($new_participant){
+						$participant_id = $new_participant; 
+					}else{
+						$participant_id = $part->id;
+					}
+
+					if($itemData[$i][9] == "Unable to report"){
+						$part_uuid = $this->db->get_where('participants', ['id'=>$participant_id])->row()->uuid;
+						$round_uuid = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row()->uuid;
 
 
-							$insertdata8 = [
-								'round_uuid'    =>  $round_uuid,
-				                'equipment_id'    =>  $equip_id,
-				                'participant_uuid'    =>  $part_uuid,
-				                'facility_id'    =>  $facility_id,
-				                'reason'    =>  $itemData[$i][9] ? $itemData[$i][9] : 0,
-				                'detail'    =>  $itemData[$i][10] ? $itemData[$i][10] : 0,
-				                'date_sent'    =>  date("Y-m-d h:i:sa"),
-				                'viewed'    =>  0
+						$insertdata8 = [
+							'round_uuid'    =>  $round_uuid,
+			                'equipment_id'    =>  $equip_id,
+			                'participant_uuid'    =>  $part_uuid,
+			                'facility_id'    =>  $facility_id,
+			                'reason'    =>  $itemData[$i][9] ? $itemData[$i][9] : 0,
+			                'detail'    =>  $itemData[$i][10] ? $itemData[$i][10] : 0,
+			                'date_sent'    =>  date("Y-m-d h:i:sa"),
+			                'viewed'    =>  0
+		            	];
+
+		            	$this->db->insert('unable_response', $insertdata8);
+					}
+
+
+
+					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment' && $itemData[$i][9] != "Unable to report"){
+
+
+					
+						$insertdata = [
+							'round_id'    =>  $round_id,
+			                'participant_id'    =>  $participant_id,
+			                'equipment_id'    =>  $equip_id,
+			                'status'    =>  1,
+			                'verdict'    =>  1
+			            ];
+
+			            // $this->db->insert('pt_data_submission', $insertdata);
+						$sample_counter = $sample_id;
+						$batch_counter = 1;
+
+			            if($this->db->insert('pt_data_submission', $insertdata)){
+
+	                        $submission_id = $this->db->insert_id();
+
+	                        // echo "<pre>"; print_r($submission_id);echo "</pre>";die();
+
+	                        $insertdata1 = [
+									'equip_result_id'    =>  $submission_id,
+					                'sample_id'    =>  $sample_counter,
+					                'cd3_absolute'    =>  $itemData[$i][11] ? $itemData[$i][11] : 0,
+					                'cd3_percent'    =>  $itemData[$i][12] ? $itemData[$i][12] : 0,
+					                'cd4_absolute'    =>  $itemData[$i][13] ? $itemData[$i][13] : 0,
+					                'cd4_percent'    =>  $itemData[$i][14] ? $itemData[$i][14] : 0,
+					                'other_absolute'    =>  0,
+					                'other_percent'    =>  0
+				            	];
+
+			            	$this->db->insert('pt_equipment_results', $insertdata1);
+			            	$sample_counter ++;
+			            	
+
+			            	$insertdata2 = [
+			            		'equip_result_id'    =>  $submission_id,
+				                'sample_id'    =>  $sample_counter,
+				                'cd3_absolute'    =>  $itemData[$i][15] ? $itemData[$i][15] : 0,
+				                'cd3_percent'    =>  $itemData[$i][16] ? $itemData[$i][16] : 0,
+				                'cd4_absolute'    =>  $itemData[$i][17] ? $itemData[$i][17] : 0,
+				                'cd4_percent'    =>  $itemData[$i][18] ? $itemData[$i][18] : 0,
+				                'other_absolute'    =>  0,
+				                'other_percent'    =>  0
 			            	];
 
-			            	$this->db->insert('unable_response', $insertdata8);
-						}else{
-							$insertdata = [
-								'round_id'    =>  $round_id,
-				                'participant_id'    =>  $participant_id,
+			            	$this->db->insert('pt_equipment_results', $insertdata2);
+			            	$sample_counter ++;
+			            	
+
+			            	$insertdata3 = [
+			            		'equip_result_id'    =>  $submission_id,
+				                'sample_id'    =>  $sample_counter,
+				                'cd3_absolute'    =>  $itemData[$i][19] ? $itemData[$i][19] : 0,
+				                'cd3_percent'    =>  $itemData[$i][20] ? $itemData[$i][20] : 0,
+				                'cd4_absolute'    =>  $itemData[$i][21] ? $itemData[$i][21] : 0,
+				                'cd4_percent'    =>  $itemData[$i][22] ? $itemData[$i][22] : 0,
+				                'other_absolute'    =>  0,
+				                'other_percent'    =>  0
+			            	];
+
+			            	$this->db->insert('pt_equipment_results', $insertdata3);
+
+
+			            	if($itemData[$i][10] == 'not indicated' || $itemData[$i][10] == 'Ab reagent missing' || $itemData[$i][10] == 'partec kits'){
+			            		$expiry_date = 0;
+			            	}else{
+			            		$expiry_date = date('Y-m-d',strtotime($itemData[$i][34]));
+			            	}
+
+			            	$insertdata9 = [
+			            		'submission_id'    =>  $submission_id,
 				                'equipment_id'    =>  $equip_id,
+				                'lot_number'    =>  $itemData[$i][9] ? $itemData[$i][9] : 0,
+				                'reagent_name'    =>  $itemData[$i][8] ? $itemData[$i][8] : 0,
+				                'expiry_date'    =>  $expiry_date,
+				                'created_at'    =>  date("Y-m-d h:i:sa")
+			            	];
+
+			            	$this->db->insert('pt_data_submission_reagent', $insertdata9);
+
+
+
+
+
+
+			            	$equipment = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row(); 
+
+			            	if(!($participant_id)){
+			            		$participant_id = $new_participant;
+			            	}
+
+			            	$insertdata4 = [
+								'participant_id'    =>  $participant_id,
+				                'equipment_id'    =>  $equipment->id
+			            	];
+
+			            	$this->db->insert('participant_equipment', $insertdata4);
+
+
+			            	$insertdata5 = [
+			            		'batch_name'    =>  "Batch_".$submission_id,
+				                'description'    => "Testing for batch for Participant ID ".$participant,
+				                'pt_round_id'    =>  $round_id
+			            	];
+
+			            	$this->db->insert('pt_batches', $insertdata5);
+
+
+
+			            	$round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
+			            	$participant_det = $this->db->get_where('participants', ['id'=>$participant_id])->row();
+
+			            	$insertdata6 = [
+			            		'pt_round_no'    =>  $round_uuid,
+				                'participant_id'    => $participant_det->uuid,
+				                'participant_facility'    =>  $facility_id,
 				                'status'    =>  1,
-				                'verdict'    =>  1
-				            ];
+				                'verdict'    =>  1,
+				                'lab_result'    =>  1
+			            	];
 
-				            // $this->db->insert('pt_data_submission', $insertdata);
-							$sample_counter = $sample_id;
-							$batch_counter = 1;
+			            	$this->db->insert('participant_readiness', $insertdata6);
 
-				            if($this->db->insert('pt_data_submission', $insertdata)){
-
-		                        $submission_id = $this->db->insert_id();
-
-		                        // echo "<pre>"; print_r($submission_id);echo "</pre>";die();
-
-		                        $insertdata1 = [
-										'equip_result_id'    =>  $submission_id,
-						                'sample_id'    =>  $sample_counter,
-						                'cd3_absolute'    =>  $itemData[$i][11] ? $itemData[$i][11] : 0,
-						                'cd3_percent'    =>  $itemData[$i][12] ? $itemData[$i][12] : 0,
-						                'cd4_absolute'    =>  $itemData[$i][13] ? $itemData[$i][13] : 0,
-						                'cd4_percent'    =>  $itemData[$i][14] ? $itemData[$i][14] : 0,
-						                'other_absolute'    =>  0,
-						                'other_percent'    =>  0
-					            	];
-
-				            	$this->db->insert('pt_equipment_results', $insertdata1);
-				            	$sample_counter ++;
-				            	
-
-				            	$insertdata2 = [
-				            		'equip_result_id'    =>  $submission_id,
-					                'sample_id'    =>  $sample_counter,
-					                'cd3_absolute'    =>  $itemData[$i][15] ? $itemData[$i][15] : 0,
-					                'cd3_percent'    =>  $itemData[$i][16] ? $itemData[$i][16] : 0,
-					                'cd4_absolute'    =>  $itemData[$i][17] ? $itemData[$i][17] : 0,
-					                'cd4_percent'    =>  $itemData[$i][18] ? $itemData[$i][18] : 0,
-					                'other_absolute'    =>  0,
-					                'other_percent'    =>  0
-				            	];
-
-				            	$this->db->insert('pt_equipment_results', $insertdata2);
-				            	$sample_counter ++;
-				            	
-
-				            	$insertdata3 = [
-				            		'equip_result_id'    =>  $submission_id,
-					                'sample_id'    =>  $sample_counter,
-					                'cd3_absolute'    =>  $itemData[$i][19] ? $itemData[$i][19] : 0,
-					                'cd3_percent'    =>  $itemData[$i][20] ? $itemData[$i][20] : 0,
-					                'cd4_absolute'    =>  $itemData[$i][21] ? $itemData[$i][21] : 0,
-					                'cd4_percent'    =>  $itemData[$i][22] ? $itemData[$i][22] : 0,
-					                'other_absolute'    =>  0,
-					                'other_percent'    =>  0
-				            	];
-
-				            	$this->db->insert('pt_equipment_results', $insertdata3);
+							$date1 = date("Y-m-d",strtotime("2018-04-02"));
+							$date2 = date("Y-m-d",strtotime("2018-04-02"));
+							$date3 = date("Y-m-d",strtotime("2018-04-02"));
 
 
-				            	$equipment = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row(); 
+			            	$insertdata7 = [
+			            		'pt_batch_id'    =>  $submission_id,
+				                'pt_readiness_id'    => $submission_id,
+				                'panel_preparation_date'    =>  $date1,
+				                'panel_preparation_notes'    => "They are finished, they are done",
+				                'courier_collection_date'    =>  $date2,
+				                'courier_company'    => "G4S Courier",
+				                'courier_official'    =>  "Mr. Mareka",
+				                'courier_dispatch_notes'    => "They are on their way",
+				                'participant_received_date'    =>  $date3,
+				                'panel_condition_comment'    => "OK we guess",
+				                'panel_received_entered'    =>  $submission_id,
+				                'receipt'    => 1,
+				                'panel_condition'    =>  1
+			            	];
 
-				            	if(!($participant_id)){
-				            		$participant_id = $new_participant;
-				            	}
-
-				            	$insertdata4 = [
-									'participant_id'    =>  $participant_id,
-					                'equipment_id'    =>  $equipment->id
-				            	];
-
-				            	$this->db->insert('participant_equipment', $insertdata4);
-
-
-				            	$insertdata5 = [
-				            		'batch_name'    =>  "Batch_".$submission_id,
-					                'description'    => "Testing for batch for Participant ID ".$participant,
-					                'pt_round_id'    =>  $round_id
-				            	];
-
-				            	$this->db->insert('pt_batches', $insertdata5);
+			            	$this->db->insert('pt_panel_tracking', $insertdata7);
 
 
+			            	$insertdata7 = [
+			            		'batch_id'    =>  $submission_id,
+				                'tube_id'    => $batch_counter,
+				                'sample_id'    =>  $sample_counter
+			            	];
 
-				            	$round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
-				            	$participant_det = $this->db->get_where('participants', ['id'=>$participant_id])->row();
-
-				            	$insertdata6 = [
-				            		'pt_round_no'    =>  $round_uuid,
-					                'participant_id'    => $participant_det->uuid,
-					                'participant_facility'    =>  $facility_id,
-					                'status'    =>  1,
-					                'verdict'    =>  1,
-					                'lab_result'    =>  1
-				            	];
-
-				            	$this->db->insert('participant_readiness', $insertdata6);
-
-								$date1 = date("Y-m-d",strtotime("2018-04-02"));
-								$date2 = date("Y-m-d",strtotime("2018-04-02"));
-								$date3 = date("Y-m-d",strtotime("2018-04-02"));
+			            	$this->db->insert('pt_batch_tube', $insertdata7);
+			            	$batch_counter++;
 
 
-				            	$insertdata7 = [
-				            		'pt_batch_id'    =>  $submission_id,
-					                'pt_readiness_id'    => $submission_id,
-					                'panel_preparation_date'    =>  $date1,
-					                'panel_preparation_notes'    => "They are finished, they are done",
-					                'courier_collection_date'    =>  $date2,
-					                'courier_company'    => "G4S Courier",
-					                'courier_official'    =>  "Mr. Mareka",
-					                'courier_dispatch_notes'    => "They are on their way",
-					                'participant_received_date'    =>  $date3,
-					                'panel_condition_comment'    => "OK we guess",
-					                'panel_received_entered'    =>  $submission_id,
-					                'receipt'    => 1,
-					                'panel_condition'    =>  1
-				            	];
+			            	$insertdata7 = [
+			            		'batch_id'    =>  $submission_id,
+				                'tube_id'    => $batch_counter,
+				                'sample_id'    =>  $sample_counter
+			            	];
 
-				            	$this->db->insert('pt_panel_tracking', $insertdata7);
+			            	$this->db->insert('pt_batch_tube', $insertdata7);
+			            	$batch_counter++;
 
 
-				            	$insertdata7 = [
-				            		'batch_id'    =>  $submission_id,
-					                'tube_id'    => $batch_counter,
-					                'sample_id'    =>  $sample_counter
-				            	];
+			            	$insertdata7 = [
+			            		'batch_id'    =>  $submission_id,
+				                'tube_id'    => $batch_counter,
+				                'sample_id'    =>  $sample_counter
+			            	];
 
-				            	$this->db->insert('pt_batch_tube', $insertdata7);
-				            	$batch_counter++;
+			            	$this->db->insert('pt_batch_tube', $insertdata7);
 
-
-				            	$insertdata7 = [
-				            		'batch_id'    =>  $submission_id,
-					                'tube_id'    => $batch_counter,
-					                'sample_id'    =>  $sample_counter
-				            	];
-
-				            	$this->db->insert('pt_batch_tube', $insertdata7);
-				            	$batch_counter++;
-
-
-				            	$insertdata7 = [
-				            		'batch_id'    =>  $submission_id,
-					                'tube_id'    => $batch_counter,
-					                'sample_id'    =>  $sample_counter
-				            	];
-
-				            	$this->db->insert('pt_batch_tube', $insertdata7);
-
-	                   		}
-						}
-						
-
-						
-
-
+                   		}
+							
 					}
 
 					

@@ -161,23 +161,10 @@ class Program_m extends CI_Model {
     }
 
 
-    public function ParticipatingParticipants($round_uuid, $county_id = null, $facility_id = null){
-        $facility = $county = '';
-
-        if($county_id){
-        	$county = " AND county_id = ".$county_id." " ;
-        }
-
-        if($facility_id){
-            $facility = " AND facility_id = ".$facility_id." " ;
-        }
-
-        $sql = "SELECT COUNT(participant_id) AS participants 
-        FROM pt_ready_participants 
-        WHERE pt_round_uuid = '".$round_uuid."' 
-        $county
-        $facility
-        AND verdict = 1; ";
+    public function ParticipatingParticipants(){
+        
+        $sql = "SELECT COUNT(DISTINCT facility_id) AS participants 
+        FROM participant_readiness_v; ";
 
         $query = $this->db->query($sql);
 
@@ -217,17 +204,26 @@ class Program_m extends CI_Model {
             $facility = " AND fv.facility_id = ".$facility_id. " ";
         }
 
-        $sql = "SELECT COUNT(prv.p_id) AS participants
-                FROM participant_readiness_v prv
-                JOIN facility_v fv ON prv.facility_id = fv.facility_id
-                WHERE NOT EXISTS 
-                    (SELECT * 
-                     FROM participant_readiness pr
-                     WHERE prv.uuid = pr.participant_id 
-                     AND pr.pt_round_no = '".$round_uuid."')
+        // $sql = "SELECT COUNT(prv.p_id) AS participants
+        //         FROM participant_readiness_v prv
+        //         JOIN facility_v fv ON prv.facility_id = fv.facility_id
+        //         WHERE NOT EXISTS 
+        //             (SELECT * 
+        //              FROM participant_readiness pr
+        //              WHERE prv.uuid = pr.participant_id 
+        //              AND pr.pt_round_no = '".$round_uuid."')
+        //         $county
+        //         $facility
+        //         AND prv.user_type = 'participant'";
+
+        $sql = "SELECT COUNT(ur.id) AS participants
+                FROM unable_response ur
+                JOIN facility_v fv ON ur.facility_id = fv.facility_id
+                JOIN participant_readiness_v prv ON prv.uuid = ur.participant_uuid
+                WHERE prv.user_type = 'participant'
                 $county
                 $facility
-                AND prv.user_type = 'participant'";
+                AND ur.round_uuid = '".$round_uuid."'"; 
 
         $query = $this->db->query($sql);
 
