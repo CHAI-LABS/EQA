@@ -106,28 +106,29 @@ class Program_m extends CI_Model {
     }
 
 
-    public function TotalFacilities($round_uuid, $county_id = null, $facility_id = null){
-        $this->db->select('COUNT(DISTINCT(prv.facility_code)) AS facilities');
-        $this->db->from('participant_readiness_v prv');
-        $this->db->join("facility_v fv", "fv.facility_id = prv.facility_id", "left");
-        $this->db->join("pt_ready_participants prp", "prp.p_id = prv.p_id", "left");
+    // public function getCounties($round_id,$county_id=null,$facility_id=null){
 
-        if($county_id){
-            $this->db->where('prv.county_id', $county_id);
-        }
-
-        if($facility_id){
-            $this->db->where('prv.facility_id', $facility_id);
-        }
+    //     $facility = $county = '';
+    //     if($county_id){
+    //         $county = " AND cv.county_id = ".$county_id." " ;
+    //     }
+    //     if($facility_id){
+    //         $facility = " AND fv.facility_id = ".$facility_id." " ;
+    //     }
+    //     $sql = "SELECT cv.id AS county_id,cv.county_name AS county_name,fv.facility_id AS facility_id,fv.facility_name AS facility_name
+    //             FROM participant_readiness_v pr
+    //             JOIN facility_v fv ON fv.facility_id = pr.facility_id
+    //             JOIN county_v cv ON cv.id = pr.county_id
+    //             JOIN pt_participant_review_v prv ON prv.participant_id = pr.p_id
+    //             WHERE prv.round_id = '".$round_id."'
+    //             $county
+    //             $facility
+    //             GROUP BY cv.id;";
+    //     $query = $this->db->query($sql);
+    //     // $query = $this->db->get();
         
-        $this->db->where('prp.pt_round_uuid', $round_uuid);
-        $this->db->where('prv.status', 1);
-        $this->db->where('prv.user_type', 'participant');
-        
-        $query = $this->db->get();
-
-        return $query->row();
-    }
+    //     return $query->result();
+    // }
 
     public function getCounties(){
 
@@ -160,18 +161,52 @@ class Program_m extends CI_Model {
         return $query->result();
     }
 
+    public function TotalFacilities($round_uuid, $county_id = null, $facility_id = null){
+        $this->db->select('COUNT(DISTINCT(prv.facility_code)) AS facilities');
+        $this->db->from('participant_readiness_v prv');
+        $this->db->join("facility_v fv", "fv.facility_id = prv.facility_id");
 
-    public function ParticipatingParticipants(){
+        if($county_id){
+            $this->db->where('prv.county_id', $county_id);
+        }
+
+        if($facility_id){
+            $this->db->where('prv.facility_id', $facility_id);
+        }
         
-        $sql = "SELECT COUNT(DISTINCT facility_id) AS participants 
-        FROM participant_readiness_v; ";
+        $this->db->where('prv.status', 1);
+        $this->db->where('prv.user_type', 'participant');
+        
+        $query = $this->db->get();
 
+        return $query->row();
+    }
+
+
+    public function ParticipatingParticipants($round_uuid, $county_id = null, $facility_id = null){
+        $facility = $county = '';
+        if($county_id){
+            $county = " AND county_id = ".$county_id." " ;
+        }
+        if($facility_id){
+            $facility = " AND facility_id = ".$facility_id." " ;
+        }
+        $sql = "SELECT COUNT(participant_id) AS participants 
+        FROM pt_ready_participants 
+        WHERE pt_round_uuid = '".$round_uuid."' 
+        $county
+        $facility
+        AND verdict = 1; ";
         $query = $this->db->query($sql);
-
         // $query = $this->db->get();
         
         return $query->row();
     }
+
+
+    
+
+
 
     public function getRoundVerdict($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select('COUNT(pr.participant_id) AS participants');
@@ -257,12 +292,36 @@ class Program_m extends CI_Model {
     }
 
 
+    public function RespondedParticipants($round_uuid, $county_id = null, $facility_id = null){
+        $facility = $county = '';
+        if($county_id){
+            $county = " AND prp.county_id = ".$county_id." " ;
+        }
+        if($facility_id){
+            $facility = " AND prp.facility_id = ".$facility_id." " ;
+        }
+        $sql = "SELECT *
+        FROM pt_ready_participants prp
+        JOIN pt_participant_review_v prv on prv.participant_id = prp.p_id
+        WHERE prp.pt_round_uuid = '".$round_uuid."' 
+        $county
+        $facility
+        AND prp.verdict = 1
+        GROUP BY prp.p_id; ";
+        $query = $this->db->query($sql);
+        // $query = $this->db->get();
+        
+        return $query->result();
+    }
+
+
     public function getReadyParticipants($round_id, $county_id = null, $facility_id = null){
 
         $this->db->select("ppr.participant_id,ppr.equipment_id");
         $this->db->from("pt_participant_review_v ppr");
         $this->db->where("ppr.round_id",$round_id);
         $this->db->join('participant_readiness pr', 'pr.participant_facility = ppr.facility_id');
+        $this->db->join('pt_participant_review_v prv', 'prv.participant_id = ppr.participant_id');
 
         if($county_id){
             $this->db->where("ppr.county_id", $county_id);
