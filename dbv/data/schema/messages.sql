@@ -2,6 +2,7 @@ CREATE TABLE `messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uuid` varchar(255) NOT NULL,
   `from` varchar(255) NOT NULL DEFAULT 'No Name',
+  `to_facility` int(11) NOT NULL,
   `email` varchar(255) DEFAULT 'No email',
   `subject` varchar(255) DEFAULT NULL,
   `message` text NOT NULL,

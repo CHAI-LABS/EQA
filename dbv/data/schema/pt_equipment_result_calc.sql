@@ -1,0 +1,17 @@
+CREATE TABLE `pt_equipment_result_calc` (
+  `equip_result_id` int(11) NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `sample_id` int(11) NOT NULL,
+  `cd3_absolute_mean` float DEFAULT NULL,
+  `cd3_absolute_sd` float DEFAULT NULL,
+  `cd3_percent_mean` float DEFAULT NULL,
+  `cd3_percent_sd` float DEFAULT NULL,
+  `cd4_absolute_mean` float DEFAULT NULL,
+  `cd4_absolute_sd` float DEFAULT NULL,
+  `cd4_percent_mean` float DEFAULT NULL,
+  `cd4_percent_sd` float DEFAULT NULL,
+  `other_absolute_mean` float DEFAULT NULL,
+  `other_absolute_sd` float DEFAULT NULL,
+  `other_percent_mean` float DEFAULT NULL,
+  `other_percent_sd` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1

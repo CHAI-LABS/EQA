@@ -190,7 +190,7 @@ class Import extends MY_Controller {
 				
 				for ($i=4; $i < 72; $i++) {
 
-					$expiry_date = 0;
+					$equip_id = $expiry_date = 0;
 					
 	
 					$equip = $this->db->get_where('equipment', ['equipment_name'=>$itemData[$i][7]])->row();

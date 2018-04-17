@@ -1,4 +1,4 @@
-CREATE DEFINER=`homestead`@`%` PROCEDURE `get_facility_readiness_data`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_facility_readiness_data`(
 	IN `pt_round_uuid` VARCHAR(36),
 	IN `search_value` TEXT,
 	IN `v_limit` INT,

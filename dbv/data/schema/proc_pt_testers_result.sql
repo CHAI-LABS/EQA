@@ -1,4 +1,4 @@
-CREATE DEFINER=`homestead`@`%` PROCEDURE `proc_pt_testers_result`(IN `p_equipment_id` INT,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_pt_testers_result`(IN `p_equipment_id` INT,
 	IN `p_sample_id` INT,
 	IN `p_tester_id` INT,
 	IN `p_round_id` INT,

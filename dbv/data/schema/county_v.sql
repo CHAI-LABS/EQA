@@ -1,0 +1,1 @@
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `county_v` AS select `c`.`id` AS `id`,`c`.`county_name` AS `county_name`,`c`.`county_dhis_code` AS `county_dhis_code`,`c`.`county_mfl_code` AS `county_mfl_code`,`c`.`county_coordinates` AS `county_coordinates`,`c`.`county_letter` AS `county_letter` from `county` `c` order by `c`.`county_name`

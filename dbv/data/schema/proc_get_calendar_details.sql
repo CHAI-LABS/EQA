@@ -1,4 +1,4 @@
-CREATE DEFINER=`homestead`@`%` PROCEDURE `proc_get_calendar_details`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_get_calendar_details`(
 	IN `pt_round_id` INT
 )
 BEGIN

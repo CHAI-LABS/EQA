@@ -14,8 +14,8 @@ CREATE TABLE `participants` (
   `user_type` varchar(45) DEFAULT NULL,
   `participant_password` varchar(255) NOT NULL,
   `avatar` text,
-  `approved` int(11) NOT NULL DEFAULT '0',
-  `status` int(11) NOT NULL DEFAULT '0',
+  `approved` int(11) NOT NULL DEFAULT '0' COMMENT 'For qa or admin to accept logging in',
+  `status` int(11) NOT NULL DEFAULT '0' COMMENT 'After clicking on email for activation',
   `date_registered` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `confirm_token` longtext,
   PRIMARY KEY (`id`)
