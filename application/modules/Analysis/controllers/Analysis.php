@@ -2071,59 +2071,124 @@ class Analysis extends DashboardController {
                      
             switch ($type) {
                 case 'cd3':
+                    switch ($type2) {
+                        case 'absolute':
+                            if($calculated_values_2){
+                                $mean_2 = ($calculated_values_2->cd3_absolute_mean) ? $calculated_values_2->cd3_absolute_mean : 0;
+                                $sd_2 = ($calculated_values_2->cd3_absolute_sd) ? $calculated_values_2->cd3_absolute_sd : 0;
+                                $sd2_2 = ($calculated_values_2->double_cd3_absolute_sd) ? $calculated_values_2->double_cd3_absolute_sd : 0;
+                                $upper_limit_2 = $mean_2 + $sd_2;
+                                $lower_limit_2 = $mean_2 - $sd_2;
+                            }else{
+                                $mean_2 = 0;
+                                $sd_2 = 0;
+                                $sd2_2 = 0;
+                                $upper_limit_2 = 0;
+                                $lower_limit_2 = 0;
+                            }
+                            break;
 
-                    if($calculated_values_2){
-                        $mean_2 = ($calculated_values_2->cd3_absolute_mean) ? $calculated_values_2->cd3_absolute_mean : 0;
-                        $sd_2 = ($calculated_values_2->cd3_absolute_sd) ? $calculated_values_2->cd3_absolute_sd : 0;
-                        $sd2_2 = ($calculated_values_2->double_cd3_absolute_sd) ? $calculated_values_2->double_cd3_absolute_sd : 0;
-                        $upper_limit_2 = $mean_2 + $sd_2;
-                        $lower_limit_2 = $mean_2 - $sd_2;
-                    }else{
-                        $mean_2 = 0;
-                        $sd_2 = 0;
-                        $sd2_2 = 0;
-                        $upper_limit_2 = 0;
-                        $lower_limit_2 = 0;
+                        case 'percent':
+                            if($calculated_values_2){
+                                $mean_2 = ($calculated_values_2->cd3_percent_mean) ? $calculated_values_2->cd3_percent_mean : 0;
+                                $sd_2 = ($calculated_values_2->cd3_percent_sd) ? $calculated_values_2->cd3_percent_sd : 0;
+                                $sd2_2 = ($calculated_values_2->double_cd3_percent_sd) ? $calculated_values_2->double_cd3_percent_sd : 0;
+                                $upper_limit_2 = $mean_2 + $sd_2;
+                                $lower_limit_2 = $mean_2 - $sd_2;
+                            }else{
+                                $mean_2 = 0;
+                                $sd_2 = 0;
+                                $sd2_2 = 0;
+                                $upper_limit_2 = 0;
+                                $lower_limit_2 = 0;
+                            }
+                            break;
+                        
+                        default:
+                            echo "<pre>";print_r("Something wrong with choosing absolute or percent");echo "</pre>";die();
+                            break;
                     }
-                    
+                     
                 break;
 
                 case 'cd4':
-                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-                    if($calculated_values_2){
-                        $mean_2 = ($calculated_values_2->cd4_absolute_mean) ? $calculated_values_2->cd4_absolute_mean : 0;
-                        $sd_2 = ($calculated_values_2->cd4_absolute_sd) ? $calculated_values_2->cd4_absolute_sd : 0;
-                        $sd2_2 = ($calculated_values_2->double_cd4_absolute_sd) ? $calculated_values_2->double_cd4_absolute_sd : 0;
-                        $upper_limit_2 = $mean_2 + $sd_2;
-                        $lower_limit_2 = $mean_2 - $sd_2;
-                    }else{
-                        $mean_2 = 0;
-                        $sd_2 = 0;
-                        $sd2_2 = 0;
-                        $upper_limit_2 = 0;
-                        $lower_limit_2 = 0;
+                    switch ($type2) {
+                        case 'absolute':
+                            if($calculated_values_2){
+                                $mean_2 = ($calculated_values_2->cd4_absolute_mean) ? $calculated_values_2->cd4_absolute_mean : 0;
+                                $sd_2 = ($calculated_values_2->cd4_absolute_sd) ? $calculated_values_2->cd4_absolute_sd : 0;
+                                $sd2_2 = ($calculated_values_2->double_cd4_absolute_sd) ? $calculated_values_2->double_cd4_absolute_sd : 0;
+                                $upper_limit_2 = $mean_2 + $sd_2;
+                                $lower_limit_2 = $mean_2 - $sd_2;
+                            }else{
+                                $mean_2 = 0;
+                                $sd_2 = 0;
+                                $sd2_2 = 0;
+                                $upper_limit_2 = 0;
+                                $lower_limit_2 = 0;
+                            }
+                            break;
+
+                        case 'percent':
+                            if($calculated_values_2){
+                                $mean_2 = ($calculated_values_2->cd4_percent_mean) ? $calculated_values_2->cd4_percent_mean : 0;
+                                $sd_2 = ($calculated_values_2->cd4_percent_sd) ? $calculated_values_2->cd4_percent_sd : 0;
+                                $sd2_2 = ($calculated_values_2->double_cd4_percent_sd) ? $calculated_values_2->double_cd4_percent_sd : 0;
+                                $upper_limit_2 = $mean_2 + $sd_2;
+                                $lower_limit_2 = $mean_2 - $sd_2;
+                            }else{
+                                $mean_2 = 0;
+                                $sd_2 = 0;
+                                $sd2_2 = 0;
+                                $upper_limit_2 = 0;
+                                $lower_limit_2 = 0;
+                            }
+                            break;
+                        
+                        default:
+                            echo "<pre>";print_r("Something wrong with choosing absolute or percent");echo "</pre>";die();
+                            break;
                     }
-                    
                 break;
 
                 case 'other':
-                    // echo "<pre>";print_r($calculated_values->other_absolute_mean);echo "</pre>";die();
+                    switch ($type2) {
+                        case 'absolute':
+                            if($calculated_values_2){
+                                $mean_2 = ($calculated_values_2->other_absolute_mean) ? $calculated_values_2->other_absolute_mean : 0;
+                                $sd_2 = ($calculated_values_2->other_absolute_sd) ? $calculated_values_2->other_absolute_sd : 0;
+                                $sd2_2 = ($calculated_values_2->double_other_absolute_sd) ? $calculated_values_2->double_other_absolute_sd : 0;
+                                $upper_limit_2 = $mean_2 + $sd_2;
+                                $lower_limit_2 = $mean_2 - $sd_2;
+                            }else{
+                                $mean_2 = 0;
+                                $sd_2 = 0;
+                                $sd2_2 = 0;
+                                $upper_limit_2 = 0;
+                                $lower_limit_2 = 0;
+                            }
+                            break;
 
-                    if($calculated_values_2){
-                        $mean_2 = ($calculated_values_2->other_absolute_mean) ? $calculated_values_2->other_absolute_mean : 0;
-                        $sd_2 = ($calculated_values_2->other_absolute_sd) ? $calculated_values_2->other_absolute_sd : 0;
-                        $sd2_2 = ($calculated_values_2->double_other_absolute_sd) ? $calculated_values_2->double_other_absolute_sd : 0;
-                        $upper_limit_2 = $mean_2 + $sd_2;
-                        $lower_limit_2 = $mean_2 - $sd_2;
-                    }else{
-                        $mean_2 = 0;
-                        $sd_2 = 0;
-                        $sd2_2 = 0;
-                        $upper_limit_2 = 0;
-                        $lower_limit_2 = 0;
+                        case 'percent':
+                            if($calculated_values_2){
+                                $mean_2 = ($calculated_values_2->other_percent_mean) ? $calculated_values_2->other_percent_mean : 0;
+                                $sd_2 = ($calculated_values_2->other_percent_sd) ? $calculated_values_2->other_percent_sd : 0;
+                                $sd2_2 = ($calculated_values_2->double_other_percent_sd) ? $calculated_values_2->double_other_percent_sd : 0;
+                                $upper_limit_2 = $mean_2 + $sd_2;
+                                $lower_limit_2 = $mean_2 - $sd_2;
+                            }else{
+                                $mean_2 = 0;
+                                $sd_2 = 0;
+                                $sd2_2 = 0;
+                                $upper_limit_2 = 0;
+                                $lower_limit_2 = 0;
+                            }
+                            break;
+                        
+                        default:
+                            echo "<pre>";print_r("Something wrong with choosing absolute or percent");echo "</pre>";die();
+                            break;
                     }
-
-                    
                 break;
                 
                 default:
