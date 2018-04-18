@@ -1991,7 +1991,7 @@ class Analysis extends DashboardController {
     }
 
 
-    public function createPercentPeerTable($form, $round_id, $equipment_id, $type){
+    public function createPeerTable($form, $round_id, $equipment_id, $type, $type2){
         $template = $this->config->item('default');
 
         $column_data = $row_data = array();
@@ -2067,431 +2067,11 @@ class Analysis extends DashboardController {
 
             // $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
 
-            $calculated_values = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,'');
-             
+            $calculated_values_2 = $this->getEvaluationResults($round_id, $equipment_id, $sample->id,$type,$type2);
+                     
             switch ($type) {
                 case 'cd3':
 
-                   
-                    if($calculated_values){
-                        $mean = ($calculated_values->cd3_percent_mean) ? $calculated_values->cd3_percent_mean : 0;
-                        $sd = ($calculated_values->cd3_percent_sd) ? $calculated_values->cd3_percent_sd : 0;
-                        $sd2 = ($calculated_values->double_cd3_percent_sd) ? $calculated_values->double_cd3_percent_sd : 0;
-                        $upper_limit_1 = $mean + $sd;
-                        $lower_limit_1 = $mean - $sd;
-                    }else{
-                        $mean = 0;
-                        $sd = 0;
-                        $sd2 = 0;
-                        $upper_limit_1 = 0;
-                        $lower_limit_1 = 0;
-                    }
-                    
-                break;
-
-                case 'cd4':
-                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-                    if($calculated_values){
-                        $mean = ($calculated_values->cd4_percent_mean) ? $calculated_values->cd4_percent_mean : 0;
-                        $sd = ($calculated_values->cd4_percent_sd) ? $calculated_values->cd4_percent_sd : 0;
-                        $sd2 = ($calculated_values->double_cd4_percent_sd) ? $calculated_values->double_cd4_percent_sd : 0;
-                        $upper_limit_1 = $mean + $sd;
-                        $lower_limit_1 = $mean - $sd;
-                    }else{
-                        $mean = 0;
-                        $sd = 0;
-                        $sd2 = 0;
-                        $upper_limit_1 = 0;
-                        $lower_limit_1 = 0;
-                    }
-                    
-                break;
-
-                case 'other':
-                    // echo "<pre>";print_r($calculated_values->other_absolute_mean);echo "</pre>";die();
-
-                    if($calculated_values){
-                        $mean = ($calculated_values->other_percent_mean) ? $calculated_values->other_percent_mean : 0;
-                        $sd = ($calculated_values->other_percent_sd) ? $calculated_values->other_percent_sd : 0;
-                        $sd2 = ($calculated_values->double_other_percent_sd) ? $calculated_values->double_other_percent_sd : 0;
-                        $upper_limit_1 = $mean + $sd;
-                        $lower_limit_1 = $mean - $sd;
-                    }else{
-                        $mean = 0;
-                        $sd = 0;
-                        $sd2 = 0;
-                        $upper_limit_1 = 0;
-                        $lower_limit_1 = 0;
-                    }
-
-                    
-                break;
-                
-                default:
-                    echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
-                break;
-            }
-
-
-            $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
-
-
-            foreach ($submissions as $submission) {
-
-                $part_cd4 = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample->id, 'participant_id' => $submission->participant_id])->row();
-
-                if($part_cd4){
-
-                    if($type == 'cd3'){
-                        if($part_cd4->cd3_percent >= $lower_limit_1 && $part_cd4->cd3_percent <= $upper_limit_1){
-                            array_push($accepted, $part_cd4->participant_id);
-                        }else{
-                            array_push($unaccepted, $part_cd4->participant_id);
-                        }
-                    }elseif ($type == 'cd4') {
-                        if($part_cd4->cd4_percent >= $lower_limit_1 && $part_cd4->cd4_percent <= $upper_limit_1){
-                            array_push($accepted, $part_cd4->participant_id);
-                        }else{
-                            array_push($unaccepted, $part_cd4->participant_id);
-                        }
-                    }elseif ($type == 'other') {
-                        if($part_cd4->other_percent >= $lower_limit_1 && $part_cd4->other_percent <= $upper_limit_1){
-                            array_push($accepted, $part_cd4->participant_id);
-                        }else{
-                            array_push($unaccepted, $part_cd4->participant_id);
-                        }
-                    }
-                }
-            }
-
-            $parts = implode(",",$accepted);
-            
-            $calculated_values_2 = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,$parts);
-
-             
-            switch ($type) {
-                case 'cd3':
-
-                   
-                    if($calculated_values_2){
-                        $mean_2 = ($calculated_values_2->cd3_percent_mean) ? $calculated_values_2->cd3_percent_mean : 0;
-                        $sd_2 = ($calculated_values_2->cd3_percent_sd) ? $calculated_values_2->cd3_percent_sd : 0;
-                        $sd2_2 = ($calculated_values_2->double_cd3_percent_sd) ? $calculated_values_2->double_cd3_percent_sd : 0;
-                        $upper_limit_2 = $mean_2 + $sd_2;
-                        $lower_limit_2 = $mean_2 - $sd_2;
-                    }else{
-                        $mean_2 = 0;
-                        $sd_2 = 0;
-                        $sd2_2 = 0;
-                        $upper_limit_2 = 0;
-                        $lower_limit_2 = 0;
-                    }
-                    
-                break;
-
-                case 'cd4':
-                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-                    if($calculated_values_2){
-                        $mean_2 = ($calculated_values_2->cd4_percent_mean) ? $calculated_values_2->cd4_percent_mean : 0;
-                        $sd_2 = ($calculated_values_2->cd4_percent_sd) ? $calculated_values_2->cd4_percent_sd : 0;
-                        $sd2_2 = ($calculated_values_2->double_cd4_percent_sd) ? $calculated_values_2->double_cd4_percent_sd : 0;
-                        $upper_limit_2 = $mean_2 + $sd_2;
-                        $lower_limit_2 = $mean_2 - $sd_2;
-                    }else{
-                        $mean_2 = 0;
-                        $sd_2 = 0;
-                        $sd2_2 = 0;
-                        $upper_limit_2 = 0;
-                        $lower_limit_2 = 0;
-                    }
-                    
-                break;
-
-                case 'other':
-                    // echo "<pre>";print_r($calculated_values->other_absolute_mean);echo "</pre>";die();
-
-                    if($calculated_values_2){
-                        $mean_2 = ($calculated_values_2->other_percent_mean) ? $calculated_values_2->other_percent_mean : 0;
-                        $sd_2 = ($calculated_values_2->other_percent_sd) ? $calculated_values_2->other_percent_sd : 0;
-                        $sd2_2 = ($calculated_values_2->double_other_percent_sd) ? $calculated_values_2->double_other_percent_sd : 0;
-                        $upper_limit_2 = $mean_2 + $sd_2;
-                        $lower_limit_2 = $mean_2 - $sd_2;
-                    }else{
-                        $mean_2 = 0;
-                        $sd_2 = 0;
-                        $sd2_2 = 0;
-                        $upper_limit_2 = 0;
-                        $lower_limit_2 = 0;
-                    }
-
-                    
-                break;
-                
-                default:
-                    echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
-                break;
-            }
-            // echo "<pre>";print_r($calculated_values_2);echo "</pre>";die();
-
-            switch ($form) {
-                case 'table':
-
-                $view = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/ParticipantResults/' . $round_id . '/' . $equipment_id . '/' . $sample->id . '/'.$type.'/absolute')."'><i class = 'fa fa-eye'></i>&nbsp;View Log</a>";
-
-                    $tabledata[] = [
-                                $sample->sample_name,
-                                $mean_2,
-                                $sd_2,
-                                $sd2_2,
-                                $upper_limit_2,
-                                $lower_limit_2,
-                                "<div class = 'dropdown'>
-                                    <button class = 'btn btn-secondary dropdown-toggle' type = 'button' id = 'dropdownMenuButton1' data-toggle = 'dropdown' aria-haspopup='true' aria-expanded = 'true'>
-                                        Act
-                                    </button>
-                                    <div class = 'dropdown-menu' aria-labelledby= = 'dropdownMenuButton'>
-                                        $view
-                                    </div>
-                                </div>"
-                            ];
-                break;
-
-                case 'excel':
-                    array_push($row_data, array($counter, $sample->sample_name, $mean_2, $sd_2, $sd2_2,$upper_limit_2, $lower_limit_2));
-                break;
-
-                case 'pdf':
-                    $html_body .= '<tr>';
-                    $html_body .= '<td class="spacings">'.$counter.'</td>';
-                    $html_body .= '<td class="spacings">'.$sample->sample_name.'</td>';
-                    $html_body .= '<td class="spacings">'.$mean_2.'</td>';
-                    $html_body .= '<td class="spacings">'.$sd_2.'</td>';
-                    $html_body .= '<td class="spacings">'.$sd2_2.'</td>';
-                    $html_body .= '<td class="spacings">'.$upper_limit_2.'</td>';
-                    $html_body .= '<td class="spacings">'.$lower_limit_2.'</td>';
-                    $html_body .= "</tr></ol>";
-                break;
-                    
-                
-                default:
-                    echo "<pre>";print_r("Something went wrong... PLease contact the administrator");echo "</pre>";die();
-                break;
-            }
-        }
-
-        if($form == 'table'){
-
-            $this->table->set_template($template);
-            $this->table->set_heading($heading);
-
-            return $this->table->generate($tabledata);
-
-        }else if($form == 'excel'){
-
-            $excel_data = array();
-            $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $equipment_name.'_'.$type.'_absolute');
-            // $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'excel_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
-
-            $column_data = array('No.','Sample','Mean','SD','Double SD','Upper Limit','Lower Limit');
-            $excel_data['column_data'] = $column_data;
-            $excel_data['row_data'] = $row_data;
-
-            $this->export->create_excel($excel_data);
-
-        }else if($form == 'pdf'){
-
-            $html_body .= '</tbody></table>';
-            $pdf_data = array("pdf_title" => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute', 'pdf_topic' => $round_name.'_'.$equipment_name.'_'.$type.'_absolute');
-
-            $this->export->create_pdf($html_body,$pdf_data);
-
-        }              
-    }
-
-
-    public function createAbsolutePeerTable($form, $round_id, $equipment_id, $type){
-        $template = $this->config->item('default');
-
-        $column_data = $row_data = array();
-
-        $mean = $sd = $sd2 = $upper_limit_1 = $lower_limit_1 = $upper_limit_2 = $lower_limit_2 = $counter = 0;
-
-        $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
-
-        $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
-        $round_name = str_replace(' ', '_', $rounds->pt_round_no);
-
-        $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
-        $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
-
-        // echo "<pre>";print_r($equipment_name);echo "</pre>";die();
-
-
-        $html_body = '
-        <div class="centered">
-            <div>
-                <p> 
-                    <img height="50px" width="50px" src="'. $this->config->item("server_url") . '"assets/frontend/images/files/gok.png";?>" alt="Ministry of Health" />
-                </p>
-            </div> 
-            <div>
-                <th>
-                     MINISTRY OF HEALTH <br/>
-                     NATIONAL PUBLIC HEALTH LABORATORY SERVICES <br/>
-                     NATIONAL HIV REFERENCE LABORATORY <br/>
-                     P. O. BOX 20750-00202, NAIROBI <br/>
-                </th>
-            </div><br/><br/>
-
-            <div><th>
-                Round No : ' .$round_name. ' <br/> 
-                Equipment Name : ' . $equipment_name . '
-                </th>
-            </div>
-            <br/><br/>
-
-        </div>
-        <table>
-        <thead>
-        <tr>
-            <th>No.</th>
-            <th>Sample</th>
-            <th>Mean</th>
-            <th>SD</th>
-            <th>Double SD</th>
-            <th>Upper Limit</th>
-            <th>Lower Limit</th>
-        </tr> 
-        </thead>
-        <tbody>
-        <ol type="a">';
-
-    
-        $heading = [
-            "Sample",
-            "Mean",
-            "SD",
-            "2SD",
-            "Upper Limit",
-            "Lower Limit",
-            "Actions"
-        ];
-        $tabledata = [];
-
-        foreach($samples as $sample){
-            $counter++;
-            $accepted = $unaccepted = $table_body = [];
-            $table_body[] = $sample->sample_name;
-
-            // $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
-
-            $calculated_values = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,'');
-
-            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-             
-            switch ($type) {
-                case 'cd3':
-
-                   
-                    if($calculated_values){
-                        $mean = ($calculated_values->cd3_absolute_mean) ? $calculated_values->cd3_absolute_mean : 0;
-                        $sd = ($calculated_values->cd3_absolute_sd) ? $calculated_values->cd3_absolute_sd : 0;
-                        $sd2 = ($calculated_values->double_cd3_absolute_sd) ? $calculated_values->double_cd3_absolute_sd : 0;
-                        $upper_limit_1 = $mean + $sd;
-                        $lower_limit_1 = $mean - $sd;
-                    }else{
-                        $mean = 0;
-                        $sd = 0;
-                        $sd2 = 0;
-                        $upper_limit_1 = 0;
-                        $lower_limit_1 = 0;
-                    }
-                    
-                break;
-
-                case 'cd4':
-                    // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
-                    if($calculated_values){
-                        $mean = ($calculated_values->cd4_absolute_mean) ? $calculated_values->cd4_absolute_mean : 0;
-                        $sd = ($calculated_values->cd4_absolute_sd) ? $calculated_values->cd4_absolute_sd : 0;
-                        $sd2 = ($calculated_values->double_cd4_absolute_sd) ? $calculated_values->double_cd4_absolute_sd : 0;
-                        $upper_limit_1 = $mean + $sd;
-                        $lower_limit_1 = $mean - $sd;
-                    }else{
-                        $mean = 0;
-                        $sd = 0;
-                        $sd2 = 0;
-                        $upper_limit_1 = 0;
-                        $lower_limit_1 = 0;
-                    }
-                    
-                break;
-
-                case 'other':
-                    // echo "<pre>";print_r($calculated_values->other_absolute_mean);echo "</pre>";die();
-
-                    if($calculated_values){
-                        $mean = ($calculated_values->other_absolute_mean) ? $calculated_values->other_absolute_mean : 0;
-                        $sd = ($calculated_values->other_absolute_sd) ? $calculated_values->other_absolute_sd : 0;
-                        $sd2 = ($calculated_values->double_other_absolute_sd) ? $calculated_values->double_other_absolute_sd : 0;
-                        $upper_limit_1 = $mean + $sd;
-                        $lower_limit_1 = $mean - $sd;
-                    }else{
-                        $mean = 0;
-                        $sd = 0;
-                        $sd2 = 0;
-                        $upper_limit_1 = 0;
-                        $lower_limit_1 = 0;
-                    }
-
-                    
-                break;
-                
-                default:
-                    echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
-                break;
-            }
-
-
-            $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
-
-
-            foreach ($submissions as $submission) {
-
-                $part_cd4 = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample->id, 'participant_id' => $submission->participant_id])->row();
-
-                if($part_cd4){
-
-                    if($type == 'cd3'){
-                        if($part_cd4->cd3_absolute >= $lower_limit_1 && $part_cd4->cd3_absolute <= $upper_limit_1){
-                            array_push($accepted, $part_cd4->participant_id);
-                        }else{
-                            array_push($unaccepted, $part_cd4->participant_id);
-                        }
-                    }elseif ($type == 'cd4') {
-                        if($part_cd4->cd4_absolute >= $lower_limit_1 && $part_cd4->cd4_absolute <= $upper_limit_1){
-                            array_push($accepted, $part_cd4->participant_id);
-                        }else{
-                            array_push($unaccepted, $part_cd4->participant_id);
-                        }
-                    }elseif ($type == 'other') {
-                        if($part_cd4->other_absolute >= $lower_limit_1 && $part_cd4->other_absolute <= $upper_limit_1){
-                            array_push($accepted, $part_cd4->participant_id);
-                        }else{
-                            array_push($unaccepted, $part_cd4->participant_id);
-                        }
-                    }
-                }
-            }
-
-            $parts = implode(",",$accepted);
-            
-            $calculated_values_2 = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,$parts);
-             
-            switch ($type) {
-                case 'cd3':
-
-                   
                     if($calculated_values_2){
                         $mean_2 = ($calculated_values_2->cd3_absolute_mean) ? $calculated_values_2->cd3_absolute_mean : 0;
                         $sd_2 = ($calculated_values_2->cd3_absolute_sd) ? $calculated_values_2->cd3_absolute_sd : 0;
@@ -2628,7 +2208,7 @@ class Analysis extends DashboardController {
     }
 
 
-    public function createParticipantTable($form, $round_id, $equipment_id){
+    public function createParticipantTable($form, $round_id, $equipment_id, $type, $type2){
         $template = $this->config->item('default');
         $column_data = $row_data = $tablevalues = $tablebody = $table = [];
         $count = $zerocount = $sub_counter = 0;
@@ -2753,45 +2333,7 @@ class Analysis extends DashboardController {
                 $samp_counter++;
                 $accepted = $unaccepted = [];
 
-
-
-
-
-                $calculated_values = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,'');
-
-                if($calculated_values){
-                    $mean = ($calculated_values->cd4_absolute_mean) ? $calculated_values->cd4_absolute_mean : 0;
-                    $sd = ($calculated_values->cd4_absolute_sd) ? $calculated_values->cd4_absolute_sd : 0;
-                    $sd2 = ($calculated_values->double_cd4_absolute_sd) ? $calculated_values->double_cd4_absolute_sd : 0;
-                    $upper_limit_1 = $mean + $sd;
-                    $lower_limit_1 = $mean - $sd;
-                }else{
-                    $mean = 0;
-                    $sd = 0;
-                    $sd2 = 0;
-                    $upper_limit_1 = 0;
-                    $lower_limit_1 = 0;
-                }
-
-                $submissions2 = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
-
-
-                foreach ($submissions2 as $submission2) {
-                    $part_cd4_2 = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample->id, 'participant_id' => $submission2->participant_id])->row();
-
-                    if($part_cd4_2){
-
-                        if($part_cd4_2->cd4_absolute >= $lower_limit_1 && $part_cd4_2->cd4_absolute <= $upper_limit_1){
-                            array_push($accepted, $part_cd4_2->participant_id);
-                        }else{
-                            array_push($unaccepted, $part_cd4_2->participant_id);
-                        } 
-                    }
-                }
-
-                $parts = implode(",",$accepted);
-                
-                $calculated_values_2 = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,$parts);
+                $calculated_values_2 = $this->getEvaluationResults($round_id, $equipment_id, $sample->id,$type,$type2);
 
                 $mean_2 = ($calculated_values_2->cd4_absolute_mean) ? $calculated_values_2->cd4_absolute_mean : 0;
                 $sd_2 = ($calculated_values_2->cd4_absolute_sd) ? $calculated_values_2->cd4_absolute_sd : 0;
@@ -2800,19 +2342,17 @@ class Analysis extends DashboardController {
                 $lower_limit_2 = $mean_2 - $sd_2;
 
 
-
-
-                
-    
                 $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$submission->participant_id);
- 
+                $sdi = '';
                 if($part_cd4){
 
                     $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
 
+                    
                     $sdi = (($part_cd4->cd4_absolute - $mean_2) / $sd_2);
+                    
 
-                    // echo "<pre>";print_r($sdi);echo "</pre>";die();
+                    // echo "<pre>";print_r($mean_2);echo "</pre>";
 
                     if($sdi > -2 && 2 > $sdi){
                         $acceptable++;
@@ -2922,6 +2462,163 @@ class Analysis extends DashboardController {
             $this->export->create_pdf($html_body,$pdf_data);
 
         }
+    }
+
+
+    public function getEvaluationResults($round_id, $equipment_id, $sample_id, $type, $type2){
+        $accepted = $unaccepted = [];
+
+        $calculated_values = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample_id,'');
+
+        switch ($type) {
+            case 'cd3':
+
+                switch ($type2) {
+                    case 'absolute':
+                        if($calculated_values){
+                            $mean = ($calculated_values->cd3_absolute_mean) ? $calculated_values->cd3_absolute_mean : 0;
+                            $sd = ($calculated_values->cd3_absolute_sd) ? $calculated_values->cd3_absolute_sd : 0;
+                            $sd2 = ($calculated_values->double_cd3_absolute_sd) ? $calculated_values->double_cd3_absolute_sd : 0;
+                            $upper_limit_1 = $mean + $sd;
+                            $lower_limit_1 = $mean - $sd;
+                        }else{
+                            $mean = 0;
+                            $sd = 0;
+                            $sd2 = 0;
+                            $upper_limit_1 = 0;
+                            $lower_limit_1 = 0;
+                        }
+                        break;
+
+                    case 'percent':
+                        if($calculated_values){
+                            $mean = ($calculated_values->cd3_percent_mean) ? $calculated_values->cd3_percent_mean : 0;
+                            $sd = ($calculated_values->cd3_percent_sd) ? $calculated_values->cd3_percent_sd : 0;
+                            $sd2 = ($calculated_values->double_cd3_percent_sd) ? $calculated_values->double_cd3_percent_sd : 0;
+                            $upper_limit_1 = $mean + $sd;
+                            $lower_limit_1 = $mean - $sd;
+                        }else{
+                            $mean = 0;
+                            $sd = 0;
+                            $sd2 = 0;
+                            $upper_limit_1 = 0;
+                            $lower_limit_1 = 0;
+                        }
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }   
+                break;
+
+            case 'cd4':
+                switch ($type2) {
+                    case 'absolute':
+                        if($calculated_values){
+                            $mean = ($calculated_values->cd4_absolute_mean) ? $calculated_values->cd4_absolute_mean : 0;
+                            $sd = ($calculated_values->cd4_absolute_sd) ? $calculated_values->cd4_absolute_sd : 0;
+                            $sd2 = ($calculated_values->double_cd4_absolute_sd) ? $calculated_values->double_cd4_absolute_sd : 0;
+                            $upper_limit_1 = $mean + $sd;
+                            $lower_limit_1 = $mean - $sd;
+                        }else{
+                            $mean = 0;
+                            $sd = 0;
+                            $sd2 = 0;
+                            $upper_limit_1 = 0;
+                            $lower_limit_1 = 0;
+                        }
+                        break;
+
+                    case 'percent':
+                        if($calculated_values){
+                            $mean = ($calculated_values->cd4_percent_mean) ? $calculated_values->cd4_percent_mean : 0;
+                            $sd = ($calculated_values->cd4_percent_sd) ? $calculated_values->cd4_percent_sd : 0;
+                            $sd2 = ($calculated_values->double_cd4_percent_sd) ? $calculated_values->double_cd4_percent_sd : 0;
+                            $upper_limit_1 = $mean + $sd;
+                            $lower_limit_1 = $mean - $sd;
+                        }else{
+                            $mean = 0;
+                            $sd = 0;
+                            $sd2 = 0;
+                            $upper_limit_1 = 0;
+                            $lower_limit_1 = 0;
+                        }
+                        break;
+                    
+                    default:
+                        echo "<pre>";print_r("Something went wrong on CD4");echo "</pre>";die();
+                        break;
+                }   
+                   
+            break;
+
+            case 'other':
+                switch ($type2) {
+                    case 'absolute':
+                        if($calculated_values){
+                            $mean = ($calculated_values->other_absolute_mean) ? $calculated_values->other_absolute_mean : 0;
+                            $sd = ($calculated_values->other_absolute_sd) ? $calculated_values->other_absolute_sd : 0;
+                            $sd2 = ($calculated_values->double_other_absolute_sd) ? $calculated_values->double_other_absolute_sd : 0;
+                            $upper_limit_1 = $mean + $sd;
+                            $lower_limit_1 = $mean - $sd;
+                        }else{
+                            $mean = 0;
+                            $sd = 0;
+                            $sd2 = 0;
+                            $upper_limit_1 = 0;
+                            $lower_limit_1 = 0;
+                        }
+                        break;
+
+                    case 'percent':
+                        if($calculated_values){
+                            $mean = ($calculated_values->other_percent_mean) ? $calculated_values->other_percent_mean : 0;
+                            $sd = ($calculated_values->other_percent_sd) ? $calculated_values->other_percent_sd : 0;
+                            $sd2 = ($calculated_values->double_other_percent_sd) ? $calculated_values->double_other_percent_sd : 0;
+                            $upper_limit_1 = $mean + $sd;
+                            $lower_limit_1 = $mean - $sd;
+                        }else{
+                            $mean = 0;
+                            $sd = 0;
+                            $sd2 = 0;
+                            $upper_limit_1 = 0;
+                            $lower_limit_1 = 0;
+                        }
+                        break;
+                    
+                    default:
+                        echo "<pre>";print_r("Something went wrong on Other");echo "</pre>";die();
+                        break;
+                }    
+            break;
+            
+            default:
+                echo "<pre>";print_r("Something went wrong on choosing type");echo "</pre>";die();
+            break;
+        }
+
+        $submissions2 = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
+
+
+        foreach ($submissions2 as $submission2) {
+            $part_cd4_2 = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample_id, 'participant_id' => $submission2->participant_id])->row();
+
+            if($part_cd4_2){
+
+                if($part_cd4_2->cd4_absolute >= $lower_limit_1 && $part_cd4_2->cd4_absolute <= $upper_limit_1){
+                    array_push($accepted, $part_cd4_2->participant_id);
+                }else{
+                    array_push($unaccepted, $part_cd4_2->participant_id);
+                } 
+            }
+        }
+
+        $parts = implode(",",$accepted);
+        
+        $calculated_values_2 = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample_id,$parts);
+
+        return $calculated_values_2;
     }
 
 
@@ -3583,14 +3280,14 @@ class Analysis extends DashboardController {
 
                                     CD4 Absolute Peer Results
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createAbsolutePeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Analysis/createPeerTable/excel/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createAbsolutePeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Analysis/createPeerTable/pdf/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
                                 <div class = "card-block"><div class="table-responsive">';
 
-            $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'cd4');
+            $equipment_tabs .= $this->createPeerTable('table', $round_id, $equipment_id,'cd4','absolute');
 
             $equipment_tabs .= '</div></div>
                             </div>
@@ -3604,15 +3301,15 @@ class Analysis extends DashboardController {
                                 CD4 Percent Peer Results
 
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createPercentPeerTable/excel/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Analysis/createPeerTable/excel/$round_id/$equipment_id/cd4/percent").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createPercentPeerTable/pdf/$round_id/$equipment_id/cd4").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Analysis/createPeerTable/pdf/$round_id/$equipment_id/cd4/percent").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
 
                                 <div class = "card-block"><div class="table-responsive">';
 
-            $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'cd4');
+            $equipment_tabs .= $this->createPeerTable('table', $round_id, $equipment_id,'cd4','percent');
 
             $equipment_tabs .= '</div></div>
                             </div>
@@ -3632,14 +3329,14 @@ class Analysis extends DashboardController {
                                     CD3 Absolute Peer Results
 
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createAbsolutePeerTable/excel/$round_id/$equipment_id/cd3").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Analysis/createPeerTable/excel/$round_id/$equipment_id/cd3/absolute").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createAbsolutePeerTable/pdf/$round_id/$equipment_id/cd3").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Analysis/createPeerTable/pdf/$round_id/$equipment_id/cd3/absolute").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
                                 <div class = "card-block"><div class="table-responsive">';
 
-            $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'cd3');
+            $equipment_tabs .= $this->createPeerTable('table', $round_id, $equipment_id,'cd3','absolute');
 
             $equipment_tabs .= '</div></div>
                             </div>
@@ -3653,14 +3350,14 @@ class Analysis extends DashboardController {
                                 CD3 Percent Peer Results
 
                                 <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createPercentPeerTable/excel/$round_id/$equipment_id/cd3").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Analysis/createPeerTable/excel/$round_id/$equipment_id/cd3/percent").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createPercentPeerTable/pdf/$round_id/$equipment_id/cd3").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Analysis/createPeerTable/pdf/$round_id/$equipment_id/cd3/percent").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
                                 <div class = "card-block"><div class="table-responsive">';
 
-            $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'cd3');
+            $equipment_tabs .= $this->createPeerTable('table', $round_id, $equipment_id,'cd3','percent');
 
             $equipment_tabs .= '</div></div>
                             </div>
@@ -3679,14 +3376,14 @@ class Analysis extends DashboardController {
                                     Other Absolute Peer Results
 
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createAbsolutePeerTable/excel/$round_id/$equipment_id/other").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Analysis/createPeerTable/excel/$round_id/$equipment_id/other/absolute").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createAbsolutePeerTable/pdf/$round_id/$equipment_id/other").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Analysis/createPeerTable/pdf/$round_id/$equipment_id/other/absolute").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
                                 <div class = "card-block"><div class="table-responsive">';
 
-            $equipment_tabs .= $this->createAbsolutePeerTable('table', $round_id, $equipment_id,'other');
+            $equipment_tabs .= $this->createPeerTable('table', $round_id, $equipment_id,'other','absolute');
 
             $equipment_tabs .= '</div></div>
                             </div>
@@ -3700,14 +3397,14 @@ class Analysis extends DashboardController {
                                 Other Percent Peer Results
 
                                 <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createPercentPeerTable/excel/$round_id/$equipment_id/other").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Analysis/createPeerTable/excel/$round_id/$equipment_id/other/percent").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createPercentPeerTable/pdf/$round_id/$equipment_id/other").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Analysis/createPeerTable/pdf/$round_id/$equipment_id/other/percent").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                                 </div>
                                 <div class = "card-block"><div class="table-responsive">';
 
-            $equipment_tabs .= $this->createPercentPeerTable('table', $round_id, $equipment_id,'other');
+            $equipment_tabs .= $this->createPeerTable('table', $round_id, $equipment_id,'other','percent');
 
             $equipment_tabs .= '</div></div>
                             </div>
@@ -3725,15 +3422,15 @@ class Analysis extends DashboardController {
 
 
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createParticipantTable/excel/$round_id/$equipment_id/").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Analysis/createParticipantTable/excel/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createParticipantTable/pdf/$round_id/$equipment_id/").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Analysis/createParticipantTable/pdf/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                             </div>
 
                             <div class = "card-block col-md-12"><div class="table-responsive">';
 
-            $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id);
+            $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id,'cd4','absolute');
 
             $equipment_tabs .= '</div></div>
 
