@@ -1,3 +1,6 @@
+<?php
+
+
 public function createAbsolutePeerTable($form, $round_id, $equipment_id, $type){
         $template = $this->config->item('default');
 
@@ -696,3 +699,24 @@ public function createAbsolutePeerTable($form, $round_id, $equipment_id, $type){
 
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+?>

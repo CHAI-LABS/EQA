@@ -2386,6 +2386,8 @@ class Analysis extends DashboardController {
             // $calculated_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row(); 
 
             $calculated_values = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,'');
+
+            // echo "<pre>";print_r($calculated_values);echo "</pre>";die();
              
             switch ($type) {
                 case 'cd3':
@@ -2626,10 +2628,6 @@ class Analysis extends DashboardController {
     }
 
 
-
-    
-
-
     public function createParticipantTable($form, $round_id, $equipment_id){
         $template = $this->config->item('default');
         $column_data = $row_data = $tablevalues = $tablebody = $table = [];
@@ -2708,7 +2706,7 @@ class Analysis extends DashboardController {
 
         $submissions = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
 
-        // echo "<pre>";print_r(count($submissions));echo "</pre>";die();
+        
 
         foreach ($submissions as $submission) {
             $sub_counter++;
@@ -2730,7 +2728,6 @@ class Analysis extends DashboardController {
                     $facility_name = "No Facility";
                 }
 
-                // echo "<pre>";print_r($facility_name);echo "</pre>";die();
             }else{
                 $facility_name = "No Facility";
             }
@@ -2754,29 +2751,70 @@ class Analysis extends DashboardController {
             foreach ($samples as $sample) {
                 $comment = '';
                 $samp_counter++;
-                
-                // $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+                $accepted = $unaccepted = [];
 
-                $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
 
-                  
-                if($cd4_values){
-                    $upper_limit_1 = $cd4_values->cd4_absolute_mean + $cd4_values->cd4_absolute_sd;
-                    $lower_limit_1 = $cd4_values->cd4_absolute_mean - $cd4_values->cd4_absolute_sd;
+
+
+
+                $calculated_values = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,'');
+
+                if($calculated_values){
+                    $mean = ($calculated_values->cd4_absolute_mean) ? $calculated_values->cd4_absolute_mean : 0;
+                    $sd = ($calculated_values->cd4_absolute_sd) ? $calculated_values->cd4_absolute_sd : 0;
+                    $sd2 = ($calculated_values->double_cd4_absolute_sd) ? $calculated_values->double_cd4_absolute_sd : 0;
+                    $upper_limit_1 = $mean + $sd;
+                    $lower_limit_1 = $mean - $sd;
                 }else{
+                    $mean = 0;
+                    $sd = 0;
+                    $sd2 = 0;
                     $upper_limit_1 = 0;
                     $lower_limit_1 = 0;
-                } 
+                }
+
+                $submissions2 = $this->db->get_where('pt_data_submission', ['round_id' =>  $round_id, 'equipment_id' => $equipment_id])->result();
+
+
+                foreach ($submissions2 as $submission2) {
+                    $part_cd4_2 = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id, 'sample_id' => $sample->id, 'participant_id' => $submission2->participant_id])->row();
+
+                    if($part_cd4_2){
+
+                        if($part_cd4_2->cd4_absolute >= $lower_limit_1 && $part_cd4_2->cd4_absolute <= $upper_limit_1){
+                            array_push($accepted, $part_cd4_2->participant_id);
+                        }else{
+                            array_push($unaccepted, $part_cd4_2->participant_id);
+                        } 
+                    }
+                }
+
+                $parts = implode(",",$accepted);
+                
+                $calculated_values_2 = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample->id,$parts);
+
+                $mean_2 = ($calculated_values_2->cd4_absolute_mean) ? $calculated_values_2->cd4_absolute_mean : 0;
+                $sd_2 = ($calculated_values_2->cd4_absolute_sd) ? $calculated_values_2->cd4_absolute_sd : 0;
+                $sd2_2 = ($calculated_values_2->double_cd4_absolute_sd) ? $calculated_values_2->double_cd4_absolute_sd : 0;
+                $upper_limit_2 = $mean_2 + $sd_2;
+                $lower_limit_2 = $mean_2 - $sd_2;
+
+
+
 
                 
+    
                 $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$submission->participant_id);
  
-
                 if($part_cd4){
 
                     $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
 
-                    if($part_cd4->cd4_absolute >= $lower_limit_1 && $part_cd4->cd4_absolute <= $upper_limit_1){
+                    $sdi = (($part_cd4->cd4_absolute - $mean_2) / $sd_2);
+
+                    // echo "<pre>";print_r($sdi);echo "</pre>";die();
+
+                    if($sdi > -2 && 2 > $sdi){
                         $acceptable++;
                         $comment = "Acceptable";
 
@@ -2801,9 +2839,9 @@ class Analysis extends DashboardController {
 
             $overall_grade = round($grade, 2) . ' %';
 
-            if($grade == 100){
+            if($grade >= 80){
                 $review = "Satisfactory Performance";
-            }else if($grade > 0 && $grade < 100){
+            }else if($grade > 0 && $grade < 80){
                 $review = "Unsatisfactory Performance";
             }else{
                 $review = "Non-responsive";
@@ -2857,19 +2895,6 @@ class Analysis extends DashboardController {
                       
         }
 
-        // $tablecounter = 1;
-        // foreach ($table as $key => $values) {
-
-            
-        //     if($values[10] != 'Satisfactory Performance'){
-        //         unset($table[$key]);
-                
-        //     }else{
-        //         $values[0] = $tablecounter;
-        //         $tablecounter++;
-        //     }   
-            
-        // }
 
         if($form == 'table'){
 
@@ -3376,6 +3401,8 @@ class Analysis extends DashboardController {
 
         $equipment_tabs .= "<ul class='nav nav-tabs' role='tablist'>";
 
+        $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid;
+
         foreach ($equipments as $key => $equipment) {
             $tab++;
 
@@ -3404,8 +3431,9 @@ class Analysis extends DashboardController {
         
         foreach ($equipments as $key => $equipment) {
             
-
             $counter++;
+
+            $zerocount = $partcount = $passed = $failed = 0;
             
             $equipment_id = $equipment->id;
             $equipmentname = $equipment->equipment_name;
@@ -3419,27 +3447,29 @@ class Analysis extends DashboardController {
                 $equipment_tabs .= "<div class='tab-pane' id='". $equipmentname ."' role='tabpanel'>";
             }
 
-            $round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
+            
 
             $submissions = $this->Analysis_m->getSubmissionsNumber($round_id, $equipment_id);
             $registrations = $this->Analysis_m->getRegistrationsNumber($equipment_id);
-            $participants = $this->Analysis_m->getReadyParticipants($round_id, $equipment_id);
 
 
-            $zerocount = $partcount = $passed = $failed = 0;
+            $this->db->group_by("participant_id");
+            $participants = $this->db->get_where('pt_participant_review_v',['round_id'=> $round_id, 'equipment_id' => $equipment_id])->result();
 
+            // $participants = $this->Program_m->RespondedParticipants($round_uuid, '', '');
+            // echo "<pre>";print_r(count($participants));echo "</pre>";die();
+        
             foreach ($participants as $participant) {
-                $partcount ++;
+                $partcount++;
                 $samp_counter = $acceptable = $unacceptable = 0;
+                $tabledata = [];
+     
 
                 foreach ($samples as $sample) {
                     $samp_counter++;
                     
-                    // $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $equipment_id, 'sample_id'  =>  $sample->id])->row();
+                    $cd4_values = $this->db->get_where('pt_participants_calculated_v', ['round_id' =>  $round_id, 'equipment_id'   =>  $participant->equipment_id, 'sample_id'  =>  $sample->id])->row();
 
-                    $cd4_values = $this->Analysis_m->getRoundResults($round_id, $equipment_id, $sample->id);
-
-                    
                     if($cd4_values){
                         $upper_limit = $cd4_values->cd4_absolute_upper_limit;
                         $lower_limit = $cd4_values->cd4_absolute_lower_limit;
@@ -3447,29 +3477,21 @@ class Analysis extends DashboardController {
                         $upper_limit = 0;
                         $lower_limit = 0;
                     } 
-
                     
-                    $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$equipment_id,$sample->id,$participant->participant_id);
-
+                    $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->participant_id);
                    
                     if($part_cd4){
 
                         if($part_cd4->cd4_absolute >= $lower_limit && $part_cd4->cd4_absolute <= $upper_limit){
                             $acceptable++;
-                        }else{
-                            $unacceptable++;
-                        }   
 
-                        if($part_cd4->cd4_absolute == 0 || $part_cd4->cd4_absolute == null){
-                            $zerocount++;
-                        }
-                        
-                    }else{
-                        echo "<pre>";print_r("Problem Here");echo "</pre>";die();
-                    }   
+                        }    
+                    }      
                 }
 
-                if($acceptable == $samp_counter) {
+                $grade = (($acceptable / $samp_counter) * 100);
+
+                if($grade == 100){
                     $passed++;
                 }else{
                     $failed++;
