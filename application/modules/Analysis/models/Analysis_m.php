@@ -24,7 +24,7 @@ class Analysis_m extends CI_Model {
 
     public function absoluteValue($round_id,$equipment_id,$sample_id,$participant_id){
 
-        $this->db->select("cd4_absolute");
+        $this->db->select("*");
         $this->db->from("pt_participant_review_v");
         $this->db->where("round_id",$round_id);
         $this->db->where("equipment_id",$equipment_id);
@@ -263,35 +263,35 @@ class Analysis_m extends CI_Model {
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
                 END)),
-                0) AS `cd3_absolute_mean`,
+                1) AS `cd3_absolute_mean`,
         ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
                 END)),
-                2) AS `cd3_absolute_sd`,
+                1) AS `cd3_absolute_sd`,
         (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
                 END)),
-                2)) AS `double_cd3_absolute_sd`,
+                1)) AS `double_cd3_absolute_sd`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
                 END)),
-                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                1) + (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
                 END)),
-                2))) AS `cd3_absolute_upper_limit`,
+                1))) AS `cd3_absolute_upper_limit`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
                 END)),
-                0) - (2 * ROUND(STDDEV_SAMP((CASE
+                1) - (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
                 END)),
-                2))) AS `cd3_absolute_lower_limit`,
+                1))) AS `cd3_absolute_lower_limit`,
         CEILING(((STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_absolute` <> 0) THEN `per`.`cd3_absolute`
                     ELSE NULL
@@ -316,35 +316,35 @@ class Analysis_m extends CI_Model {
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
                 END)),
-                0) AS `cd3_percent_mean`,
+                1) AS `cd3_percent_mean`,
         ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
                 END)),
-                2) AS `cd3_percent_sd`,
+                1) AS `cd3_percent_sd`,
         (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
                 END)),
-                2)) AS `double_cd3_percent_sd`,
+                1)) AS `double_cd3_percent_sd`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
                 END)),
-                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                1) + (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
                 END)),
-                2))) AS `cd3_percent_upper_limit`,
+                1))) AS `cd3_percent_upper_limit`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
                 END)),
-                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                1) - (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
                 END)),
-                2))) AS `cd3_percent_lower_limit`,
+                1))) AS `cd3_percent_lower_limit`,
         CEILING(((STDDEV_SAMP((CASE
                     WHEN (`per`.`cd3_percent` <> 0) THEN `per`.`cd3_percent`
                     ELSE NULL
@@ -369,35 +369,35 @@ class Analysis_m extends CI_Model {
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
                 END)),
-                0) AS `cd4_absolute_mean`,
+                1) AS `cd4_absolute_mean`,
         ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
                 END)),
-                2) AS `cd4_absolute_sd`,
+                1) AS `cd4_absolute_sd`,
         (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
                 END)),
-                2)) AS `double_cd4_absolute_sd`,
+                1)) AS `double_cd4_absolute_sd`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
                 END)),
-                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                1) + (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
                 END)),
-                2))) AS `cd4_absolute_upper_limit`,
+                1))) AS `cd4_absolute_upper_limit`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
                 END)),
-                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                1) - (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
                 END)),
-                2))) AS `cd4_absolute_lower_limit`,
+                1))) AS `cd4_absolute_lower_limit`,
         CEILING(((STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_absolute` <> 0) THEN `per`.`cd4_absolute`
                     ELSE NULL
@@ -422,35 +422,35 @@ class Analysis_m extends CI_Model {
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
                 END)),
-                0) AS `cd4_percent_mean`,
+                1) AS `cd4_percent_mean`,
         ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
                 END)),
-                2) AS `cd4_percent_sd`,
+                1) AS `cd4_percent_sd`,
         (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
                 END)),
-                2)) AS `double_cd4_percent_sd`,
+                1)) AS `double_cd4_percent_sd`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
                 END)),
-                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                1) + (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
                 END)),
-                2))) AS `cd4_percent_upper_limit`,
+                1))) AS `cd4_percent_upper_limit`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
                 END)),
-                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                1) - (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
                 END)),
-                2))) AS `cd4_percent_lower_limit`,
+                1))) AS `cd4_percent_lower_limit`,
         CEILING(((STDDEV_SAMP((CASE
                     WHEN (`per`.`cd4_percent` <> 0) THEN `per`.`cd4_percent`
                     ELSE NULL
@@ -475,35 +475,35 @@ class Analysis_m extends CI_Model {
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
                 END)),
-                0) AS `other_absolute_mean`,
+                1) AS `other_absolute_mean`,
         ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
                 END)),
-                2) AS `other_absolute_sd`,
+                1) AS `other_absolute_sd`,
         (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
                 END)),
-                2)) AS `double_other_absolute_sd`,
+                1)) AS `double_other_absolute_sd`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
                 END)),
-                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                1) + (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
                 END)),
-                2))) AS `other_absolute_upper_limit`,
+                1))) AS `other_absolute_upper_limit`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
                 END)),
-                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                1) - (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
                 END)),
-                2))) AS `other_absolute_lower_limit`,
+                1))) AS `other_absolute_lower_limit`,
         CEILING(((STDDEV_SAMP((CASE
                     WHEN (`per`.`other_absolute` <> 0) THEN `per`.`other_absolute`
                     ELSE NULL
@@ -528,35 +528,35 @@ class Analysis_m extends CI_Model {
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL
                 END)),
-                0) AS `other_percent_mean`,
+                1) AS `other_percent_mean`,
         ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL
                 END)),
-                2) AS `other_percent_sd`,
+                1) AS `other_percent_sd`,
         (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL
                 END)),
-                2)) AS `double_other_percent_sd`,
+                1)) AS `double_other_percent_sd`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL
                 END)),
-                0) + (2 * ROUND(STDDEV_SAMP((CASE
+                1) + (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL
                 END)),
-                2))) AS `other_percent_upper_limit`,
+                1))) AS `other_percent_upper_limit`,
         (ROUND(AVG((CASE
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL
                 END)),
-                2) - (2 * ROUND(STDDEV_SAMP((CASE
+                1) - (2 * ROUND(STDDEV_SAMP((CASE
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL
                 END)),
-                2))) AS `other_percent_lower_limit`,
+                1))) AS `other_percent_lower_limit`,
         CEILING(((STDDEV_SAMP((CASE
                     WHEN (`per`.`other_percent` <> 0) THEN `per`.`other_percent`
                     ELSE NULL

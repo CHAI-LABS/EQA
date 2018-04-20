@@ -16,7 +16,7 @@ class Program extends MY_Controller {
         $counter = 0;
         
         $this->db->where('type', 'previous');
-        $this->db->order_by('id', 'ASC');
+        $this->db->order_by('id', 'DESC');
         $rounds = $this->db->get('pt_round_v')->result();
         $round_list = '<select id="round-select" class="form-control select2-single">';
         foreach ($rounds as $round) {
