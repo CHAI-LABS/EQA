@@ -952,4 +952,41 @@ class Analysis_m extends CI_Model {
     }
 
 
+
+    // public function getTestersResults($round_id, $equipment_id = null, $sample_id){
+
+    //     if($equipment_id){
+    //         $equip_where = 'AND equipment_id = '. $equipment_id;
+    //     }else{
+    //         $equip_where = null;
+    //     }
+
+    //     $sql = "SELECT 
+    //     `pt_testers_result`.`pt_sample_id` AS `pt_sample_id`,
+    //     `pt_testers_result`.`equipment_id` AS `equipment_id`,
+    //     `pt_testers_result`.`pt_round_id` AS `pt_round_id`,
+    //     ROUND(AVG(`pt_testers_result`.`result`), 0) AS `mean`,
+    //     ROUND(STDDEV_SAMP(`pt_testers_result`.`result`), 2) AS `sd`,
+    //     (2 * ROUND(STDDEV_SAMP(`pt_testers_result`.`result`), 2)) AS `doublesd`,
+    //     (ROUND(AVG(`pt_testers_result`.`result`), 0) + (2 * ROUND(STDDEV_SAMP(`pt_testers_result`.`result`), 2))) AS `upper_limit`,
+    //     (ROUND(AVG(`pt_testers_result`.`result`), 2) - (2 * ROUND(STDDEV_SAMP(`pt_testers_result`.`result`), 2))) AS `lower_limit`,
+    //     CEILING(((STDDEV_SAMP(`pt_testers_result`.`result`) / AVG(`pt_testers_result`.`result`)) * 100)) AS `cv`,
+    //     (CASE
+    //         WHEN (CEILING(((STDDEV_SAMP(`pt_testers_result`.`result`) / AVG(`pt_testers_result`.`result`)) * 100)) > 28) THEN 'Failed'
+    //         ELSE 'Passed'
+    //     END) AS `outcome`
+    // FROM
+    //     `pt_testers_result`
+    // WHERE pt_round_id = $round_id
+    // $equip_where
+    // AND pt_sample_id = $sample_id
+    // GROUP BY `pt_testers_result`.`pt_sample_id` , `pt_testers_result`.`equipment_id`";
+
+    // $query = $this->db->query($sql);
+
+    // return $query->row();
+
+    // }
+
+
 }

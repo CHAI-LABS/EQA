@@ -312,6 +312,22 @@ class Import extends MY_Controller {
 		            	$this->db->insert('unable_response', $insertdata8);
 					}
 
+					// if($itemData[$i][4] == "N"){
+					// 	$part_uuid = $this->db->get_where('participants', ['id'=>$participant_id])->row()->uuid;
+					// 	$round_uuid = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row()->uuid;
+
+					// 	$insertdata13 = [
+			  //           		'pt_round_no'    =>  $round_uuid,
+				 //                'participant_id'    => $part_uuid,
+				 //                'participant_facility'    =>  $facility_id,
+				 //                'status'    =>  1,
+				 //                'verdict'    =>  0,
+				 //                'lab_result'    =>  1
+			  //           	];
+
+		   //          	$this->db->insert('participant_readiness', $insertdata13);
+					// }
+
 					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment' && $itemData[$i][9] != "Unable to report"){	
 
 						$insertdata = [
@@ -329,8 +345,7 @@ class Import extends MY_Controller {
 
 	                        $submission_id = $this->db->insert_id();
 
-	                        
-
+	                  
 	                        $insertdata1 = [
 									'equip_result_id'    =>  $submission_id,
 					                'sample_id'    =>  $sample_counter,

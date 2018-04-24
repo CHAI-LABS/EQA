@@ -97,7 +97,7 @@ class Program_m extends CI_Model {
         $this->db->select("*");
         $this->db->from("pt_round_v");
         $this->db->where('type', 'previous');
-        $this->db->order_by('id', 'ASC');
+        $this->db->order_by('id', 'DESC');
         $this->db->limit(6);
 
         $query = $this->db->get();
@@ -183,25 +183,9 @@ class Program_m extends CI_Model {
     }
 
 
-    public function ParticipatingParticipants($round_uuid, $county_id = null, $facility_id = null){
-        $facility = $county = '';
-        if($county_id){
-            $county = " AND county_id = ".$county_id." " ;
-        }
-        if($facility_id){
-            $facility = " AND facility_id = ".$facility_id." " ;
-        }
-        $sql = "SELECT COUNT(participant_id) AS participants 
-        FROM pt_ready_participants 
-        WHERE pt_round_uuid = '".$round_uuid."' 
-        $county
-        $facility
-        AND verdict = 1; ";
-        $query = $this->db->query($sql);
-        // $query = $this->db->get();
-        
-        return $query->row();
-    }
+    
+
+
 
 
     
@@ -291,8 +275,29 @@ class Program_m extends CI_Model {
         return $query->row();
     }
 
+    public function RespondedParticipantsData($round_id, $round_uuid, $equipment_id = null){
+        $equipment = '';
 
-    public function RespondedParticipants($round_uuid, $county_id = null, $facility_id = null){
+        if($equipment_id){
+            $equipment = " AND prv.equipment_id = ".$equipment_id." " ;
+        }
+
+        $sql = "SELECT *
+        FROM pt_ready_participants prp
+        JOIN pt_participant_review_v prv on prv.participant_id = prp.p_id
+        WHERE prp.pt_round_uuid = '".$round_uuid."' 
+        AND prv.round_id = '".$round_id."'
+        $equipment
+        AND prp.verdict = 1
+        GROUP BY prv.participant_id; ";
+        $query = $this->db->query($sql);
+        // $query = $this->db->get();
+        
+        return $query->result();
+    }
+
+
+    public function RespondedParticipants($round_id, $round_uuid, $county_id = null, $facility_id = null){
         $facility = $county = '';
         if($county_id){
             $county = " AND prp.county_id = ".$county_id." " ;
@@ -304,6 +309,7 @@ class Program_m extends CI_Model {
         FROM pt_ready_participants prp
         JOIN pt_participant_review_v prv on prv.participant_id = prp.p_id
         WHERE prp.pt_round_uuid = '".$round_uuid."' 
+        AND prv.round_id = '".$round_id."'
         $county
         $facility
         AND prp.verdict = 1
@@ -312,6 +318,56 @@ class Program_m extends CI_Model {
         // $query = $this->db->get();
         
         return $query->result();
+    }
+
+    public function ParticipatingParticipants($round_uuid, $county_id = null, $facility_id = null){
+        $facility = $county = '';
+        if($county_id){
+            $county = " AND county_id = ".$county_id." " ;
+        }
+        if($facility_id){
+            $facility = " AND facility_id = ".$facility_id." " ;
+        }
+
+        $sql = "SELECT COUNT(participant_id) AS participants 
+        FROM pt_ready_participants 
+        WHERE pt_round_uuid = '".$round_uuid."' 
+        $county
+        $facility
+        AND verdict = 1; ";
+        $query = $this->db->query($sql);
+        // $query = $this->db->get();
+        
+        return $query->row();
+    }
+
+
+    public function getNonReponsive($round_uuid, $county_id = null, $facility_id = null){
+        $facility = $county = '';
+        if($county_id){
+            $county = " AND county_id = ".$county_id." " ;
+        }
+        if($facility_id){
+            $facility = " AND facility_id = ".$facility_id." " ;
+        }
+
+        $sql = "SELECT COUNT(DISTINCT facility_id) as participants
+                FROM participant_readiness_v
+                WHERE facility_id NOT IN
+                    (SELECT facility_id
+                     FROM  pt_all_participants
+                     WHERE pt_round_uuid = '".$round_uuid."' )
+                AND facility_id NOT IN
+                    (SELECT facility_id
+                     FROM unable_response
+                     WHERE round_uuid = '".$round_uuid."' )
+                $county
+                $facility; ";
+
+        $query = $this->db->query($sql);
+        // $query = $this->db->get();
+        
+        return $query->row();
     }
 
 
