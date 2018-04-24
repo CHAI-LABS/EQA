@@ -151,7 +151,7 @@ class Program_m extends CI_Model {
 
         $this->db->select("*");
         $this->db->from("facility_v fv");
-        $this->db->join("participant_readiness pr", "fv.facility_id = pr.participant_facility");
+        $this->db->join("pt_ready_participants pr", "fv.facility_id = pr.facility_id");
         $this->db->where("fv.county_id", $county_id);
         $this->db->group_by("fv.facility_name");
         $this->db->order_by("fv.facility_name");
@@ -289,7 +289,7 @@ class Program_m extends CI_Model {
         AND prv.round_id = '".$round_id."'
         $equipment
         AND prp.verdict = 1
-        GROUP BY prv.participant_id; ";
+        GROUP BY prp.p_id; ";
         $query = $this->db->query($sql);
         // $query = $this->db->get();
         
@@ -305,7 +305,8 @@ class Program_m extends CI_Model {
         if($facility_id){
             $facility = " AND prp.facility_id = ".$facility_id." " ;
         }
-        $sql = "SELECT *
+        $sql = "SELECT 
+        prp.p_id AS p_id, prp.participant_id AS participant_id, prv.equipment_id AS equipment_id
         FROM pt_ready_participants prp
         JOIN pt_participant_review_v prv on prv.participant_id = prp.p_id
         WHERE prp.pt_round_uuid = '".$round_uuid."' 
