@@ -2421,58 +2421,58 @@ class Analysis extends DashboardController {
             $html_body .= '<td class="spacings">'.$batch.'</td>';
 
             $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
-                        foreach ($samples as $sample) {
-                            $comment = '';
-                            $samp_counter++;
+            foreach ($samples as $sample) {
+                $comment = '';
+                $samp_counter++;
 
-                            $cd4_abs_values = $this->getEvaluationResults($round_id, $submission->equipment_id, $sample->id,'cd4','absolute');
+                $cd4_abs_values = $this->getEvaluationResults($round_id, $submission->equipment_id, $sample->id,'cd4','absolute');
 
-                            $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
-                            $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
-                            $upper_limit_2 = $mean_2 + $sd_2;
-                            $lower_limit_2 = $mean_2 - $sd_2;
-                            
+                $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
+                $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
+                $upper_limit_2 = $mean_2 + $sd_2;
+                $lower_limit_2 = $mean_2 - $sd_2;
+                
 
-                            $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,$submission->participant_id);
+                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,$submission->participant_id);
 
-                            
-                            if($part_cd4){
-                                if($part_cd4->cd4_absolute != 0){
-                                    $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
-                                    $zerocheck = $part_cd4->cd4_absolute - $mean_2;
-                                    $cd4abs_samples++;
+                
+                if($part_cd4){
+                    if($part_cd4->cd4_absolute != 0){
+                        $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+                        $zerocheck = $part_cd4->cd4_absolute - $mean_2;
+                        $cd4abs_samples++;
 
-                                    if($zerocheck == 0 || $sd_2 == 0){
-                                        $sdi = 3;
-                                    }else{
-                                        $sdi = (($part_cd4->cd4_absolute - $mean_2) / $sd_2);
-                                    }
-
-                                    if($part_cd4->cd4_absolute == 0){
-                                        $cd4abs_acceptable++;
-                                    }
-                                    
-                                    if($sdi > -2 && 2 > $sdi){
-                                        $cd4abs_acceptable++;
-                                        $comment = "Acceptable";
-                                    }else{
-                                        $cd4abs_unacceptable++;
-                                        $comment = "Unacceptable";
-                                    }
-
-                                    array_push($tabledata, $part_cd4->cd4_absolute, $comment);
-
-                                }else{
-                                    $cd4abs_grade = 0;
-                                    array_push($tabledata, 0, "Unacceptable");
-                                }
-                                    
-                            }else{
-                                $cd4abs_grade = 0;
-                                array_push($tabledata, 0, "Unacceptable");
-                            }
-                            $html_body .= '<td class="spacings">'.$comment.'</td>';      
+                        if($zerocheck == 0 || $sd_2 == 0){
+                            $sdi = 3;
+                        }else{
+                            $sdi = (($part_cd4->cd4_absolute - $mean_2) / $sd_2);
                         }
+
+                        if($part_cd4->cd4_absolute == 0){
+                            $cd4abs_acceptable++;
+                        }
+                        
+                        if($sdi > -2 && 2 > $sdi){
+                            $cd4abs_acceptable++;
+                            $comment = "Acceptable";
+                        }else{
+                            $cd4abs_unacceptable++;
+                            $comment = "Unacceptable";
+                        }
+
+                        array_push($tabledata, $part_cd4->cd4_absolute, $comment);
+
+                    }else{
+                        $cd4abs_grade = 0;
+                        array_push($tabledata, 0, "Unacceptable");
+                    }
+                        
+                }else{
+                    $cd4abs_grade = 0;
+                    array_push($tabledata, 0, "Unacceptable");
+                }
+                $html_body .= '<td class="spacings">'.$comment.'</td>';      
+            }
 
             $cd4abs_grade = (($cd4abs_acceptable / $samp_counter) * 100); 
 
