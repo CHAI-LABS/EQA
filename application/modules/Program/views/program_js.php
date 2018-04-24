@@ -66,15 +66,9 @@ $(document).ready(function(){
 		  type: 'info',
 		  title:'Please wait',
 		  text: 'Loading Graphs',
-		  timer: 7000,
+		  timer: 10000,
 		  showConfirmButton: false
 		});
-
-		// swal({
-		//   title: "Good job!",
-		//   text: "You clicked the button!",
-		//   icon: "success",
-		// });
 
   		var axisname = '';
 
