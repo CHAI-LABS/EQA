@@ -66,7 +66,7 @@ $(document).ready(function(){
 		  type: 'info',
 		  title:'Please wait',
 		  text: 'Loading Graphs',
-		  timer: 10000,
+		  timer: 12000,
 		  showConfirmButton: false
 		});
 

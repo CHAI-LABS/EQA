@@ -3,7 +3,7 @@
 <div class="hero-area" id="home">
         <div id="hero-slider-screen" class="owl-carousel owl-theme hero-slider-inner">
             <div class="item">
-                <img src="<?= @$this->config->item('assets_url'); ?>frontend/images/files/sliders/banner/ORIGINAL.PNG" alt="responsive img">
+                <img src="<?= @$this->config->item('assets_url'); ?>frontend/images/files/sliders/banner/ORIGINAL_2.jpg" alt="responsive img">
                 <div class="hero-caption">
                     <div class="hero-caption-inner">
                         <div class="container">

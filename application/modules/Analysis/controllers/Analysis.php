@@ -1930,7 +1930,7 @@ class Analysis extends DashboardController {
 
     public function createdFailedParticipants($form, $round_id, $equipment_id){
         $template = $this->config->item('default');
-        $column_data = $row_data = $tablevalues = $tablebody = $table = [];
+        $column_data = $row_data = $tablevalues = $tablebody = $tabledata = $table = [];
         $count = $zerocount = $sub_counter = 0;
 
         $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
@@ -2099,10 +2099,8 @@ class Analysis extends DashboardController {
 
             if($grade >= 80){
                 $review = "Satisfactory Performance";
-            }else if($grade > 0 && $grade < 80){
-                $review = "Unsatisfactory Performance";
             }else{
-                $review = "Non-responsive";
+                $review = "Unsatisfactory Performance";
             }
 
             $part = $this->db->get_where('pt_ready_participants', ['p_id' =>  $submission->participant_id])->row();

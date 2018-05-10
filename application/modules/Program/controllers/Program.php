@@ -1089,8 +1089,9 @@ class Program extends MY_Controller {
         if($county_id == 0 && $facility_id == 0){
             $counties = $this->Program_m->getCounties();
 
-            // echo "<pre>";print_r(count($counties));echo "</pre>";die();
+            
             foreach ($counties as $county) {
+                $tabledata = [];
                 $partcount = $no_of_participants = $passed = $failed = 0;
 
                 $labels[] = $county->county_name;
@@ -1354,7 +1355,7 @@ class Program extends MY_Controller {
                 $graph_data['y_axis_left_name'] = "Participants";
                 $facilities = $this->Program_m->getFacilities($county_id);
                 // echo "<pre>";print_r($facilities);echo "</pre>";die();
-
+                
 
                 foreach ($facilities as $facility) {
                     $partcount = $no_of_participants = $passed = $failed = 0;
@@ -1975,7 +1976,7 @@ class Program extends MY_Controller {
     }
 
 
-    public function PassFailGraph($round_id,$county_id,$facility_id){
+    public function PassFailGraph($round_id, $county_id, $facility_id){
         $labels = $graph_data = $datasets = $data = array();
         $participants = $pass = $fail = $pass_rate = 0;
         $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
