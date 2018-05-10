@@ -108,7 +108,7 @@ function create_pdf($html, $data){
 
     ');
 
-    $pdf->output($data["pdf_title"],'D');
+    $pdf->output($data["pdf_title"].'.pdf','I');
 
 
 }
