@@ -2623,7 +2623,8 @@ class Program extends MY_Controller {
                     $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
                 }
 
-                $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
+                // $submissions = $this->Program_m->getReadyParticipants($round->id, $county_id, $facility_id);
+                $submissions = $this->Program_m->RespondedParticipants($round->id, $round->uuid, $county_id, $facility_id);
 
                 if($submissions){
                     $no_responsive = $partcount = $no_non_responsive = 0;

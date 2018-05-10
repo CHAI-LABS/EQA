@@ -176,10 +176,10 @@ class Import extends MY_Controller {
 	function importRoundDataSubmissions(){
 		//new round change excel name (1), round id (1), sample id (1)
 
-		$file_path = './uploads/data/R18_Results.xlsx';
+		$file_path = './uploads/data/R17_Results.xlsx';
 
-		$round_id = 2;
-		$sample_id = 4;
+		$round_id = 1;
+		$sample_id = 1;
 
 		$data = $this->excel->readExcel($file_path);
 		if (count($data) > 0) {
@@ -312,21 +312,6 @@ class Import extends MY_Controller {
 		            	$this->db->insert('unable_response', $insertdata8);
 					}
 
-					// if($itemData[$i][4] == "N"){
-					// 	$part_uuid = $this->db->get_where('participants', ['id'=>$participant_id])->row()->uuid;
-					// 	$round_uuid = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row()->uuid;
-
-					// 	$insertdata13 = [
-			  //           		'pt_round_no'    =>  $round_uuid,
-				 //                'participant_id'    => $part_uuid,
-				 //                'participant_facility'    =>  $facility_id,
-				 //                'status'    =>  1,
-				 //                'verdict'    =>  0,
-				 //                'lab_result'    =>  1
-			  //           	];
-
-		   //          	$this->db->insert('participant_readiness', $insertdata13);
-					// }
 
 					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment' && $itemData[$i][9] != "Unable to report"){	
 
@@ -435,8 +420,11 @@ class Import extends MY_Controller {
 			            	$round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
 			            	$participant_det = $this->db->get_where('participants', ['id'=>$participant_id])->row();
 
+			            	
+		            		$end_date = strtotime(date('Y-m-d', strtotime('2017-10-30')));
 			            	$analysed_date = date('Y-m-d',strtotime($itemData[$i][33]));
-							if(strtotime($analysed_date) > strtotime(date('Y-m-d', strtotime('2017-10-30')))){
+
+							if(strtotime($analysed_date) > $end_date){
 								$verdict = 0;
 							}else{
 								$verdict = 1;

@@ -11,6 +11,27 @@ class M_PTRound extends CI_Model {
         return $query->row();
     }
 
+    public function RespondedParticipantsData($round_id, $round_uuid, $participant_id, $equipment_id = null){
+        $equipment = '';
+
+        if($equipment_id){
+            $equipment = " AND prv.equipment_id = ".$equipment_id." " ;
+        }
+
+        $sql = "SELECT *
+        FROM pt_ready_participants prp
+        JOIN pt_participant_review_v prv on prv.participant_id = prp.p_id
+        WHERE prp.pt_round_uuid = '".$round_uuid."' 
+        AND prv.round_id = '".$round_id."'
+        $equipment
+        AND prp.p_id = '".$participant_id."'
+        GROUP BY prp.p_id; ";
+        $query = $this->db->query($sql);
+        // $query = $this->db->get();
+        
+        return $query->row();
+    }
+
     public function absoluteValue($round_id,$equipment_id,$sample_id,$participant_id){
 
         $this->db->select("cd4_absolute");
@@ -29,7 +50,7 @@ class M_PTRound extends CI_Model {
             SELECT e.id, e.uuid, e.equipment_name FROM equipment e
             JOIN participant_equipment pe ON pe.participant_id = $participant_id
             WHERE e.equipment_status = 1 AND e.id = pe.equipment_id
-        ";
+            GROUP BY e.id";
 
         $query = $this->db->query($sql);
 

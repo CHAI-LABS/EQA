@@ -245,8 +245,6 @@ class Analysis_m extends CI_Model {
             $equip_where = null;
         }
 
-        
-
         if ($participant_ids) {
             $participants = 'AND participant_id IN ('.$participant_ids.')';
         }else{

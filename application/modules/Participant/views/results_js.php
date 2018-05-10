@@ -3,9 +3,9 @@
 
         $('table').dataTable({
         	"createdRow": function( row, data, dataIndex){
-                if( data[8] ==  `Unsatisfactory Performance`){
+                if( data[11] ==  `Unsatisfactory Performance`){
                     $(row).addClass('red');
-                }else if(data[8] ==  `Satisfactory Performance`){
+                }else if(data[11] ==  `Satisfactory Performance`){
                 	$(row).addClass('green');
                 }
             }
