@@ -33,6 +33,7 @@ class Export extends MY_Controller
 
         foreach ($excel_data['column_data'] as $column_data) {
             $objPHPExcel -> getActiveSheet() -> setCellValueByColumnAndRow($column, $rowExec, $column_data);
+
             $objPHPExcel -> getActiveSheet() -> getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($column)) -> setAutoSize(true);
             //$objPHPExcel->getActiveSheet()->getStyle($column, $rowExec)->getFont()->setBold(true);
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($column, $rowExec)->getFont()->setBold(true);
@@ -43,8 +44,17 @@ class Export extends MY_Controller
         foreach ($excel_data['row_data'] as $row_data) {
         $column = 0;
         foreach($row_data as $cell){
+
          //Looping through the cells per facility
         $objPHPExcel -> getActiveSheet() -> setCellValueByColumnAndRow($column, $rowExec, $cell);
+        $objPHPExcel -> getActiveSheet() -> getStyle("A1:A30") -> getFont() -> setBold( true );
+        $objPHPExcel -> getActiveSheet() -> getStyle("B16:F16") -> getFont() -> setBold( true );
+        $objPHPExcel -> getActiveSheet() -> getStyle("B22") -> getFont() -> setBold( true );
+        $objPHPExcel -> getActiveSheet() -> getStyle("D22") -> getFont() -> setBold( true );
+        if($column == 0){
+            $objPHPExcel -> getActiveSheet() -> getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($column)) -> setAutoSize(true);
+        }
+        
                 
         $column++;  
          }

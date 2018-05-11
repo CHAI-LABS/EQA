@@ -931,7 +931,7 @@ class Dashboard extends DashboardController {
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$no_participants];
 
-        echo "<pre>";print_r($partcount);die;
+        // echo "<pre>";print_r($partcount);die;
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

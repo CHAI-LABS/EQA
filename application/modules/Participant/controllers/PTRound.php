@@ -330,15 +330,42 @@ class PTRound extends MY_Controller {
 
 
                                     <div class = "pull-right">
-                                        <a href = "'.base_url("Analysis/createParticipantTable/excel/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+                                        <a href = "'.base_url("Participant/PTRound/createParticipantTable/excel/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
 
-                                        <a href = "'.base_url("Analysis/createParticipantTable/pdf/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                        <a href = "'.base_url("Participant/PTRound/createParticipantTable/pdf/$round_id/$equipment_id/cd4/absolute").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
                                     </div>
                             </div>
 
                             <div class = "card-block col-md-12"><div class="table-responsive">';
 
             $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id,'cd4','absolute');
+
+            $equipment_tabs .= '</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>';
+
+
+            $equipment_tabs .=  '<div class = "row">
+                    <div class="col-md-12">
+                        <div class = "card card-outline-danger">
+                            <div class="card-header col-12">
+                                <i class = "icon-chart"></i>
+                                &nbsp;
+                                    Participant CD4 Percent Results
+
+
+                                    <div class = "pull-right">
+                                        <a href = "'.base_url("Participant/PTRound/createParticipantTable/excel/$round_id/$equipment_id/cd4/percent").'"> <button class = "btn btn-success btn-sm"><i class = "fa fa-arrow-down"></i> Excel</button></a>
+
+                                        <a href = "'.base_url("Participant/PTRound/createParticipantTable/pdf/$round_id/$equipment_id/cd4/percent").'"> <button class = "btn btn-danger btn-sm"><i class = "fa fa-arrow-down"></i> PDF</button></a>    
+                                    </div>
+                            </div>
+
+                            <div class = "card-block col-md-12"><div class="table-responsive">';
+
+            $equipment_tabs .= $this->createParticipantTable('table', $round_id, $equipment_id,'cd4','percent');
 
             $equipment_tabs .= '</div>
                             </div>
@@ -353,6 +380,8 @@ class PTRound extends MY_Controller {
         return $equipment_tabs;
 
     }
+
+
 
     public function createPeerTable($form, $round_id, $equipment_id, $type, $type2){
         $template = $this->config->item('default');
@@ -369,7 +398,8 @@ class PTRound extends MY_Controller {
         $equipments = $this->db->get_where('equipment', ['id'=>$equipment_id,'equipment_status'=>1])->row();
         $equipment_name = str_replace(' ', '_', $equipments->equipment_name);
 
-        // echo "<pre>";print_r($equipment_name);echo "</pre>";die();
+        $participant_uuid = $this->session->userdata('uuid');
+        $participant = $this->db->get_where('participant_readiness_v', ['uuid' =>  $participant_uuid])->row();
 
 
         $html_body = '
@@ -1202,7 +1232,7 @@ class PTRound extends MY_Controller {
         $cd4abs_acceptable = $cd4abs_unacceptable = $cd4abs_samples = 0;
         $cd4per_acceptable = $cd4per_unacceptable = $cd4per_samples = 0;
         $samp_counter = $acceptable = $unacceptable = 0;
-        $tabledata = [];
+        $column = $row = $tabledata = [];
 
         $rounds = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row();
         $round_name = str_replace(' ', '_', $rounds->pt_round_no);
@@ -1213,6 +1243,7 @@ class PTRound extends MY_Controller {
 
         $participant_uuid = $this->session->userdata('uuid');
         $participant = $this->db->get_where('participant_readiness_v', ['uuid' =>  $participant_uuid])->row();
+        // echo "<pre>";print_r(strtoupper($type));echo "</pre>";die();
 
         $html_body = '
         <div class="centered">
@@ -1228,12 +1259,42 @@ class PTRound extends MY_Controller {
                      NATIONAL HIV REFERENCE LABORATORY <br/>
                      P. O. BOX 20750-00202, NAIROBI <br/>
                 </th>
-            </div><br/><br/>
+            </div>
 
-            <div><th>
+            <br/><br/>
+
+            <div>
+                <th>
+                Facility Name: ' .$participant->facility_name. ' <br/>
                 Round No : ' .$round_name. ' <br/> 
-                Equipment Name : ' . $equipment_name . '
-                </th>
+                Equipment Name : ' . $equipment_name . ' <br/><br/>
+                Participant Name : ' .$participant->firstname. ' '. $participant->lastname .'<br/>
+                Phone : ' .$participant->phone. '<br/>
+                Email : ' .$participant->email_address. '<br/><br/>';
+
+        array_push($row, 'MINISTRY OF HEALTH');array_push($row_data, $row);$row = [];
+        array_push($row, 'NATIONAL PUBLIC HEALTH LABORATORY SERVICES');array_push($row_data, $row);$row = [];
+        array_push($row, 'NATIONAL HIV REFERENCE LABORATORY');array_push($row_data, $row);$row = [];
+        array_push($row, 'P. O. BOX 20750-00202, NAIROBI');array_push($row_data, $row);$row = [];
+
+        array_push($row, '');array_push($row_data, $row);$row = [];
+        array_push($row, '');array_push($row_data, $row);$row = [];
+
+        array_push($row, 'Facility Name',$participant->facility_name);array_push($row_data, $row);$row = [];
+        array_push($row, 'Round No',$round_name);array_push($row_data, $row);$row = [];
+        array_push($row, 'Equipment Name',$equipment_name);array_push($row_data, $row);$row = [];
+        array_push($row, 'Participant Name',$participant->phone);array_push($row_data, $row);$row = [];
+        array_push($row, 'Phone',$participant->phone);array_push($row_data, $row);$row = [];
+        array_push($row, 'Email',$participant->email_address);array_push($row_data, $row);$row = [];
+
+        array_push($row, '');array_push($row_data, $row);$row = [];
+        array_push($row, '');array_push($row_data, $row);$row = [];
+
+        $html_body .= strtoupper($type) . ' ' . strtoupper($type2);
+
+
+        $html_body .= '<br/>
+        ACCEPTED CRITERIA &plusmn; 2 BDI</th>
             </div>
             <br/><br/>
 
@@ -1241,7 +1302,7 @@ class PTRound extends MY_Controller {
         <table>
         <thead>
         <tr>
-            <th>Batch</th>';
+            <th>Sample</th>';
             
         $heading = [
             "Name",
@@ -1250,22 +1311,28 @@ class PTRound extends MY_Controller {
             "Batch"
         ];
 
-        $column_data = array('Name','Phone','Email','Batch');
+        // array_push($row_data, array('Name','Email','Phone'));
+
+        // $column_data = array('Sample','Your Result','Mean','SD','SDI','Your Grade');
+
+        array_push($row, 'Sample','Your Result','Mean','SD','SDI','Your Grade');
+        array_push($row_data, $row);
+        $row = [];
         
         $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round_id])->result();
 
         foreach ($samples as $sample) {
             array_push($heading, $sample->sample_name,"Comment");
-            array_push($column_data, $sample->sample_name,"Comment");
-            $html_body .= '<th>'.$sample->sample_name.'</th> <th>Comment</th>';
         }
 
         array_push($heading, 'Overall Grade', "Review Comment");
-        array_push($column_data, 'Overall Grade', "Review Comment");
 
         $html_body .= ' 
-        <th>Overall Grade</th>
-            <th>Review Comment</th>
+                <th>Your Result</th>
+                <th>Mean</th>
+                <th>SD</th>
+                <th>SDI</th>
+                <th>Your Grade</th>
             </tr> 
         </thead>
         <tbody>
@@ -1290,10 +1357,10 @@ class PTRound extends MY_Controller {
 
         if($submission){
             array_push($tabledata, $submission->batch);
-            $html_body .= '<tr><td class="spacings">'.$submission->batch.'</td>';
+            // $html_body .= '<tr><td class="spacings">'.$submission->batch.'</td>';
         }else{
             array_push($tabledata, 'No Batch');
-            $html_body .= '<tr><td class="spacings">No Batch</td>';
+            // $html_body .= '<tr><td class="spacings">No Batch</td>';
         }
 
         $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
@@ -1302,8 +1369,10 @@ class PTRound extends MY_Controller {
             case 'cd3':
                 switch ($type2) {
                     case 'absolute':
+
                         foreach ($samples as $sample) {
                             $comment = '';
+                            $row = [];
                             $samp_counter++;
 
 
@@ -1320,7 +1389,9 @@ class PTRound extends MY_Controller {
                             
                             if($part_cd3){
                                 if($part_cd3->cd3_absolute != 0){
-                                    $html_body .= '<td class="spacings">'.$part_cd3->cd3_absolute.'</td>';
+
+                                    
+
                                     $zerocheck = $part_cd3->cd3_absolute - $mean_2;
                                     $cd3abs_samples++;
 
@@ -1329,6 +1400,8 @@ class PTRound extends MY_Controller {
                                     }else{
                                         $sdi = (($part_cd3->cd3_absolute - $mean_2) / $sd_2);
                                     }
+
+                                    
 
                                     if($part_cd3->cd3_absolute == 0){
                                         $cd3abs_acceptable++;
@@ -1342,6 +1415,8 @@ class PTRound extends MY_Controller {
                                         $comment = "Unacceptable";
                                     }
 
+
+
                                     array_push($tabledata, $part_cd3->cd3_absolute, $comment);
 
                                 }else{
@@ -1353,8 +1428,19 @@ class PTRound extends MY_Controller {
                                 $cd3abs_grade = 0;
                                 array_push($tabledata, 0, "Unacceptable");
                             }
-                            $html_body .= '<td class="spacings">'.$comment.'</td>';      
+
+                            array_push($row, $sample->sample_name,$part_cd3->cd3_absolute,$mean_2,$sd_2,round($sdi, 2),$comment);
+
+                            $html_body .= '<tr><th>'.$sample->sample_name.'</th>';
+                            $html_body .= '<td class="spacings">'.$part_cd3->cd3_absolute.'</td>';
+                            $html_body .= '<td class="spacings">'.$mean_2.'</td>';
+                            $html_body .= '<td class="spacings">'.$sd_2.'</td>';
+                            $html_body .= '<td class="spacings">'.round($sdi, 2).'</td>';
+                            $html_body .= '<td class="spacings">'.$comment.'</td><tr/>';  
+                            array_push($row_data, $row);$row = []; 
                         }
+
+                        
 
                         $cd3abs_grade = (($cd3abs_acceptable / $samp_counter) * 100); 
 
@@ -1364,8 +1450,10 @@ class PTRound extends MY_Controller {
 
                         if($cd3abs_grade >= 80){
                             $review = "Satisfactory Performance";
+                            $interpretation = "PASS";
                         }else{
                             $review = "Unsatisfactory Performance";
+                            $interpretation = "FAIL";
                         }
 
                         break;
@@ -1373,8 +1461,8 @@ class PTRound extends MY_Controller {
                     case 'percent':
                         foreach ($samples as $sample) {
                             $comment = '';
+                            $row = [];
                             $samp_counter++;
-
 
                             $cd3_per_values = $this->getEvaluationResults($round_id, $submission->equipment_id, $sample->id,'cd3','percent');
 
@@ -1389,7 +1477,7 @@ class PTRound extends MY_Controller {
                             
                             if($part_cd3){
                                 if($part_cd3->cd3_percent != 0){
-                                    $html_body .= '<td class="spacings">'.$part_cd3->cd3_percent.'</td>';
+                                    // $html_body .= '<td class="spacings">'.$part_cd3->cd3_percent.'</td>';
                                     $zerocheck = $part_cd3->cd3_percent - $mean_2;
                                     $cd3per_samples++;
 
@@ -1422,8 +1510,19 @@ class PTRound extends MY_Controller {
                                 $cd3per_grade = 0;
                                 array_push($tabledata, 0, "Unacceptable");
                             }
-                            $html_body .= '<td class="spacings">'.$comment.'</td>';      
+
+                            array_push($row, $sample->sample_name,$part_cd3->cd3_percent,$mean_2,$sd_2,round($sdi, 2),$comment);
+
+                            $html_body .= '<tr><th>'.$sample->sample_name.'</th>';
+                            $html_body .= '<td class="spacings">'.$part_cd3->cd3_percent.'</td>';
+                            $html_body .= '<td class="spacings">'.$mean_2.'</td>';
+                            $html_body .= '<td class="spacings">'.$sd_2.'</td>';
+                            $html_body .= '<td class="spacings">'.round($sdi, 2).'</td>';
+                            $html_body .= '<td class="spacings">'.$comment.'</td><tr/>';    
+                            array_push($row_data, $row);$row = [];  
                         }
+
+                        
 
                         $cd3per_grade = (($cd3per_acceptable / $samp_counter) * 100); 
 
@@ -1432,8 +1531,10 @@ class PTRound extends MY_Controller {
                         $overall_grade = round($cd3per_grade, 2) . ' %';
 
                         if($cd3per_grade >= 80){
+                            $interpretation = "PASS";
                             $review = "Satisfactory Performance";
                         }else{
+                            $interpretation = "FAIL";
                             $review = "Unsatisfactory Performance";
                         }
                         break;
@@ -1450,6 +1551,7 @@ class PTRound extends MY_Controller {
                     case 'absolute':
                         foreach ($samples as $sample) {
                             $comment = '';
+                            $row = [];
                             $samp_counter++;
 
 
@@ -1466,7 +1568,7 @@ class PTRound extends MY_Controller {
                             
                             if($part_cd4){
                                 if($part_cd4->cd4_absolute != 0){
-                                    $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+                                    // $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
                                     $zerocheck = $part_cd4->cd4_absolute - $mean_2;
                                     $cd4abs_samples++;
 
@@ -1499,7 +1601,17 @@ class PTRound extends MY_Controller {
                                 $cd4abs_grade = 0;
                                 array_push($tabledata, 0, "Unacceptable");
                             }
-                            $html_body .= '<td class="spacings">'.$comment.'</td>';      
+
+                            array_push($row, $sample->sample_name,$part_cd4->cd4_absolute,$mean_2,$sd_2,round($sdi, 2),$comment);
+
+                            $html_body .= '<tr><th>'.$sample->sample_name.'</th>';
+                            $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+                            $html_body .= '<td class="spacings">'.$mean_2.'</td>';
+                            $html_body .= '<td class="spacings">'.$sd_2.'</td>';
+                            $html_body .= '<td class="spacings">'.round($sdi, 2).'</td>';
+                            $html_body .= '<td class="spacings">'.$comment.'</td><tr/>'; 
+
+                            array_push($row_data, $row);$row = []; 
                         }
 
                         $cd4abs_grade = (($cd4abs_acceptable / $samp_counter) * 100); 
@@ -1509,8 +1621,10 @@ class PTRound extends MY_Controller {
                         $overall_grade = round($cd4abs_grade, 2) . ' %';
 
                         if($cd4abs_grade >= 80){
+                            $interpretation = "PASS";
                             $review = "Satisfactory Performance";
                         }else{
+                            $interpretation = "FAIL";
                             $review = "Unsatisfactory Performance";
                         }
                         
@@ -1519,6 +1633,7 @@ class PTRound extends MY_Controller {
                     case 'percent':
                         foreach ($samples as $sample) {
                             $comment = '';
+                            $row = [];
                             $samp_counter++;
 
 
@@ -1535,7 +1650,7 @@ class PTRound extends MY_Controller {
                             
                             if($part_cd4){
                                 if($part_cd4->cd4_percent != 0){
-                                    $html_body .= '<td class="spacings">'.$part_cd4->cd4_percent.'</td>';
+                                    // $html_body .= '<td class="spacings">'.$part_cd4->cd4_percent.'</td>';
                                     $zerocheck = $part_cd4->cd4_percent - $mean_2;
                                     $cd4per_samples++;
 
@@ -1568,8 +1683,19 @@ class PTRound extends MY_Controller {
                                 $cd4per_grade = 0;
                                 array_push($tabledata, 0, "Unacceptable");
                             }
-                            $html_body .= '<td class="spacings">'.$comment.'</td>';      
+
+                            array_push($row, $sample->sample_name,$part_cd4->cd4_percent,$mean_2,$sd_2,round($sdi, 2),$comment);
+
+                            $html_body .= '<tr><th>'.$sample->sample_name.'</th>';
+                            $html_body .= '<td class="spacings">'.$part_cd4->cd4_percent.'</td>';
+                            $html_body .= '<td class="spacings">'.$mean_2.'</td>';
+                            $html_body .= '<td class="spacings">'.$sd_2.'</td>';
+                            $html_body .= '<td class="spacings">'.round($sdi, 2).'</td>';
+                            $html_body .= '<td class="spacings">'.$comment.'</td><tr/>';    
+                            array_push($row_data, $row);$row = [];
                         }
+
+                        
 
                         $cd4per_grade = (($cd4per_acceptable / $samp_counter) * 100); 
 
@@ -1578,8 +1704,10 @@ class PTRound extends MY_Controller {
                         $overall_grade = round($cd4per_grade, 2) . ' %';
 
                         if($cd4per_grade >= 80){
+                            $interpretation = "PASS";
                             $review = "Satisfactory Performance";
                         }else{
+                            $interpretation = "FAIL";
                             $review = "Unsatisfactory Performance";
                         }
                         break;
@@ -1624,14 +1752,14 @@ class PTRound extends MY_Controller {
             break;
 
             case 'excel':
-                array_push($row_data, $tabledata);
+                // array_push($row_data, $row);
             break;
 
             case 'pdf':
-             
-                $html_body .= '<td class="spacings">'.$overall_grade.' %</td>';
-                $html_body .= '<td class="spacings">'.$review.'</td>';
-                $html_body .= "</tr></ol>";
+
+                $html_body .= "
+                </tr></ol><br/><br/>
+                ";
             break;
                 
             
@@ -1650,9 +1778,30 @@ class PTRound extends MY_Controller {
             return $this->table->generate($table);
 
         }else if($form == 'excel'){
+                array_push($row, '');array_push($row_data, $row);$row = [];
+                array_push($row, '');array_push($row_data, $row);$row = [];
+
+                array_push($row, '','Final Score',$overall_grade,'INTERPRETATION',$interpretation,'','0-79% = FAIL , 80-100% = PASS');array_push($row_data, $row);$row = [];
+
+                array_push($row, '');array_push($row_data, $row);$row = [];
+                array_push($row, '');array_push($row_data, $row);$row = [];
+
+            if($interpretation == 'FAIL'){
+                array_push($row, 'Comments : ','Please submit your corrective action for unacceptable results by date. ');array_push($row_data, $row);$row = [];
+
+                array_push($row, '','Kindly note that failure to submit the corrective action will result in exclusion from subsequent rounds until it duly filled and received by the NHRL CD4 EQA team. ');array_push($row_data, $row);$row = [];
+                
+                array_push($row, '','This report has been complied by the NHRL Sample Split team. ');array_push($row_data, $row);$row = [];
+
+                array_push($row, '','For any clarification please contact us at nhrlcd4eqa@nphls.or.ke');array_push($row_data, $row);$row = [];
+            }
+
+        
 
             $excel_data = array();
             $excel_data = array('doc_creator' => 'External_Quality_Assurance', 'doc_title' => 'Participants_'.$round_name.'_'.$equipment_name, 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'excel_topic' => 'Participants_'.$equipment_name);
+
+
 
             
             $excel_data['column_data'] = $column_data;
@@ -1662,7 +1811,32 @@ class PTRound extends MY_Controller {
 
         }else if($form == 'pdf'){
 
-            $html_body .= '</tbody></table>';
+            $html_body .= '</tbody></table><br/><br/>';
+
+            $html_body .= '<div>
+                <strong>Final Score</strong> : '. $overall_grade .' 
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   
+
+                <strong>INTERPRETATION</strong> : ' . $interpretation . '  
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
+
+                0-79% = <strong>FAIL</strong>, 80-100% = <strong>PASS</strong>
+            </div>
+            <br/><br/><br/><br/>';
+
+            if($interpretation == 'FAIL'){
+                $html_body .= '<div>
+                Comments : <br/><br/>
+                    Please submit your corrective action for unacceptable results by date. Kindly note that failure to submit the corrective action will result in exclusion from subsequent rounds until it duly filled and received by the NHRL CD4 EQA team.
+                    <br/><br/>
+
+                    This report has been complied by the NHRL Sample Split team. For any clarification please contact us at nhrlcd4eqa@nphls.or.ke
+                </div>';
+            }
+            
+
             $pdf_data = array("pdf_title" => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_html_body' => $html_body, 'pdf_view_option' => 'download', 'file_name' => 'Participants_'.$round_name.'_'.$equipment_name, 'pdf_topic' => 'Participants_'.$round_name.'_'.$equipment_name);
 
             $this->export->create_pdf($html_body,$pdf_data);
