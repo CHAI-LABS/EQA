@@ -228,6 +228,7 @@ $(document).ready(function(){
 	        var nonresp = ChartData['datasets']['2']['data']['0'];
 	        var unable = ChartData['datasets']['3']['data']['0'];
 	        var disqualified = ChartData['datasets']['4']['data']['0'];
+	        var partrate = ChartData['datasets']['7']['data']['0'];
 	        var resp = ChartData['responsive'];
 
 
@@ -237,6 +238,7 @@ $(document).ready(function(){
 	    	document.getElementById('unable').innerHTML = unable;
 	    	document.getElementById('nonresp').innerHTML = nonresp;
 	    	document.getElementById('resp').innerHTML = resp;
+	    	document.getElementById('partrate').innerHTML = partrate;
 
 
 	    //     var ctx3 = document.getElementById('graph-3');

@@ -84,10 +84,11 @@
                                     <div class="card-block">
                                         Total # site enrolled : <strong id="enrolled"> 0 </strong><br/>
                                         # of participants : <strong id="partno"> 0 </strong><br/>
+                                        Participation Rate : <strong id="partrate"> 0 </strong>%<br/>
                                         Disqualified : <strong id="disqualified"> 0 </strong><br/>
                                         Unable to report : <strong id="unable"> 0 </strong><br/>
                                         Non-Responsive : <strong id="nonresp"> 0 </strong><br/>
-                                        Responded : <strong id="resp"> 0 </strong>
+                                        Valid Submissions : <strong id="resp"> 0 </strong>
                                         <br/><br/>
                                         <div class="chart-wrapper">
                                             <canvas id="graph-1"></canvas>

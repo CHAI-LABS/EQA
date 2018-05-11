@@ -2718,7 +2718,7 @@ class Program extends MY_Controller {
 
     public function OverallInfo($round_id, $county_id, $facility_id){
         $labels = $graph_data = $datasets = $data = array();
-        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $responsive = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = 0;
+        $counter = $unsatisfactory = $satisfactory = $disqualified = $unable = $responsive = $non_responsive = $partcount = $accept = $unaccept = $passed = $failed = $partrate = 0;
 
         $round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
         $round_uuid = $round->uuid;
@@ -2835,19 +2835,19 @@ class Program extends MY_Controller {
             $county_id = $this->db->get_where('facility_v', ['facility_id' => $facility_id])->row()->county_id;
         }
 
-        $unable = $this->Program_m->getUnableParticipants($round_uuid, $county_id, $facility_id)->participants;
+        
         $disqualified = $this->Program_m->getRoundVerdict($round_uuid, $county_id, $facility_id)->participants;
         $total_participants = $this->Program_m->TotalFacilities($round_uuid, $county_id, $facility_id)->facilities;
-        $no_of_participants = COUNT($this->Program_m->RespondedParticipants($round_id, $round_uuid, $county_id, $facility_id));
-        // $all_participants = $this->Program_m->AllParticipating($round_uuid, $county_id, $facility_id)->participants;
-        $failed = $no_of_participants - $passed;
-
+        $responded = COUNT($this->Program_m->RespondedParticipants($round_id, $round_uuid, $county_id, $facility_id));
+        $failed = $responded - $passed;
+        // $nonresponsive = $total_participants - $responded - $unable - $disqualified;
         $nonresponsive = $this->Program_m->getNonReponsive($round_uuid, $county_id, $facility_id)->participants;
-
+        $unable = ($this->Program_m->getUnableParticipants($round_uuid, $county_id, $facility_id)->participants);
+        $partrate = round(((($total_participants - $nonresponsive) / $total_participants) * 100), 2);
         // echo "<pre>";print_r($nonresponsive);echo "</pre>";die();
 
         $datasets7 = [
-            'label'         =>  'Total No. of Facilities Enrolled',
+            'label' =>  'Total No. of Facilities Enrolled',
             'backgroundColor' => 'rgba(211,84,0,0.5)',
             'borderColor' => 'rgba(211,84,0,0.8)',
             'highlightFill' => 'rgba(211,84,0,0.75)',
@@ -2860,7 +2860,7 @@ class Program extends MY_Controller {
             'borderColor' => 'rgba(52,152,219,0.8)',
             'highlightFill' => 'rgba(52,152,219,0.75)',
             'highlightStroke' => 'rgba(52,152,219,1)',
-            'data' => [$partcount]
+            'data' => [$total_participants]
         ];
         $datasets2 = [
             'label'         =>  'Passed',
@@ -2904,11 +2904,20 @@ class Program extends MY_Controller {
             'data' => [$disqualified]
         ];
 
+        $datasets8 = [
+            'label'         =>  'Participation Rate',
+            'backgroundColor' => 'rgba(232,76,60,0.5)',
+            'borderColor' => 'rgba(232,76,60,0.8)',
+            'highlightFill' => 'rgba(232,76,60,0.75)',
+            'highlightStroke' => 'rgba(232,76,60,1)',
+            'data' => [$partrate]
+        ];
+
         // echo "<pre>";print_r($unable);echo "</pre>";die();
         $graph_data['round'] = $round_name;
-        $graph_data['responsive'] = $no_of_participants;
+        $graph_data['responsive'] = $responded;
         $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets7, $datasets1, $datasets3, $datasets4, $datasets6, $datasets2, $datasets5];
+        $graph_data['datasets'] = [$datasets7, $datasets1, $datasets3, $datasets4, $datasets6, $datasets2, $datasets5,$datasets8];
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

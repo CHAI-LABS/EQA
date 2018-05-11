@@ -176,10 +176,10 @@ class Import extends MY_Controller {
 	function importRoundDataSubmissions(){
 		//new round change excel name (1), round id (1), sample id (1)
 
-		$file_path = './uploads/data/R17_Results.xlsx';
+		$file_path = './uploads/data/R18_Results.xlsx';
 
-		$round_id = 1;
-		$sample_id = 1;
+		$round_id = 2;
+		$sample_id = 4;
 
 		$data = $this->excel->readExcel($file_path);
 		if (count($data) > 0) {
@@ -280,8 +280,6 @@ class Import extends MY_Controller {
 					}
 
 
-					
-
 					$part = $this->getParticipant($names[0],$facility_id,$names[1]);
 					// echo "<pre>"; print_r($part);echo "</pre>";die();
 
@@ -297,14 +295,13 @@ class Import extends MY_Controller {
 						$part_uuid = $this->db->get_where('participants', ['id'=>$participant_id])->row()->uuid;
 						$round_uuid = $this->db->get_where('pt_round_v', ['id'=>$round_id])->row()->uuid;
 
-
 						$insertdata8 = [
 							'round_uuid'    =>  $round_uuid,
 			                'equipment_id'    =>  $equip_id,
 			                'participant_uuid'    =>  $part_uuid,
 			                'facility_id'    =>  $facility_id,
-			                'reason'    =>  $itemData[$i][9] ? $itemData[$i][9] : 0,
-			                'detail'    =>  $itemData[$i][10] ? $itemData[$i][10] : 0,
+			                'reason'    =>  $itemData[$i][9] ? $itemData[$i][9] : "Unable to report",
+			                'detail'    =>  $itemData[$i][10] ? $itemData[$i][10] : "No reason given",
 			                'date_sent'    =>  date("Y-m-d h:i:sa"),
 			                'viewed'    =>  0
 		            	];
@@ -313,7 +310,7 @@ class Import extends MY_Controller {
 					}
 
 
-					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment' && $itemData[$i][9] != "Unable to report"){	
+					if($itemData[$i][7] != '' && $itemData[$i][7] != null && $itemData[$i][7] != 'not indicated' && $itemData[$i][7] != 'No equipment' && $itemData[$i][9] != "Unable to report" && $itemData[$i][9] != "" && $itemData[$i][4] != "N"){	
 
 						$insertdata = [
 							'round_id'    =>  $round_id,

@@ -182,16 +182,6 @@ class Program_m extends CI_Model {
         return $query->row();
     }
 
-
-    
-
-
-
-
-    
-
-
-
     public function getRoundVerdict($round_uuid, $county_id = null, $facility_id = null){
         $this->db->select('COUNT(pr.participant_id) AS participants');
         $this->db->from('participant_readiness pr');
