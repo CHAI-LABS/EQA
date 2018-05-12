@@ -97,11 +97,6 @@ class Participant extends MY_Controller {
 
 
 	public function CapaForm($pt_uuid){
-
-		
-		// echo "<pre>";print_r($this->session->userdata());echo "</pre>";die();
-
-
 		$sampledata = '';
 		// $this->checkLogin($pt_uuid);
 		
@@ -122,6 +117,9 @@ class Participant extends MY_Controller {
         	'sampledata' => $sampledata,
         	'pt_uuid' => $pt_uuid
         ];
+
+		// echo "<pre>";print_r($capa_info);echo "</pre>";die();
+
 
         $title = "CAPA Form";
 

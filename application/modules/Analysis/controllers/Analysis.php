@@ -1884,6 +1884,7 @@ class Analysis extends DashboardController {
             $email = $this->input->post('email');
             $subject = $this->input->post('subject');
             $message = $this->input->post('message');
+            $round_uuid = $this->input->post('round_uuid');
 
             // echo "<pre>";print_r($email);echo "</pre>";die();
             if($email == null || $email == '' || is_numeric($email)){
@@ -1898,7 +1899,8 @@ class Analysis extends DashboardController {
                     'to_facility'   =>  $facility_code,
                     'email'         =>  $email,
                     'subject'       =>  $subject,
-                    'message'       =>  $message
+                    'message'       =>  $message,
+                    'round_uuid'       =>  $round_uuid
                 ];
 
                 $data = [

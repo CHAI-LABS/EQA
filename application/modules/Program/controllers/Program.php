@@ -2697,8 +2697,8 @@ class Program extends MY_Controller {
                     }
 
                 }else{
-                    $no_responsive = 0;
-                    $no_non_responsive = 0;
+                    $no_of_participants = 0;
+                    $nonresponsive = 0;
                 }
 
                 $labels[] = $round->pt_round_no;

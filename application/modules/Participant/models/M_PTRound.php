@@ -79,6 +79,7 @@ class M_PTRound extends CI_Model {
             JOIN participants p ON p.id = pe.participant_id
             WHERE e.equipment_status = 1
             AND p.uuid = '{$participant_uuid}'
+            GROUP BY e.id
         ";
 
         $query = $this->db->query($sql);

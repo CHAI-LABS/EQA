@@ -190,6 +190,9 @@ class Import extends MY_Controller {
 				
 				for ($i=4; $i < 72; $i++) {
 
+					$expiry_date = date('Y-m-d',strtotime($itemData[$i][34]));
+					// echo "<pre>"; print_r($itemData[$i]);echo "</pre>";die();
+
 					$equip_id = $expiry_date = 0;
 					
 	
@@ -201,7 +204,7 @@ class Import extends MY_Controller {
 					}
 
 
-					// echo "<pre>"; print_r($itemData[$i]);echo "</pre>";die();
+					
 					
 					$facility = $this->db->get_where('facility_v', ['facility_name'=>$itemData[$i][0]])->row();
 
@@ -414,12 +417,15 @@ class Import extends MY_Controller {
 
 
 
-			            	$round_uuid = $this->db->get_where('pt_round', ['id' => $round_id])->row()->uuid;
+			            	$round = $this->db->get_where('pt_round_v', ['id' => $round_id])->row();
+			            	$round_uuid = $round->uuid;
+			            	$tag = $round->tag;
 			            	$participant_det = $this->db->get_where('participants', ['id'=>$participant_id])->row();
 
 			            	
 		            		$end_date = strtotime(date('Y-m-d', strtotime('2017-10-30')));
 			            	$analysed_date = date('Y-m-d',strtotime($itemData[$i][33]));
+			            	$expiry = date('dS F, Y', strtotime($itemData[$i][34]));
 
 							if(strtotime($analysed_date) > $end_date){
 								$verdict = 0;
@@ -440,6 +446,23 @@ class Import extends MY_Controller {
 
 			            	$readiness_id = $this->db->insert_id();
 
+			            	if($verdict == 0){
+
+			            		$lotnumber = $itemData[$i][9] ? $itemData[$i][9] : 0;
+			            		$insertdata14 = [
+				            		'from'    =>  'nhrlCD4eqa@nphls.or.ke',
+				            		'round_uuid'    =>  $round_uuid,
+					                'to_facility'    =>  $facility_id,
+					                'email'    =>  $itemData[$i][26] ? $itemData[$i][26] : "no email given",
+					                'subject'    =>  'CAPA Message from NHRL',
+					                'message'    =>  'Results were submitted with an expired kit lot (Lot No. "'. $lotnumber .'", Expiry Date "'. $expiry .'" and therefore performance was not graded. Please submit the corrective action together with your result of Round '.$tag.' ',
+					                'status' 	=> 0,
+					                'deleted' 	=> 0
+				            	];
+
+				            	$this->db->insert('messages', $insertdata14);
+			            	}
+
 
 							$date1 = date("Y-m-d",strtotime("2018-04-02"));
 							$date2 = date("Y-m-d",strtotime("2018-04-02"));
@@ -448,7 +471,7 @@ class Import extends MY_Controller {
 
 			            	$insertdata7 = [
 			            		'pt_batch_id'    =>  $submission_id,
-				                'pt_readiness_id'    => $submission_id,
+				                'pt_readiness_id'    => $readiness_id,
 				                'panel_preparation_date'    =>  $date1,
 				                'panel_preparation_notes'    => "They are finished, they are done",
 				                'courier_collection_date'    =>  $date2,
@@ -525,37 +548,34 @@ class Import extends MY_Controller {
 				
 
 				echo "<pre>"; print_r("Check your DB to view TABLE -> pt_batch_tube, pt_panel_tracking, participant_readiness, pt_batches, pt_data_submission, participants, participant_equipment and pt_equipment_results.... Now run function changeParticipantID next");echo "</pre>";die();
-
-				 //         	$this->db->set('participant_id',$facility->facility_code.'-001');
-				// $this->db->where('id',$submission_id);
-				// $this->db->update('participants');		
+	
 			}
 		}
 	}
 
 	function addQAUser (){
 		$insertdata4 = [
-				                'participant_id'    =>  '12881_002',
-				                'participant_fname'    =>  'Supervisor',
-				                'participant_lname'    =>  'NHRL',
-				                'participant_phonenumber'    =>  '0714135480',
-				                'participant_facility'    =>  3277,
-				                'participant_email'    =>  'supervisor@nhrl.com',
-				                'participant_sex'    =>  'Male',
-				                'participant_age'    =>  23,
-				                'participant_education'    =>  'Higher Diploma',
-				                'participant_experience'    =>  'Very Little',
-				                'user_type'    =>  'qareviewer',
-				                'participant_password'    =>  '$2y$10$kHEgvCOIRVePKcwc00n0puvWsrCXN6ab2HIxwvKsNsCbvt8UK49au',
-				                'avatar'    =>  '',
-				                'approved'    =>  1,
-				                'status'    =>  1,
-				                'date_registered'    =>  date("Y-m-d h:i:sa"),
-				                'confirm_token'    =>  null
-			            	];
+            'participant_id'    =>  '12881_002',
+            'participant_fname'    =>  'Supervisor',
+            'participant_lname'    =>  'NHRL',
+            'participant_phonenumber'    =>  '0714135480',
+            'participant_facility'    =>  3277,
+            'participant_email'    =>  'supervisor@nhrl.com',
+            'participant_sex'    =>  'Male',
+            'participant_age'    =>  23,
+            'participant_education'    =>  'Higher Diploma',
+            'participant_experience'    =>  'Very Little',
+            'user_type'    =>  'qareviewer',
+            'participant_password'    =>  '$2y$10$kHEgvCOIRVePKcwc00n0puvWsrCXN6ab2HIxwvKsNsCbvt8UK49au',
+            'avatar'    =>  '',
+            'approved'    =>  1,
+            'status'    =>  1,
+            'date_registered'    =>  date("Y-m-d h:i:sa"),
+            'confirm_token'    =>  null
+    	];
 
-			            	$this->db->insert('participants', $insertdata4);
-			            	echo "<pre>"; print_r("Added the QA User");echo "</pre>";die();
+    	$this->db->insert('participants', $insertdata4);
+    	echo "<pre>"; print_r("Added the QA User");echo "</pre>";die();
 
 	}
 

@@ -58,18 +58,29 @@ class Dashboard extends DashboardController {
 
 			$participant = $this->M_Participant->findParticipantByIdentifier('uuid', $this->session->userdata('uuid'));
 
+        	// echo "<pre>";print_r($participant);echo "</pre>";die();
 			
 			$facility = $this->db->get_where('facility_v', ['facility_id' => $participant->participant_facility])->row();
 
-			$capa_check = $this->db->get_where('messages', ['to_facility' => $facility->facility_code])->row();
+			$this->db->order_by('id','desc');
+			$capa_check = $this->db->get_where('messages', ['to_facility' => $facility->facility_id])->row();
 
 			if($capa_check){
+				$last_round_uuid = $capa_check->round_uuid;
+
+				$capa_info = $this->db->get_where('messages', ['round_uuid' => $last_round_uuid, 'to_facility' => $participant->participant_facility, 'email' => $participant->participant_email])->row();
+
+				$subject = $capa_info->subject;
+				$message = $capa_info->message;
 				$capa = 1;
+				
 			}else{
+				$subject = '';
+				$message = '';
 				$capa = 0;
+				$last_round_uuid = 0;
 			}
 			
-			// echo "<pre>";print_r($facility);echo "</pre>";die();
 			$this->load->model('participant/M_Participant');
 			$view = "dashboard_v";
 			$this->assets
@@ -82,7 +93,10 @@ class Dashboard extends DashboardController {
 				'dashboard_data'	=>	$this->getParticipantDashboardData($this->session->userdata('uuid')),
 				'participant'		=>	$participant,
 				'facility_id'		=>	$participant->participant_facility,
-				'capa_check'		=>	$capa
+				'capa_check'		=>	$capa,
+				'subject_from_sender' => $subject,
+		        'message_from_sender' => $message,
+				'last_round_uuid'	=>  $last_round_uuid
 			];
 		}elseif($type == "admin"){
 			$view = "admin_dashboard";
@@ -125,7 +139,6 @@ class Dashboard extends DashboardController {
         	redirect('Program/', 'refresh');
         }
 
-        // echo "<pre>";print_r($data);echo "</pre>";die();
         $this->assets
 				->addJs('dashboard/js/libs/moment.min.js')
 				->addJs('dashboard/js/libs/fullcalendar.min.js')

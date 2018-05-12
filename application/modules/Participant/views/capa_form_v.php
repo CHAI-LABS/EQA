@@ -5,7 +5,6 @@
         <a href = "<?= @base_url('Dashboard/'); ?>"> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to Dashboard</button></a><br /><br />
     </div>
 
-
 	<div class="col-sm-12">
 
 	    <div class="card">

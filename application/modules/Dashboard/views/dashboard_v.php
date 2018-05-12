@@ -12,9 +12,7 @@
 </div>
 
 
-<?php if($capa_check){ ?>
-	<a href = "<?= @base_url('Participant/Participant/CapaForm/' . $dashboard_data->pt_round->uuid); ?>" class = "btn btn-primary pull-right">Fill in CAPA Form</a><br/><br/>
-<?php } ?>
+
 
 
 
@@ -86,7 +84,52 @@
 	</div>
 </div> -->
 
+
+    <div class="col-sm-12">
+
+	    <div class="card">
+	        <div class="card-header">
+	            <strong><?= @$subject_from_sender; ?></strong>
+	        </div>
+	        <div class="card-block">
+	        	
+	        </div>
+	    </div>
+	</div>
+
 <?php } ?>
+
+<?php if($capa_check){ ?>
+	<div class="col-md-12 container-fluid">
+	    <div class="animated fadeIn">
+	        <!-- <div class="card-columns col-2"> -->
+
+		        <div class="col-md-12 container-fluid">
+		            <div class="animated fadeIn">
+		                <div class="card" style="width:100%";>
+		                    <div class="card-header">
+		                         <strong class="criteria"><?= @$subject_from_sender; ?></strong>
+		                        <div class="card-actions">
+		                        </div>
+		                    </div>
+		                    <div class="card-block">
+		                        <div class="chart-wrapper">
+		                        	<div class = "pull-left"><?= @$message_from_sender; ?></div>
+		                            <a href = "<?= @base_url('Participant/Participant/CapaForm/' . $last_round_uuid); ?>" class = "btn btn-primary pull-right">Fill in CAPA Form</a><br/><br/>
+		                            This report has been complied by the NHRL Sample Split team. For any clarifications please contact us at nhrlcd4eqa@nphls.or.ke)
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		        
+	    	<!-- </div> -->
+		</div>
+	</div>
+	<?php } ?>
+
+
+
 
 
 <!-- <div class = "row"> -->
