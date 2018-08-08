@@ -117,83 +117,36 @@ $(document).ready(function(){
 
   		
 
+  		$.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	        
+	        $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
+
+	    	var roundname1 = ChartData['round'];
+	    	var enrolled = ChartData['values']['0']['data']['0'];
+	        var partno = ChartData['values']['1']['data']['0'];
+	        var nonresp = ChartData['values']['2']['data']['0'];
+	        var unable = ChartData['values']['3']['data']['0'];
+	        var disqualified = ChartData['values']['4']['data']['0'];
+	        var partrate = ChartData['values']['7']['data']['0'];
+	        var resp = ChartData['responsive'];
+	        
 
 
-	    $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	    	// console.log(ChartData);
+	    	document.getElementById('enrolled').innerHTML = enrolled;
+	    	document.getElementById('partno').innerHTML = partno;
+	    	document.getElementById('disqualified').innerHTML = disqualified;
+	    	document.getElementById('unable').innerHTML = unable;
+	    	document.getElementById('nonresp').innerHTML = nonresp;
+	    	document.getElementById('resp').innerHTML = resp;
+	    	document.getElementById('partrate').innerHTML = partrate;
+
 
 	    	$('#graph-1').replaceWith('<canvas id="graph-1"></canvas>');
 
+	    	console.log(ChartData['datasets']['0']);
+
 	        var ctx1 = document.getElementById('graph-1');
 	        var chart = new Chart(ctx1, {
-	             	type: 'pie',
-    				data: ChartData,
-			        options: {
-				        datasets: [{
-						    dataLabels: { 
-						    	display: true,       
-						        colors: ['#fff', '#ccc', '#000'], 
-						        minRadius: 30,
-						        align: 'start',
-						        anchor: 'start'
-						    }
-						}],
-						cutoutPercentage: 0,
-			            responsive: true,
-					    pieceLabel: {
-						    render: 'percentage',
-						    fontColor: ['black', 'black', 'black'],
-						    precision: 2,
-						    position: 'outside'
-					  	}
-			        }
-	        });
-	    });
-
-	    $.get("<?=@base_url('Program/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	    	// console.log(ChartData.datasets);
-	    	
-	    	
-	        $('#graph-2').replaceWith('<canvas id="graph-2"></canvas>');
-
-	        var part = ChartData['no_participants'];
-	        var pass = ChartData['datasets']['0']['data']['0'];
-	        var fail = ChartData['datasets']['0']['data']['1'];
-
-
-
-	    	document.getElementById('part').innerHTML = part;
-	    	document.getElementById('pass').innerHTML = pass;
-	    	document.getElementById('fail').innerHTML = fail;
-
-	    	$('#failure').replaceWith('<div id="failure" style="color: blue;"><a class="failedlinks">No. of failed : <strong id="fail"> '+fail+' </strong> (View)</a></div>');
-
-	    	$("a.failedlinks").click(function(){
-	    		swal({
-					  // position: 'top-right',
-					  type: 'info',
-					  title:'Please Wait !',
-					  html: 'Loading Failed Participants',
-					  width: '800px',
-					  showConfirmButton: false
-					})
-
-		   	$.get("<?=@base_url('Program/createFailedParticipants/');?>" + round + '/' + county + '/' + facility, function(table){
-			   		swal({
-					  // position: 'top-right',
-					  type: 'info',
-					  title:'Failed Facilities',
-					  html: table,
-					  width: '800px',
-					  showConfirmButton: true
-					})
-
-					// console.log(table);
-				});
-			 });
-
-	        var ctx2 = document.getElementById('graph-2');
-	        var chart = new Chart(ctx2, {
 	             	type: 'pie',
     				data: ChartData,
 			        options: {
@@ -216,29 +169,6 @@ $(document).ready(function(){
 							  }
 			        }
 	        });
-	    });
-
-	    $.get("<?=@base_url('Program/OverallInfo/');?>" + round + '/' + county + '/' + facility, function(ChartData){
-	        
-	        $('#graph-3').replaceWith('<canvas id="graph-3"></canvas>');
-
-	    	var roundname1 = ChartData['round'];
-	    	var enrolled = ChartData['datasets']['0']['data']['0'];
-	        var partno = ChartData['datasets']['1']['data']['0'];
-	        var nonresp = ChartData['datasets']['2']['data']['0'];
-	        var unable = ChartData['datasets']['3']['data']['0'];
-	        var disqualified = ChartData['datasets']['4']['data']['0'];
-	        var partrate = ChartData['datasets']['7']['data']['0'];
-	        var resp = ChartData['responsive'];
-
-
-	    	document.getElementById('enrolled').innerHTML = enrolled;
-	    	document.getElementById('partno').innerHTML = partno;
-	    	document.getElementById('disqualified').innerHTML = disqualified;
-	    	document.getElementById('unable').innerHTML = unable;
-	    	document.getElementById('nonresp').innerHTML = nonresp;
-	    	document.getElementById('resp').innerHTML = resp;
-	    	document.getElementById('partrate').innerHTML = partrate;
 
 
 	    //     var ctx3 = document.getElementById('graph-3');
@@ -291,6 +221,109 @@ $(document).ready(function(){
 
 
 	    });
+
+	    // $.get("<?=@base_url('Program/OverallResponses/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	    // 	// console.log(ChartData);
+
+	    // 	$('#graph-1').replaceWith('<canvas id="graph-1"></canvas>');
+
+	    //     var ctx1 = document.getElementById('graph-1');
+	    //     var chart = new Chart(ctx1, {
+	    //          	type: 'pie',
+    	// 			data: ChartData,
+			  //       options: {
+				 //        datasets: [{
+					// 	    dataLabels: { 
+					// 	    	display: true,       
+					// 	        colors: ['#fff', '#ccc', '#000'], 
+					// 	        minRadius: 30,
+					// 	        align: 'start',
+					// 	        anchor: 'start'
+					// 	    }
+					// 	}],
+					// 	cutoutPercentage: 0,
+			  //           responsive: true,
+					//     pieceLabel: {
+					// 	    render: 'percentage',
+					// 	    fontColor: ['black', 'black', 'black'],
+					// 	    precision: 2,
+					// 	    position: 'outside'
+					//   	}
+			  //       }
+	    //     });
+	    // });
+
+	    $.get("<?=@base_url('Program/ParticipantPass/');?>" + round + '/' + county + '/' + facility, function(ChartData){
+	    	// console.log(ChartData.datasets);
+	    	
+	    	
+	        $('#graph-2').replaceWith('<canvas id="graph-2"></canvas>');
+
+	        var part = ChartData['no_participants'];
+	        var pass = ChartData['datasets']['0']['data']['0'];
+	        var fail = ChartData['datasets']['0']['data']['1'];
+
+
+
+	    	document.getElementById('part').innerHTML = part;
+	    	document.getElementById('pass').innerHTML = pass;
+	    	document.getElementById('fail').innerHTML = fail;
+
+	    	$('#failure').replaceWith('<div id="failure" style="color: blue;"><a class="failedlinks">No. of failed : <strong id="fail"> '+fail+' </strong> (View)</a></div>');
+
+	    	$("a.failedlinks").click(function(){
+	    		swal({
+					  // position: 'top-right',
+					  type: 'info',
+					  title:'Please Wait !',
+					  html: 'Loading Failed Participants',
+					  width: '800px',
+					  showConfirmButton: false
+					})
+
+		   	$.get("<?=@base_url('Program/createFailedParticipants/');?>" + round + '/' + county + '/' + facility, function(table){
+			   		swal({
+					  // position: 'top-right',
+					  type: 'info',
+					  title:'Failed Facilities',
+					  html: table,
+					  width: '800px',
+					  showConfirmButton: true
+					})
+
+					// console.log(table);
+				});
+			 });
+
+	    	console.log(ChartData);
+
+	        var ctx2 = document.getElementById('graph-2');
+	        var chart = new Chart(ctx2, {
+	             	type: 'pie',
+    				data: ChartData,
+			        options: {
+				        datasets: [{
+						    dataLabels: { 
+						    	display: true,         
+						        colors: ['#fff', '#ccc', '#000'], 
+						        minRadius: 30,
+						        align: 'start',
+						        anchor: 'start'
+						    }
+						}],
+						cutoutPercentage: 0,
+			            responsive: true,
+						    pieceLabel: {
+							    render: 'percentage',
+							    fontColor: ['black', 'black', 'black'],
+							    precision: 2,
+							    position: 'outside'
+							  }
+			        }
+	        });
+	    });
+
+	    
 
 
 	    $.get("<?=@base_url('Program/DisqualifiedParticipants/');?>" + round + '/' + county + '/' + facility, function(ChartData){

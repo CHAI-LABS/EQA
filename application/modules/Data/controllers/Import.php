@@ -454,7 +454,7 @@ class Import extends MY_Controller {
 				            		'round_uuid'    =>  $round_uuid,
 					                'to_facility'    =>  $facility_id,
 					                'email'    =>  $itemData[$i][26] ? $itemData[$i][26] : "no email given",
-					                'subject'    =>  'CAPA Message from NHRL',
+					                'subject'    =>  'INVALID SUBMISSION',
 					                'message'    =>  'Results were submitted with an expired kit lot (Lot No. "'. $lotnumber .'", Expiry Date "'. $expiry .'" and therefore performance was not graded. Please submit the corrective action together with your result of Round '.$tag.' ',
 					                'status' 	=> 0,
 					                'deleted' 	=> 0

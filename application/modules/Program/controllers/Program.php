@@ -1029,7 +1029,7 @@ class Program extends MY_Controller {
         $graph_data['no_participants'] = $no_of_participants;
         $graph_data['datasets'] = [$datasets];
 
-        // echo "<pre>";print_r("reached");echo "</pre>";die();
+        // echo "<pre>";print_r($graph_data['datasets']);echo "</pre>";die();
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
@@ -2913,11 +2913,27 @@ class Program extends MY_Controller {
             'data' => [$partrate]
         ];
 
-        // echo "<pre>";print_r($unable);echo "</pre>";die();
+
+
+        // //pie start
+
+        $datasets = [
+            'label'         =>  ['Responsive','Non-Responsive','Unable to Report','Disqualified'],
+            'backgroundColor' => ['rgba(46,204,113,0.5)','rgba(231,76,60,0.5)','rgba(241,196,15,0.5)', 'rgba(52,73,94,0.5)'],
+            'data' => [(int)$responded, (int)$nonresponsive, (int)$unable, (int)$disqualified]
+        ];
+        $labels = ['Responsive','Non-Responsive','Unable to Report','Disqualified'];
+        
+
+        // //pie end
+
+        $graph_data['datasets'] = [$datasets];
+        $graph_data['labels'] = $labels;
         $graph_data['round'] = $round_name;
         $graph_data['responsive'] = $responded;
-        $graph_data['labels'] = $labels;
-        $graph_data['datasets'] = [$datasets7, $datasets1, $datasets3, $datasets4, $datasets6, $datasets2, $datasets5,$datasets8];
+        $graph_data['values'] = [$datasets7, $datasets1, $datasets3, $datasets4, $datasets6, $datasets2, $datasets5,$datasets8];
+
+        // echo "<pre>";print_r($graph_data['datasets']);echo "</pre>";die();
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }
