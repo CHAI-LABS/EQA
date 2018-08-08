@@ -1052,7 +1052,7 @@ class Program extends MY_Controller {
         ];
 
 
-        $no_participants = [
+        $score = [
             'label'         =>  'Score (%)',
             'borderColor' => $borderColor[$counter],
             'highlightFill' => $highlightFill[$counter],
@@ -1341,8 +1341,7 @@ class Program extends MY_Controller {
                     $pass_rate = (($passed / $partcount) * 100);
                 }
 
-                   
-                $no_participants['data'][] = round($pass_rate, 2);
+                $score['data'][] = round($pass_rate, 2);
                 $pass['data'][] = $passed;
                 $fail['data'][] = $failed;
             }
@@ -1605,7 +1604,8 @@ class Program extends MY_Controller {
 
                     } 
 
-                    $no_participants['data'][] = round($pass_rate, 2);
+                    $score['data'][] = round($final_score, 2);
+                    // $score['data'][] = round($pass_rate, 2);
                     $pass['data'][] = $passed;
                     $fail['data'][] = $failed;
 
@@ -1846,7 +1846,7 @@ class Program extends MY_Controller {
 
                                                 if($zerocheck == 0 || $sd_2 == 0){
                                                     $sdi = 5;
-                                                    // echo "<pre>";print_r($zerocheck);echo "</pre>";die();
+                                                    
                                                 }else{
                                                     $sdi = (($part_cd3->cd3_absolute - $mean_2) / $sd_2);
                                                 }
@@ -1969,8 +1969,10 @@ class Program extends MY_Controller {
         }else{
             $graph_data['round'] = $round_name;
             $graph_data['labels'] = $labels;
-            $graph_data['datasets'] = [$no_participants, $pass, $fail];
+            $graph_data['datasets'] = [$score, $pass, $fail];
         }
+
+        // echo "<pre>";print_r($graph_data);echo "</pre>";die();
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($graph_data));
     }

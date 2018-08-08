@@ -564,7 +564,7 @@ class Analysis extends DashboardController {
         $submissions = $this->Program_m->RespondedParticipantsData($round_id, $round_uuid);
         
 
-        foreach ($submissions as $submission) {
+        foreach ($submissions as $participant) {
             $sub_counter++;
             $cd3abs_acceptable = $cd3abs_unacceptable = $cd3abs_samples = 0;
             $cd3per_acceptable = $cd3per_unacceptable = $cd3per_samples = 0;
@@ -574,7 +574,7 @@ class Analysis extends DashboardController {
             $tabledata = [];
  
 
-            $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $submission->participant_id])->row();
+            $facilityid = $this->db->get_where('participant_readiness_v', ['p_id' => $participant->participant_id])->row();
 
             
             if($facilityid){
@@ -603,137 +603,26 @@ class Analysis extends DashboardController {
             $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
 
   
+            //cd4 abs
+            $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
             foreach ($samples as $sample) {
                 $comment = '';
                 $samp_counter++;
 
-
-                $cd3_abs_values = $this->getEvaluationResults($round_id, $submission->equipment_id, $sample->id,'cd3','absolute');
-
-                $mean_2 = ($cd3_abs_values->cd3_absolute_mean) ? $cd3_abs_values->cd3_absolute_mean : 0;
-                $sd_2 = ($cd3_abs_values->cd3_absolute_sd) ? $cd3_abs_values->cd3_absolute_sd : 0;
-                $upper_limit_2 = $mean_2 + $sd_2;
-                $lower_limit_2 = $mean_2 - $sd_2;
-                
-
-                $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,97);
-
-                
-                if($part_cd3){
-                    if($part_cd3->cd3_absolute != 0){
-                        $html_body .= '<td class="spacings">'.$part_cd3->cd3_absolute.'</td>';
-                        $zerocheck = $part_cd3->cd3_absolute - $mean_2;
-                        $cd3abs_samples++;
-
-                        // echo "<pre>";print_r($submissions);echo "</pre>";die();
-
-                        if($zerocheck == 0 || $sd_2 == 0){
-                            $sdi = 3;
-                        }else{
-                            $sdi = (($part_cd3->cd3_absolute - $mean_2) / $sd_2);
-                        }
-
-                        if($part_cd3->cd3_absolute == 0){
-                            $cd3abs_acceptable++;
-                        }
-                        
-                        if($sdi > -2 && 2 > $sdi){
-                            $cd3abs_acceptable++;
-                            $comment = "Acceptable";
-                        }else{
-                            $cd3abs_unacceptable++;
-                            $comment = "Unacceptable";
-                        }
-
-                        // array_push($tabledata, $part_cd3->cd3_absolute, $comment);
-
-                    }else{
-                        $cd3abs_unacceptable++;
-                        // array_push($tabledata, 0, "Unacceptable");
-                    }
-                        
-                }else{
-                    $cd3abs_unacceptable++;
-                    // array_push($tabledata, 0, "Unacceptable");
-                }
-                $html_body .= '<td class="spacings">'.$comment.'</td>';      
-            }
-
-            
-            foreach ($samples as $sample) {
-                $comment = '';
-                $samp_counter++;
-
-
-                $cd3_per_values = $this->getEvaluationResults($round_id, $submission->equipment_id, $sample->id,'cd3','percent');
-
-                $mean_2 = ($cd3_per_values->cd3_percent_mean) ? $cd3_per_values->cd3_percent_mean : 0;
-                $sd_2 = ($cd3_per_values->cd3_percent_sd) ? $cd3_per_values->cd3_percent_sd : 0;
-                $upper_limit_2 = $mean_2 + $sd_2;
-                $lower_limit_2 = $mean_2 - $sd_2;
-                
-
-                $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,$submission->participant_id);
-
-                
-                if($part_cd3){
-                    if($part_cd3->cd3_percent != 0){
-                        $html_body .= '<td class="spacings">'.$part_cd3->cd3_percent.'</td>';
-                        $zerocheck = $part_cd3->cd3_percent - $mean_2;
-                        $cd3per_samples++;
-
-                        if($zerocheck == 0 || $sd_2 == 0){
-                            $sdi = 3;
-                        }else{
-                            $sdi = (($part_cd3->cd3_percent - $mean_2) / $sd_2);
-                        }
-
-                        if($part_cd3->cd3_percent == 0){
-                            $cd3per_acceptable++;
-                        }
-                        
-                        if($sdi > -2 && 2 > $sdi){
-                            $cd3per_acceptable++;
-                            $comment = "Acceptable";
-                        }else{
-                            $cd3per_unacceptable++;
-                            $comment = "Unacceptable";
-                        }
-
-                        // array_push($tabledata, $part_cd3->cd3_percent, $comment);
-
-                    }else{
-                        $cd3per_unacceptable++;
-                        // array_push($tabledata, 0, "Unacceptable");
-                    }
-                        
-                }else{
-                    $cd3per_unacceptable++;
-                    // array_push($tabledata, 0, "Unacceptable");
-                }
-                $html_body .= '<td class="spacings">'.$comment.'</td>';      
-            }
-
-                         
-            foreach ($samples as $sample) {
-                $comment = '';
-                $samp_counter++;
-
-
-                $cd4_abs_values = $this->getEvaluationResults($round_id, $submission->equipment_id, $sample->id,'cd4','absolute');
+                $cd4_abs_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd4','absolute');
 
                 $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
                 $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
                 $upper_limit_2 = $mean_2 + $sd_2;
                 $lower_limit_2 = $mean_2 - $sd_2;
+
+                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+
                 
-
-                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,$submission->participant_id);
-
                 
                 if($part_cd4){
                     if($part_cd4->cd4_absolute != 0){
-                        $html_body .= '<td class="spacings">'.$part_cd4->cd4_absolute.'</td>';
+                    
                         $zerocheck = $part_cd4->cd4_absolute - $mean_2;
                         $cd4abs_samples++;
 
@@ -749,35 +638,81 @@ class Analysis extends DashboardController {
                         
                         if($sdi > -2 && 2 > $sdi){
                             $cd4abs_acceptable++;
-                            $comment = "Acceptable";
                         }else{
                             $cd4abs_unacceptable++;
-                            $comment = "Unacceptable";
                         }
 
-                        // array_push($tabledata, $part_cd4->cd4_absolute, $comment);
+                        $cd4abs_grade = (($cd4abs_acceptable / $cd4abs_samples) * 100); 
 
                     }else{
-                        $cd4abs_unacceptable++;
-                        // array_push($tabledata, 0, "Unacceptable");
+                        $cd4abs_grade = 0;
                     }
                         
                 }else{
-                    $cd4abs_unacceptable++;
-                    // array_push($tabledata, 0, "Unacceptable");
-                }
-                $html_body .= '<td class="spacings">'.$comment.'</td>';      
+                    $cd4abs_grade = 0;
+                }      
             }
 
-            
+            // echo "<pre>";print_r($cd4_abs_values);echo "</pre>";die();
+            //cd4 abs
 
-            
+            //cd3 per
+            $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
             foreach ($samples as $sample) {
                 $comment = '';
                 $samp_counter++;
+                
+                $cd3_per_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd3','percent');
 
+                $mean_2 = ($cd3_per_values->cd3_percent_mean) ? $cd3_per_values->cd3_percent_mean : 0;
+                $sd_2 = ($cd3_per_values->cd3_percent_sd) ? $cd3_per_values->cd3_percent_sd : 0;
+                $upper_limit_2 = $mean_2 + $sd_2;
+                $lower_limit_2 = $mean_2 - $sd_2;
 
-                $cd4_per_values = $this->getEvaluationResults($round_id, $submission->equipment_id, $sample->id,'cd4','percent');
+                $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                
+                if($part_cd3){
+                    if($part_cd3->cd3_percent != 0){
+                    
+                        $zerocheck = $part_cd3->cd3_percent - $mean_2;
+                        $cd3per_samples++;
+
+                        if($zerocheck == 0 || $sd_2 == 0){
+                            // echo "<pre>";print_r($zerocheck);echo "</pre>";die();
+                            $sdi = 3;
+                        }else{
+                            $sdi = (($part_cd3->cd3_percent - $mean_2) / $sd_2);
+                            
+                        }
+                        
+                        if($sdi > -2 && 2 > $sdi){
+                            $cd3per_acceptable++;
+                            // $comment = "Acceptable";
+
+                        }else{
+                            $cd3per_unacceptable++;
+                            // $comment = "Unacceptable";
+                        }
+
+                        $cd3per_grade = (($cd3per_acceptable / $cd3per_samples) * 100);
+                    }else{
+                        $cd3per_grade = 0;
+                    }
+                    
+                }else{
+                    $cd3per_grade = 0;
+                }                     
+            }
+
+            //cd3 per
+
+            //cd4 per
+            $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
+            foreach ($samples as $sample) {
+                $comment = '';
+                $samp_counter++;
+                
+                $cd4_per_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd4','percent');
 
                 $mean_2 = ($cd4_per_values->cd4_percent_mean) ? $cd4_per_values->cd4_percent_mean : 0;
                 $sd_2 = ($cd4_per_values->cd4_percent_sd) ? $cd4_per_values->cd4_percent_sd : 0;
@@ -785,51 +720,95 @@ class Analysis extends DashboardController {
                 $lower_limit_2 = $mean_2 - $sd_2;
                 
 
-                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$submission->equipment_id,$sample->id,$submission->participant_id);
+                $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
 
-                
                 if($part_cd4){
                     if($part_cd4->cd4_percent != 0){
-                        $html_body .= '<td class="spacings">'.$part_cd4->cd4_percent.'</td>';
+                    
                         $zerocheck = $part_cd4->cd4_percent - $mean_2;
                         $cd4per_samples++;
 
                         if($zerocheck == 0 || $sd_2 == 0){
                             $sdi = 3;
+                            
                         }else{
+                            
                             $sdi = (($part_cd4->cd4_percent - $mean_2) / $sd_2);
                         }
-
-                        if($part_cd4->cd4_percent == 0){
+          
+                        if($sdi > -2 && 2 > $sdi){
                             $cd4per_acceptable++;
+                            // $comment = "Acceptable";
+
+                        }else{
+                            $cd4per_unacceptable++;
+                            // $comment = "Unacceptable";
+                        } 
+
+                        $cd4per_grade = (($cd4per_acceptable / $cd4per_samples) * 100);
+                    }else{
+                        $cd4per_grade = 0;
+                    }
+                    
+                }else{
+                    $cd4per_grade = 0;
+                }                  
+            }
+            //cd4 per
+
+
+            //cd3 abs
+            $total_grade = $final_score = $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
+            foreach ($samples as $sample) {
+                $comment = '';
+                $samp_counter++;
+                  
+                $cd3_abs_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd3','absolute');
+
+                $mean_2 = ($cd3_abs_values->cd3_absolute_mean) ? $cd3_abs_values->cd3_absolute_mean : 0;
+                $sd_2 = ($cd3_abs_values->cd3_absolute_sd) ? $cd3_abs_values->cd3_absolute_sd : 0;
+                $upper_limit_2 = $mean_2 + $sd_2;
+                $lower_limit_2 = $mean_2 - $sd_2;
+
+                $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+
+                
+                if($part_cd3){
+                    if($part_cd3->cd3_absolute != 0){
+                    
+                        $zerocheck = $part_cd3->cd3_absolute - $mean_2;
+                        $cd3abs_samples++;
+
+                        if($zerocheck == 0 || $sd_2 == 0){
+                            $sdi = 5;
+                            
+                        }else{
+                            $sdi = (($part_cd3->cd3_absolute - $mean_2) / $sd_2);
                         }
                         
                         if($sdi > -2 && 2 > $sdi){
-                            $cd4per_acceptable++;
-                            $comment = "Acceptable";
+                            $cd3abs_acceptable++;
+                            // $comment = "Acceptable";
+
                         }else{
-                            $cd4per_unacceptable++;
-                            $comment = "Unacceptable";
+                            $cd3abs_unacceptable++;
+                            // $comment = "Unacceptable";
                         }
 
-                        // array_push($tabledata, $part_cd4->cd4_percent, $comment);
-
+                        $cd3abs_grade = (($cd3abs_acceptable / $cd3abs_samples) * 100);
                     }else{
-                        $cd4per_unacceptable++;
-                        // array_push($tabledata, 0, "Unacceptable");
+                        $cd3abs_grade = 0;
                     }
-                        
+                       
                 }else{
-                    $cd4per_unacceptable++;
-                    // array_push($tabledata, 0, "Unacceptable");
-                }
-                $html_body .= '<td class="spacings">'.$comment.'</td>';      
+                    $cd3abs_grade = 0;
+                }  
             }
-
 
             $total_samp = $cd3abs_samples + $cd4abs_samples + $cd3per_samples + $cd4per_samples;
             $total_accept_grade = $cd3abs_acceptable + $cd4abs_acceptable + $cd3per_acceptable + $cd4per_acceptable;
 
+            
             if($total_samp == 0){
                 $final_score = 0;
             }else{
