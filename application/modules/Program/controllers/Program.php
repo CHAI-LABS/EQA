@@ -1121,16 +1121,17 @@ class Program extends MY_Controller {
                             $comment = '';
                             $samp_counter++;
 
-                            $cd4_abs_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd4','absolute');
+                            $cd4_abs_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd4','absolute');
+
 
                             $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
                             $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
                             $upper_limit_2 = $mean_2 + $sd_2;
                             $lower_limit_2 = $mean_2 - $sd_2;
+                            
 
-                            $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                            $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
 
-                            // echo "<pre>";print_r($part_cd4);echo "</pre>";die();
                             
                             if($part_cd4){
                                 if($part_cd4->cd4_absolute != 0){
@@ -1162,10 +1163,10 @@ class Program extends MY_Controller {
                                     
                             }else{
                                 $cd4abs_grade = 0;
-                            }      
+                            }     
                         }
 
-                        // echo "<pre>";print_r($cd4_abs_values);echo "</pre>";die();
+                        
                         //cd4 abs
 
                         //cd3 per
@@ -1174,14 +1175,14 @@ class Program extends MY_Controller {
                             $comment = '';
                             $samp_counter++;
                             
-                            $cd3_per_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd3','percent');
+                            $cd3_per_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd3','percent');
 
                             $mean_2 = ($cd3_per_values->cd3_percent_mean) ? $cd3_per_values->cd3_percent_mean : 0;
                             $sd_2 = ($cd3_per_values->cd3_percent_sd) ? $cd3_per_values->cd3_percent_sd : 0;
                             $upper_limit_2 = $mean_2 + $sd_2;
                             $lower_limit_2 = $mean_2 - $sd_2;
-
-                            $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                            
+                            $part_cd3 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
                             
                             if($part_cd3){
                                 if($part_cd3->cd3_percent != 0){
@@ -1213,7 +1214,7 @@ class Program extends MY_Controller {
                                 
                             }else{
                                 $cd3per_grade = 0;
-                            }                     
+                            }            
                         }
 
                         //cd3 per
@@ -1224,15 +1225,14 @@ class Program extends MY_Controller {
                             $comment = '';
                             $samp_counter++;
                             
-                            $cd4_per_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd4','percent');
-
+                            $cd4_per_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd4','percent');
+ 
                             $mean_2 = ($cd4_per_values->cd4_percent_mean) ? $cd4_per_values->cd4_percent_mean : 0;
                             $sd_2 = ($cd4_per_values->cd4_percent_sd) ? $cd4_per_values->cd4_percent_sd : 0;
                             $upper_limit_2 = $mean_2 + $sd_2;
                             $lower_limit_2 = $mean_2 - $sd_2;
                             
-
-                            $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                            $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
 
                             if($part_cd4){
                                 if($part_cd4->cd4_percent != 0){
@@ -1264,10 +1264,10 @@ class Program extends MY_Controller {
                                 
                             }else{
                                 $cd4per_grade = 0;
-                            }                  
+                            }  
+                                
                         }
                         //cd4 per
-
 
                         //cd3 abs
                         $total_grade = $final_score = $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
@@ -1275,14 +1275,15 @@ class Program extends MY_Controller {
                             $comment = '';
                             $samp_counter++;
                               
-                            $cd3_abs_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd3','absolute');
+                            $cd3_abs_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd3','absolute');
 
+                            
                             $mean_2 = ($cd3_abs_values->cd3_absolute_mean) ? $cd3_abs_values->cd3_absolute_mean : 0;
                             $sd_2 = ($cd3_abs_values->cd3_absolute_sd) ? $cd3_abs_values->cd3_absolute_sd : 0;
                             $upper_limit_2 = $mean_2 + $sd_2;
                             $lower_limit_2 = $mean_2 - $sd_2;
-
-                            $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                          
+                            $part_cd3 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
 
                             
                             if($part_cd3){
@@ -1313,12 +1314,18 @@ class Program extends MY_Controller {
                                 }
                                    
                             }else{
-                                $cd3abs_grade = 0;
+                                // array_push($tabledata, 0, "Unacceptable");
                             }  
                         }
 
                         $total_samp = $cd3abs_samples + $cd4abs_samples + $cd3per_samples + $cd4per_samples;
                         $total_accept_grade = $cd3abs_acceptable + $cd4abs_acceptable + $cd3per_acceptable + $cd4per_acceptable;
+
+                        if($total_samp == 0){
+                            $final_score = 0;
+                        }else{
+                            $final_score = (($total_accept_grade / $total_samp) * 100);
+                        }
 
                         if($total_samp == 0){
                             $final_score = 0;
@@ -1655,7 +1662,7 @@ class Program extends MY_Controller {
                         foreach ($rounds as $round) {
                             $color = $counter = 0;
                             $labels[] = $round->pt_round_no; 
-                            
+                            $samples = $this->db->get_where('pt_samples', ['pt_round_id' =>  $round->id])->result();
                             
                             if($submissions){
 
@@ -1673,17 +1680,24 @@ class Program extends MY_Controller {
                                     foreach ($samples as $sample) {
                                         $comment = '';
                                         $samp_counter++;
+                                    
+                                        $cd4_abs_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd4','absolute');
 
-                                        $cd4_abs_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd4','absolute');
-
-                                        $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
-                                        $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
+                                        // echo "<pre>";print_r($sample->id);echo "</pre>";die();
+                                        // echo "<pre>";print_r($cd4_abs_values);echo "</pre>";die();
+                                        if($cd4_abs_values == null){
+                                            $mean_2 = 0;
+                                            $sd_2 = 0;
+                                        }else{
+                                            $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
+                                            $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
+                                        }
+                                        
                                         $upper_limit_2 = $mean_2 + $sd_2;
                                         $lower_limit_2 = $mean_2 - $sd_2;
-
-                                        $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
-
                                         
+                                        $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
+
                                         
                                         if($part_cd4){
                                             if($part_cd4->cd4_absolute != 0){
@@ -1715,10 +1729,10 @@ class Program extends MY_Controller {
                                                 
                                         }else{
                                             $cd4abs_grade = 0;
-                                        }      
+                                        }     
                                     }
 
-                                    // echo "<pre>";print_r($cd4_abs_values);echo "</pre>";die();
+                                    
                                     //cd4 abs
 
                                     //cd3 per
@@ -1727,14 +1741,21 @@ class Program extends MY_Controller {
                                         $comment = '';
                                         $samp_counter++;
                                         
-                                        $cd3_per_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd3','percent');
+                                        $cd3_per_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd3','percent');
 
-                                        $mean_2 = ($cd3_per_values->cd3_percent_mean) ? $cd3_per_values->cd3_percent_mean : 0;
-                                        $sd_2 = ($cd3_per_values->cd3_percent_sd) ? $cd3_per_values->cd3_percent_sd : 0;
+                                        if($cd3_per_values == null){
+                                            $mean_2 = 0;
+                                            $sd_2 = 0;
+                                        }else{
+                                            $mean_2 = ($cd3_per_values->cd3_percent_mean) ? $cd3_per_values->cd3_percent_mean : 0;
+                                            $sd_2 = ($cd3_per_values->cd3_percent_sd) ? $cd3_per_values->cd3_percent_sd : 0;
+                                        }
+
+                                        
                                         $upper_limit_2 = $mean_2 + $sd_2;
                                         $lower_limit_2 = $mean_2 - $sd_2;
-
-                                        $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                                        
+                                        $part_cd3 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
                                         
                                         if($part_cd3){
                                             if($part_cd3->cd3_percent != 0){
@@ -1766,7 +1787,7 @@ class Program extends MY_Controller {
                                             
                                         }else{
                                             $cd3per_grade = 0;
-                                        }                     
+                                        }            
                                     }
 
                                     //cd3 per
@@ -1777,15 +1798,21 @@ class Program extends MY_Controller {
                                         $comment = '';
                                         $samp_counter++;
                                         
-                                        $cd4_per_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd4','percent');
+                                        $cd4_per_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd4','percent');
 
-                                        $mean_2 = ($cd4_per_values->cd4_percent_mean) ? $cd4_per_values->cd4_percent_mean : 0;
-                                        $sd_2 = ($cd4_per_values->cd4_percent_sd) ? $cd4_per_values->cd4_percent_sd : 0;
+                                        if($cd4_per_values == null){
+                                            $mean_2 = 0;
+                                            $sd_2 = 0;
+                                        }else{
+                                            $mean_2 = ($cd4_per_values->cd4_percent_mean) ? $cd4_per_values->cd4_percent_mean : 0;
+                                            $sd_2 = ($cd4_per_values->cd4_percent_sd) ? $cd4_per_values->cd4_percent_sd : 0;
+                                        }
+             
+                                        
                                         $upper_limit_2 = $mean_2 + $sd_2;
                                         $lower_limit_2 = $mean_2 - $sd_2;
                                         
-
-                                        $part_cd4 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                                        $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
 
                                         if($part_cd4){
                                             if($part_cd4->cd4_percent != 0){
@@ -1817,10 +1844,10 @@ class Program extends MY_Controller {
                                             
                                         }else{
                                             $cd4per_grade = 0;
-                                        }                  
+                                        }  
+                                            
                                     }
                                     //cd4 per
-
 
                                     //cd3 abs
                                     $total_grade = $final_score = $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
@@ -1828,14 +1855,21 @@ class Program extends MY_Controller {
                                         $comment = '';
                                         $samp_counter++;
                                           
-                                        $cd3_abs_values = $this->getEvaluationResults($round_id, $participant->equipment_id, $sample->id,'cd3','absolute');
+                                        $cd3_abs_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd3','absolute');
 
-                                        $mean_2 = ($cd3_abs_values->cd3_absolute_mean) ? $cd3_abs_values->cd3_absolute_mean : 0;
-                                        $sd_2 = ($cd3_abs_values->cd3_absolute_sd) ? $cd3_abs_values->cd3_absolute_sd : 0;
+                                        if($cd3_abs_values == null){
+                                            $mean_2 = 0;
+                                            $sd_2 = 0;
+                                        }else{
+                                            $mean_2 = ($cd3_abs_values->cd3_absolute_mean) ? $cd3_abs_values->cd3_absolute_mean : 0;
+                                            $sd_2 = ($cd3_abs_values->cd3_absolute_sd) ? $cd3_abs_values->cd3_absolute_sd : 0;
+                                        }
+
+                                        
                                         $upper_limit_2 = $mean_2 + $sd_2;
                                         $lower_limit_2 = $mean_2 - $sd_2;
-
-                                        $part_cd3 = $this->Analysis_m->absoluteValue($round_id,$participant->equipment_id,$sample->id,$participant->p_id);
+                                      
+                                        $part_cd3 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
 
                                         
                                         if($part_cd3){
@@ -1846,7 +1880,7 @@ class Program extends MY_Controller {
 
                                                 if($zerocheck == 0 || $sd_2 == 0){
                                                     $sdi = 5;
-                                                    
+                                                    // echo "<pre>";print_r($zerocheck);echo "</pre>";die();
                                                 }else{
                                                     $sdi = (($part_cd3->cd3_absolute - $mean_2) / $sd_2);
                                                 }
@@ -1866,7 +1900,7 @@ class Program extends MY_Controller {
                                             }
                                                
                                         }else{
-                                            $cd3abs_grade = 0;
+                                            // array_push($tabledata, 0, "Unacceptable");
                                         }  
                                     }
 
@@ -1915,7 +1949,8 @@ class Program extends MY_Controller {
                                                                                 
                                         if($partvalue['label'] == $participant->participant_id){
                                            
-                                            array_push($facility_participants[$partkey]['data'], round($pass_rate, 2));
+                                            array_push($facility_participants[$partkey]['data'], round($final_score, 2));
+                                            // array_push($facility_participants[$partkey]['data'], round($pass_rate, 2));
                                             
                                         }
                                     }
@@ -2186,12 +2221,12 @@ class Program extends MY_Controller {
 
                             $cd4_abs_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd4','absolute');
 
-                            
+                            // echo "<pre>";print_r($sample->id);echo "</pre>";die();
 
-                                $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
-                                $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
-                                $upper_limit_2 = $mean_2 + $sd_2;
-                                $lower_limit_2 = $mean_2 - $sd_2;
+                            $mean_2 = ($cd4_abs_values->cd4_absolute_mean) ? $cd4_abs_values->cd4_absolute_mean : 0;
+                            $sd_2 = ($cd4_abs_values->cd4_absolute_sd) ? $cd4_abs_values->cd4_absolute_sd : 0;
+                            $upper_limit_2 = $mean_2 + $sd_2;
+                            $lower_limit_2 = $mean_2 - $sd_2;
                             
 
                             $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
@@ -2230,7 +2265,7 @@ class Program extends MY_Controller {
                             }     
                         }
 
-                        // echo "<pre>";print_r($cd4_abs_values);echo "</pre>";die();
+                        
                         //cd4 abs
 
                         //cd3 per
@@ -2241,14 +2276,11 @@ class Program extends MY_Controller {
                             
                             $cd3_per_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd3','percent');
 
-                                $mean_2 = ($cd3_per_values->cd3_percent_mean) ? $cd3_per_values->cd3_percent_mean : 0;
-                                $sd_2 = ($cd3_per_values->cd3_percent_sd) ? $cd3_per_values->cd3_percent_sd : 0;
-                                $upper_limit_2 = $mean_2 + $sd_2;
-                                $lower_limit_2 = $mean_2 - $sd_2;
+                            $mean_2 = ($cd3_per_values->cd3_percent_mean) ? $cd3_per_values->cd3_percent_mean : 0;
+                            $sd_2 = ($cd3_per_values->cd3_percent_sd) ? $cd3_per_values->cd3_percent_sd : 0;
+                            $upper_limit_2 = $mean_2 + $sd_2;
+                            $lower_limit_2 = $mean_2 - $sd_2;
                             
-
-                            
-
                             $part_cd3 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
                             
                             if($part_cd3){
@@ -2293,14 +2325,12 @@ class Program extends MY_Controller {
                             $samp_counter++;
                             
                             $cd4_per_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd4','percent');
-
+ 
+                            $mean_2 = ($cd4_per_values->cd4_percent_mean) ? $cd4_per_values->cd4_percent_mean : 0;
+                            $sd_2 = ($cd4_per_values->cd4_percent_sd) ? $cd4_per_values->cd4_percent_sd : 0;
+                            $upper_limit_2 = $mean_2 + $sd_2;
+                            $lower_limit_2 = $mean_2 - $sd_2;
                             
-                                $mean_2 = ($cd4_per_values->cd4_percent_mean) ? $cd4_per_values->cd4_percent_mean : 0;
-                                $sd_2 = ($cd4_per_values->cd4_percent_sd) ? $cd4_per_values->cd4_percent_sd : 0;
-                                $upper_limit_2 = $mean_2 + $sd_2;
-                                $lower_limit_2 = $mean_2 - $sd_2;
-                            
-
                             $part_cd4 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
 
                             if($part_cd4){
@@ -2338,7 +2368,6 @@ class Program extends MY_Controller {
                         }
                         //cd4 per
 
-
                         //cd3 abs
                         $total_grade = $final_score = $lower_limit_2 = $upper_limit_2 = $sd_2 = $mean_2 = $samp_counter = 0;
                         foreach ($samples as $sample) {
@@ -2348,13 +2377,11 @@ class Program extends MY_Controller {
                             $cd3_abs_values = $this->getEvaluationResults($round->id, $participant->equipment_id, $sample->id,'cd3','absolute');
 
                             
-                                $mean_2 = ($cd3_abs_values->cd3_absolute_mean) ? $cd3_abs_values->cd3_absolute_mean : 0;
-                                $sd_2 = ($cd3_abs_values->cd3_absolute_sd) ? $cd3_abs_values->cd3_absolute_sd : 0;
-                                $upper_limit_2 = $mean_2 + $sd_2;
-                                $lower_limit_2 = $mean_2 - $sd_2;
-                            
-
-
+                            $mean_2 = ($cd3_abs_values->cd3_absolute_mean) ? $cd3_abs_values->cd3_absolute_mean : 0;
+                            $sd_2 = ($cd3_abs_values->cd3_absolute_sd) ? $cd3_abs_values->cd3_absolute_sd : 0;
+                            $upper_limit_2 = $mean_2 + $sd_2;
+                            $lower_limit_2 = $mean_2 - $sd_2;
+                          
                             $part_cd3 = $this->Analysis_m->absoluteValue($round->id,$participant->equipment_id,$sample->id,$participant->p_id);
 
                             
@@ -2398,6 +2425,9 @@ class Program extends MY_Controller {
                         }else{
                             $final_score = (($total_accept_grade / $total_samp) * 100);
                         }
+
+
+                // echo "<pre>";print_r($final_score);echo "</pre>";die();
                         
                         if($final_score >= 80){
                             $passed++;
@@ -2417,11 +2447,20 @@ class Program extends MY_Controller {
                 
 
                 $labels[] = $round->pt_round_no;
-                $no_participants['data'][] = $pass_rate;
+
+                if($facility_id == 0){
+                    $no_participants['data'][] = $pass_rate;
+                }else{
+                    $no_participants['data'][] = $final_score;
+                }
+                
 
                 $counter++;
+
             }
         }
+
+
 
         $graph_data['labels'] = $labels;
         $graph_data['datasets'] = [$no_participants];

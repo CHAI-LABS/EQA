@@ -174,7 +174,7 @@ class Import extends MY_Controller {
 
 
 	function importRoundDataSubmissions(){
-		//new round change excel name (1), round id (1), sample id (1)
+		//when creating a new round, change excel name (1), round id (1), sample id (1)
 
 		$file_path = './uploads/data/R18_Results.xlsx';
 
