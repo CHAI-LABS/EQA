@@ -99,7 +99,7 @@
 
 <?php } ?>
 
-<?php if($capa_check){ ?>
+<?php if($capa_check == 1){ ?>
 	<div class="col-md-12 container-fluid">
 	    <div class="animated fadeIn">
 	        <!-- <div class="card-columns col-2"> -->
@@ -126,6 +126,32 @@
 	    	<!-- </div> -->
 		</div>
 	</div>
+	<?php }else{ ?>
+		<div class="col-md-12 container-fluid">
+		    <div class="animated fadeIn">
+		        <!-- <div class="card-columns col-2"> -->
+
+			        <div class="col-md-12 container-fluid">
+			            <div class="animated fadeIn">
+			                <div class="card" style="width:100%";>
+			                    <div class="card-header">
+			                         <strong class="criteria"><?= @$subject_from_sender; ?></strong>
+			                        <div class="card-actions">
+			                        </div>
+			                    </div>
+			                    <div class="card-block">
+			                        <div class="chart-wrapper">
+			                        	<div class = "pull-left"><?= @$message_from_sender; ?></div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </div>
+			        </div>
+			        
+		    	<!-- </div> -->
+			</div>
+		</div>
+
 	<?php } ?>
 
 
