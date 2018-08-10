@@ -240,13 +240,13 @@ class Analysis_m extends CI_Model {
     public function getParticipantsResults($round_id, $equipment_id = null, $sample_id, $participant_ids = null){
 
         if($equipment_id){
-            $equip_where = 'AND equipment_id = '. $equipment_id;
+            $equip_where = 'AND pds.equipment_id = '. $equipment_id;
         }else{
             $equip_where = null;
         }
 
         if ($participant_ids) {
-            $participants = 'AND participant_id IN ('.$participant_ids.')';
+            $participants = 'AND pds.participant_id IN ('.$participant_ids.')';
         }else{
             $participants = '';
         }
@@ -579,11 +579,11 @@ class Analysis_m extends CI_Model {
     FROM
         (`pt_data_submission` `pds`
         JOIN `pt_equipment_results` `per` ON ((`pds`.`id` = `per`.`equip_result_id`)))
-        WHERE round_id = $round_id
+        WHERE pds.round_id = $round_id
         $participants
         $equip_where
-        AND sample_id = $sample_id
-    GROUP BY `per`.`sample_id` , `pds`.`equipment_id`";
+        AND `per`.sample_id = $sample_id
+        GROUP BY `per`.`sample_id` , `pds`.`equipment_id`";
 
     $query = $this->db->query($sql);
 

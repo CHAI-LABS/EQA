@@ -2370,7 +2370,6 @@ class Analysis extends DashboardController {
                     echo "<pre>";print_r("Something went wrong");echo "</pre>";die();
                 break;
             }
-            // echo "<pre>";print_r($calculated_values_2);echo "</pre>";die();
 
             switch ($form) {
                 case 'table':
@@ -2969,7 +2968,7 @@ class Analysis extends DashboardController {
 
 
     public function getEvaluationResults($round_id, $equipment_id, $sample_id, $type, $type2){
-        $accepted = $unaccepted = [];
+        $reviewparticipants = $accepted = $unaccepted = [];
 
         $calculated_values = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample_id,'');
 
@@ -3247,13 +3246,22 @@ class Analysis extends DashboardController {
             break;
         }
 
+        foreach ($accepted as $acc => $partid) {
 
-        $parts = implode(",",$accepted);
-        
-        $calculated_values_2 = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample_id,$parts);
+            $round_uuid = $this->db->get_where('pt_round_v', ['id' => $round_id])->row()->uuid;
+            $verdict = $this->db->get_where('pt_ready_participants', ['p_id' => $partid,'verdict' => 1,'pt_round_uuid' => $round_uuid])->row();
+            
+            if($verdict){
+                array_push($reviewparticipants, $partid); 
+            }
+        }
+
+
+        $parts = implode(",",$reviewparticipants);
 
         // echo "<pre>";print_r($parts);echo "</pre>";die();
 
+        $calculated_values_2 = $this->Analysis_m->getParticipantsResults($round_id, $equipment_id, $sample_id,$parts);
 
         return $calculated_values_2;
     }
