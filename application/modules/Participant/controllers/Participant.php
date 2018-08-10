@@ -93,9 +93,6 @@ class Participant extends MY_Controller {
 		}	    
     }
 
-
-
-
 	public function CapaForm($pt_uuid){
 		$sampledata = '';
 		// $this->checkLogin($pt_uuid);
@@ -113,12 +110,13 @@ class Participant extends MY_Controller {
 			$sampledata .= '<strong>Sample Name</strong> : '. $sample_name . '<br/> <strong>Value Entered</strong> : ' . $value->cd4_absolute . '<br/><br/>';
 		}
 
+		// echo "<pre>";print_r($pt_uuid);echo "</pre>";die();
+
         $data = [
         	'sampledata' => $sampledata,
         	'pt_uuid' => $pt_uuid
         ];
 
-		// echo "<pre>";print_r($capa_info);echo "</pre>";die();
 
 
         $title = "CAPA Form";
@@ -158,26 +156,23 @@ class Participant extends MY_Controller {
             $attributes = $this->input->post('attribute');
             $other = $this->input->post('other');
 
-			// echo "<pre>";print_r($tests);echo "</pre>";die();
+			// echo "<pre>";print_r($round_uuid);echo "</pre>";die();
+			$capacheck = $this->db->get_where('capa_review', ['participant_uuid' => $participantuuid, 'round_uuid' => $round_uuid])->row();
 
-            $insertcapadata = [
-            	'round_uuid'		=>	$round_uuid,
-            	'participant_uuid'			=>	$participantuuid,
-            	'facility_id'				=>	$facilityid,
-                'occurrence'    	  		=>  $occurrence,
-                'cause'    			=>  $cause,
-                'correction'  =>  $correction,
-                'effective'    			=>  $effective,
-                'prevention'  =>  $prevention,
-                'approved'  =>  0,
-                'status'  =>  0
-            ];
+			if($capacheck){
+				$capa_id = $capacheck->id;
+				$this->db->set('occurrence',$occurrence);
+				$this->db->set('cause',$cause);
+				$this->db->set('correction',$correction);
+				$this->db->set('effective',$effective);
+				$this->db->set('prevention',$prevention);
+
+				$this->db->where('id',$capa_id);
+				$this->db->update('capa_response');
 
 
-            if($this->db->insert('capa_response', $insertcapadata)){
-            	$capa_id = $this->db->insert_id();
-
-            	foreach ($tests as $test) {
+				$this->db->delete('capa_tests', array('capa_test_id' => $capa_id));
+				foreach ($tests as $test) {
 	            	$inserttestsedata = [
 		            	'capa_test_id'	=>	$capa_id,
 		            	'applied_test'		=>	$test
@@ -185,7 +180,8 @@ class Participant extends MY_Controller {
 	            	$this->db->insert('capa_tests', $inserttestsedata);
             	}
 
-            	foreach ($attributes as $attribute) {
+            	$this->db->delete('capa_attributes', array('capa_attribute_id' => $capa_id));
+				foreach ($attributes as $attribute) {
             		if($attribute == "Other"){
             			$insertattributesdata = [
 			            	'capa_attribute_id'		=>	$capa_id,
@@ -201,9 +197,57 @@ class Participant extends MY_Controller {
             		}
 	            	
 	            	$this->db->insert('capa_attributes', $insertattributesdata);
-            	}	
-	            
-            }
+            	}
+
+			}else{
+
+				$insertcapadata = [
+	            	'round_uuid'		=>	$round_uuid,
+	            	'participant_uuid'			=>	$participantuuid,
+	            	'facility_id'				=>	$facilityid,
+	                'occurrence'    	  		=>  $occurrence,
+	                'cause'    			=>  $cause,
+	                'correction'  =>  $correction,
+	                'effective'    			=>  $effective,
+	                'prevention'  =>  $prevention,
+	                'approved'  =>  0,
+	                'status'  =>  0
+	            ];
+
+
+	            if($this->db->insert('capa_response', $insertcapadata)){
+	            	$capa_id = $this->db->insert_id();
+
+	            	foreach ($tests as $test) {
+		            	$inserttestsedata = [
+			            	'capa_test_id'	=>	$capa_id,
+			            	'applied_test'		=>	$test
+		            	];
+		            	$this->db->insert('capa_tests', $inserttestsedata);
+	            	}
+
+	            	foreach ($attributes as $attribute) {
+	            		if($attribute == "Other"){
+	            			$insertattributesdata = [
+				            	'capa_attribute_id'		=>	$capa_id,
+				            	'attribute_factor'		=>	$attribute,
+				            	'specific_other'	=>	$other
+		            		];
+	            		}else{
+	            			$insertattributesdata = [
+				            	'capa_attribute_id'		=>	$capa_id,
+				            	'attribute_factor'		=>	$attribute,
+				            	'specific_other'	=>	''
+			            	];
+	            		}
+		            	
+		            	$this->db->insert('capa_attributes', $insertattributesdata);
+	            	}	
+		            
+	            }
+			}
+
+            
 
 
             redirect('Dashboard/', 'refresh');

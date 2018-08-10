@@ -160,6 +160,8 @@ class Analysis extends DashboardController {
     public function createCapaTable($round_uuid){
         $template = $this->config->item('default');
 
+        // echo "<pre>";print_r($round_uuid);echo "</pre>";die();
+
         $heading = [
             "No.",
             "Participant",
@@ -175,10 +177,13 @@ class Analysis extends DashboardController {
         if($capas){
             $counter = 0;
             foreach($capas as $capa){
-                // echo "<pre>";print_r($capa);echo "</pre>";die();
+                
                 $counter ++;
 
                 $participant_id = $this->db->get_where('participant_readiness_v', ['uuid' => $capa->participant_uuid])->row();
+
+                // $participant_uuid = $this->db->get_where('participant_readiness_v', ['uuid' => $capa->participant_uuid])->row();
+
 
                 if($participant_id){
                     $participant_id = $participant_id->username;
@@ -198,9 +203,9 @@ class Analysis extends DashboardController {
                 $view = "<a class = 'btn btn-info btn-sm dropdown-item' href = '".base_url('Analysis/CapaView/' . $capa->participant_uuid .'/'. $capa->round_uuid)."'><i class = 'icon-eye'></i>&nbsp;View</a>";
 
                 if($capa->status == 0){
-                    $review = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/MarkReview/1/' . $capa->id)."'><i class = 'icon-eye'></i>&nbsp;Mark as Reviewed</a>";
+                    $review = "<a class = 'btn btn-success btn-sm dropdown-item' href = '".base_url('Analysis/MarkReview/'.$round_uuid.'/'.$capa->participant_uuid.'/1/' . $capa->id)."'><i class = 'icon-eye'></i>&nbsp;Mark as Reviewed</a>";
                 }else{
-                    $review = "<a class = 'btn btn-danger btn-sm dropdown-item' href = '".base_url('Analysis/MarkReview/0/' . $capa->id)."'><i class = 'icon-eye'></i>&nbsp;Mark as not Reviewed</a>";
+                    $review = "<a class = 'btn btn-danger btn-sm dropdown-item' href = '".base_url('Analysis/MarkReview/'.$round_uuid.'/'.$capa->participant_uuid.'/0/' . $capa->id)."'><i class = 'icon-eye'></i>&nbsp;Mark as not Reviewed</a>";
                 }
 
                 $dropdown = "<div class = 'dropdown'>
@@ -226,7 +231,7 @@ class Analysis extends DashboardController {
                         "CAPA Table"
                     ];
             $tabledata[] = [
-                    "No CAPA Reponses were sent"
+                    "No CAPA Reponses were sent, or not yet approved by the QA / Supervisor"
                 ];
         }
         $this->table->set_heading($heading);
@@ -384,14 +389,16 @@ class Analysis extends DashboardController {
                             </div>
                         </div>
 
-                        <a href="'. base_url('Analysis/MarkReview/1/' . $capa->id) .'"><button id="submit-capa" type="submit" class="btn btn-block btn-primary">Mark as Reviewed</button></a>';
+                        <a href="'. base_url('Analysis/MarkReview/'.$round_uuid.'/'.$participant_uuid.'/1/' . $capa->id) .'"><button id="submit-capa" type="submit" class="btn btn-block btn-primary">Mark as Reviewed</button></a>';
         
 
         return $capa_view;
     }
 
-    function MarkReview($type, $capa_id){
+    function MarkReview($round_uuid,$participant_uuid,$type, $capa_id){
         $response = [];
+
+        $capacheck = $this->db->get_where('capa_review', ['participant_uuid' => $participant_uuid, 'round_uuid' => $round_uuid])->row();
 
             $update_data = [];
 
@@ -413,7 +420,7 @@ class Analysis extends DashboardController {
                     'message'   =>  "There was a problem marking the CAPA"
                 ];
             }
-        $this->Capa();
+        $this->Capa($round_uuid);
     }
 
     public function createPTTable()
