@@ -28,7 +28,7 @@
 					<label class="col-sm-3" class = "control-label">Date of Receipt</label>
 					<div class="col-sm-9">
 						<input type="text" name="participant_received_date" class = "form-control" value="<?= @date('m/d/Y'); ?>" required>
-						<span class="help-block">Format: month/day/year e.g. 02/01/2017</span>
+						<span class="help-block">Format: month/day/year e.g. 12/31/2019</span>
 					</div>
 					
 				</div>

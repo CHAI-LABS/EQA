@@ -7,7 +7,7 @@
 <html lang="zxx">
 
 
-<!-- Mirrored from www.styllustheme.com/ThemeUnit/thirdeye-preview/thirdeye/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 13 Apr 2017 11:04:22 GMT -->
+<!-- Mirrored from www.styllustheme.com/ThemeUnit/thirdeye-preview/thirdeye/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 13 Apr 2019 11:04:22 GMT -->
 <head>
     <!-- Basic Page Needs  -->
     <meta charset="utf-8">
@@ -119,7 +119,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12">
-                    <p class="footer-copyright">EQA Copyright © 2017. All Rights Reserved</p>
+                    <p class="footer-copyright">EQA Copyright © 2019. All Rights Reserved</p>
                 </div>
             </div>
         </div>

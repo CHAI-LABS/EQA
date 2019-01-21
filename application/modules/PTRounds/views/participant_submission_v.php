@@ -12,7 +12,7 @@
 
 
   	<div class = 'alert alert-warning'>
-	    Data submissions for this round is to end <span class="text-danger">before 26 May, 2017</span>
+	    Data submissions for this round is to end <span class="text-danger">before 26 May, 2019</span>
     </div>
     <div class="col-md-12 mb-2 pull-right"><a href = "<?= @base_url('PTRounds/PTRounds/ReadyParticipants/'.$pt_uuid); ?> "> <button class = "btn btn-primary btn-sm"><i class = "fa fa-arrow-left"></i>  Back to Ready Participants</button></a><br /><br /></div>
 		<div class="col-md-12 mb-2">
